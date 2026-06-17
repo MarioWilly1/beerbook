@@ -6,7 +6,9 @@ import BeerCard from "../components/BeerCard";
 const Dashboard = () => {
   const { beers, loading, error } = useBeers();
   const { userBeers, refetch } = useUserBeers();
+
   const [refresh, setRefresh] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (refresh) {
@@ -18,9 +20,34 @@ const Dashboard = () => {
   if (loading) return <p>Cargando cervezas...</p>;
   if (error) return <p>Error: {error}</p>;
 
+  // 🔍 FILTRO DE BÚSQUEDA
+  const filteredBeers = beers.filter((beer) =>
+    beer.nombre?.toLowerCase().includes(search.toLowerCase()) ||
+    beer.pais?.toLowerCase().includes(search.toLowerCase()) ||
+    beer.estilo?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <h1>Catálogo de Cervezas</h1>
+
+      {/* 🔍 SEARCH BAR */}
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="🔍 Buscar cerveza, país o estilo..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            fontSize: "16px",
+          }}
+        />
+      </div>
+
       <div
         style={{
           display: "grid",
@@ -28,7 +55,7 @@ const Dashboard = () => {
           gap: "15px",
         }}
       >
-        {beers.map((beer) => {
+        {filteredBeers.map((beer) => {
           const myBeerData = userBeers.find((b) => b.beer_id === beer.id);
           const isInMyBeers = !!myBeerData;
 
@@ -49,4 +76,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

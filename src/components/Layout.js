@@ -1,61 +1,17 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { supabase } from "../services/supabase";
+import UserLevelCard from "./UserLevelCard";
 
-const Layout = ({ children }) => {
-  const [session, setSession] = React.useState(null);
-
-  React.useEffect(() => {
-    // Obtener sesión actual
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-    };
-
-    getSession();
-
-    // Escuchar cambios de sesión
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
+const Layout = ({ children, session, profile }) => {
   const username =
+    profile?.nombre ||
     session?.user?.user_metadata?.full_name ||
     session?.user?.email ||
-    "Invitado";
+    "Usuario";
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setSession(null);
-  };
-
-  const handleLogin = async () => {
-    const method = prompt(
-      "Elige método de inicio de sesión:\n1 = Email/Contraseña\n2 = Google"
-    );
-
-    if (method === "1") {
-      const email = prompt("Introduce tu correo:");
-      const password = prompt("Introduce tu contraseña:");
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) alert("❌ Error al iniciar sesión: " + error.message);
-    } else if (method === "2") {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-      });
-
-      if (error) alert("❌ Error al iniciar sesión con Google: " + error.message);
-    }
   };
 
   return (
@@ -75,7 +31,6 @@ const Layout = ({ children }) => {
           padding: "24px 16px",
         }}
       >
-        {/* TOP */}
         <div>
           <h1
             style={{
@@ -92,29 +47,31 @@ const Layout = ({ children }) => {
               textAlign: "center",
               fontSize: "14px",
               opacity: 0.85,
-              marginBottom: "24px",
+              marginBottom: "16px",
             }}
           >
             👤 {username}
           </p>
 
+          <UserLevelCard />
+
           <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <SidebarLink to="/" label="Catálogo" />
             <SidebarLink to="/cuaderno" label="Mi Cuaderno" />
+            <SidebarLink to="/feed" label="📡 Feed" />
+            <SidebarLink to="/amigos" label="👥 Amigos" />
+            <SidebarLink to="/logros" label="Logros" />
+            <SidebarLink to="/ranking" label="Ranking" />
             <SidebarLink to="/sobre-nosotros" label="Sobre nosotros" />
           </nav>
         </div>
 
-        {/* BOTTOM */}
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <SidebarButton
             label="⚙️ Configuración"
             onClick={() => alert("Sección de configuración")}
           />
-          <SidebarButton
-            label={session ? "🚪 Cerrar sesión" : "🔐 Iniciar sesión"}
-            onClick={session ? handleLogout : handleLogin}
-          />
+          <SidebarButton label="🚪 Cerrar sesión" onClick={handleLogout} />
         </div>
       </aside>
 
@@ -132,8 +89,6 @@ const Layout = ({ children }) => {
     </div>
   );
 };
-
-/* ---------------- COMPONENTES AUX ---------------- */
 
 const SidebarLink = ({ to, label }) => (
   <NavLink

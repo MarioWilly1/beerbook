@@ -20,6 +20,9 @@ export const useMyBeers = () => {
         .select(`
           times,
           comment,
+          "Rating",
+          user_photo_url,
+          commercialized,
           beers_new (
             id,
             nombre,
@@ -33,10 +36,13 @@ export const useMyBeers = () => {
         .eq("user_id", session.user.id);
 
       if (!error && data) {
-        const mapped = data.map(row => ({
+        const mapped = data.map((row) => ({
           ...row.beers_new,
           times: row.times,
           comment: row.comment,
+          Rating: row.Rating,
+          user_photo_url: row.user_photo_url,
+          commercialized: row.commercialized,
         }));
         setBeers(mapped);
       }

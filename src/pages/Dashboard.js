@@ -3,10 +3,12 @@ import { useBeers } from "../hooks/useBeers";
 import { useUserBeers } from "../hooks/useUserBeers";
 import BeerCard from "../components/BeerCard";
 import BeerFilters from "../components/BeerFilters";
+import { useUserStats } from "../hooks/useUserStats";
 
 const Dashboard = () => {
   const { beers, loading, error } = useBeers();
   const { userBeers, refetch } = useUserBeers();
+  const { stats, refetch: refetchStats } = useUserStats();
 
   const [refresh, setRefresh] = useState(false);
 
@@ -18,9 +20,10 @@ const Dashboard = () => {
   useEffect(() => {
     if (refresh) {
       refetch();
+      refetchStats();
       setRefresh(false);
     }
-  }, [refresh, refetch]);
+  }, [refresh, refetch, refetchStats]);
 
   if (loading) return <p>Cargando cervezas...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -29,8 +32,12 @@ const Dashboard = () => {
     .filter((beer) =>
       beer.nombre?.toLowerCase().includes(search.toLowerCase())
     )
-    .filter((beer) => !styleFilter || beer.estilo?.toLowerCase().includes(styleFilter))
-    .filter((beer) => !countryFilter || beer.pais?.toLowerCase().includes(countryFilter))
+    .filter((beer) =>
+      !styleFilter || beer.estilo?.toLowerCase().includes(styleFilter)
+    )
+    .filter((beer) =>
+      !countryFilter || beer.pais?.toLowerCase().includes(countryFilter)
+    )
     .filter((beer) => {
       if (!alcoholFilter) return true;
       if (alcoholFilter === "low") return beer.alcohol <= 5;
@@ -43,7 +50,20 @@ const Dashboard = () => {
     <div>
       <h1>🍺 Catálogo de Cervezas</h1>
 
-      {/* 🔥 ESTO DEBE APARECER SI O SI */}
+      {/* 🏆 MINI PANEL DE JUEGO */}
+      <div
+        style={{
+          padding: "10px",
+          marginBottom: "15px",
+          background: "#111",
+          color: "#fff",
+          borderRadius: "10px",
+          fontSize: "14px",
+        }}
+      >
+        🏆 Nivel: {stats.level} | ⭐ XP: {stats.xp} | 🍺 Cervezas: {stats.beers}
+      </div>
+
       <BeerFilters
         search={search}
         setSearch={setSearch}
@@ -55,11 +75,13 @@ const Dashboard = () => {
         setAlcoholFilter={setAlcoholFilter}
       />
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        gap: "15px"
-      }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "15px",
+        }}
+      >
         {filteredBeers.map((beer) => (
           <BeerCard
             key={beer.id}

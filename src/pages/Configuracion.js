@@ -36,11 +36,13 @@ const Toggle = ({ value, onChange, label, description }) => (
 );
 
 // ── Main component ────────────────────────────────────────────────────────────
-const Configuracion = () => {
+const Configuracion = ({ onProfileChange }) => {
   const [tab, setTab] = useState("perfil");
   const [session, setSession] = useState(null);
   const [localProfile, setLocalProfile] = useState(null);
 
+  const [nombre, setNombre]     = useState("");
+  const [nombreError, setNombreError] = useState("");
   const [bio, setBio]           = useState("");
   const [pais, setPais]         = useState("");
   const [featuredBadges, setFeaturedBadges] = useState([]);
@@ -66,6 +68,7 @@ const Configuracion = () => {
         .single();
       if (data) {
         setLocalProfile(data);
+        setNombre(data.nombre || "");
         setBio(data.bio || "");
         setPais(data.pais_origen || "");
         setFeaturedBadges(data.featured_badges || []);
@@ -78,12 +81,26 @@ const Configuracion = () => {
 
   const handleSavePerfil = async () => {
     if (!session) return;
+    const trimmedNombre = nombre.trim();
+    if (!trimmedNombre) {
+      setNombreError("El nombre no puede estar vacío.");
+      return;
+    }
+    if (trimmedNombre.length < 2) {
+      setNombreError("Mínimo 2 caracteres.");
+      return;
+    }
+    setNombreError("");
     setSaving(true);
     await supabase.from("profiles").update({
+      nombre: trimmedNombre,
       bio: bio.trim() || null,
       pais_origen: pais.trim() || null,
       featured_badges: featuredBadges,
     }).eq("id", session.user.id);
+    setNombre(trimmedNombre);
+    setLocalProfile((p) => ({ ...p, nombre: trimmedNombre }));
+    if (onProfileChange) onProfileChange({ nombre: trimmedNombre });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -150,6 +167,27 @@ const Configuracion = () => {
               >
                 Cambiar avatar →
               </button>
+            </div>
+          </div>
+
+          {/* Nombre de usuario */}
+          <div style={{ marginBottom: 20 }}>
+            <label style={labelStyle}>Nombre de usuario</label>
+            <input
+              type="text"
+              value={nombre}
+              onChange={(e) => {
+                if (e.target.value.length <= 30) setNombre(e.target.value);
+                if (nombreError) setNombreError("");
+              }}
+              placeholder="Tu nombre visible en la app"
+              style={{ ...inputStyle, borderColor: nombreError ? "#c0392b" : "#e0e0e0" }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
+              <span style={{ fontSize: 11, color: "#c0392b" }}>{nombreError}</span>
+              <span style={{ fontSize: 11, color: nombre.length >= 28 ? "#c0392b" : "#bbb" }}>
+                {nombre.length}/30
+              </span>
             </div>
           </div>
 

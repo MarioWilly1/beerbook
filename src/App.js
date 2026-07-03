@@ -75,7 +75,7 @@ function App() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/amigos" element={<Amigos />} />
         <Route path="/sobre-nosotros" element={<SobreNosotros />} />
-        <Route path="/configuracion" element={<Configuracion />} />
+        <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
         <Route path="/perfil/:userId" element={<ProfilePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

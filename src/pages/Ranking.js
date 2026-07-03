@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRanking } from "../hooks/useRanking";
 import { getLevelInfo } from "../utils/xp";
+import Avatar from "../components/Avatar";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
@@ -19,7 +20,7 @@ const RankingRow = ({ entry, isSelf }) => {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 14,
+        gap: 12,
         padding: "12px 16px",
         marginBottom: 8,
         borderRadius: 12,
@@ -27,7 +28,7 @@ const RankingRow = ({ entry, isSelf }) => {
         border: isSelf
           ? "2px solid #d4af37"
           : pos <= 3
-          ? `2px solid ${["#ffd700", "#c0c0c0", "#cd7f32"][pos - 1]}`
+          ? `2px solid ${["#ffd700","#c0c0c0","#cd7f32"][pos - 1]}`
           : "1px solid #eee",
         fontWeight: isSelf ? 700 : 400,
       }}
@@ -35,6 +36,8 @@ const RankingRow = ({ entry, isSelf }) => {
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#888" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
+
+      <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
 
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: "#111" }}>
@@ -83,19 +86,14 @@ const Ranking = () => {
       <h2 style={{ margin: "0 0 4px" }}>🏆 Ranking BeerBook</h2>
       <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>{subtitle}</p>
 
-      {/* Tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
         {TABS.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
             style={{
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: "none",
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: "pointer",
+              padding: "8px 16px", borderRadius: 8, border: "none",
+              fontWeight: 600, fontSize: 13, cursor: "pointer",
               background: tab === key ? "#d4af37" : "#f0f0f0",
               color:      tab === key ? "#111"    : "#666",
             }}
@@ -110,19 +108,12 @@ const Ranking = () => {
       ) : (
         <>
           {list.map((entry) => (
-            <RankingRow
-              key={entry.id}
-              entry={entry}
-              isSelf={entry.id === currentUserId}
-            />
+            <RankingRow key={entry.id} entry={entry} isSelf={entry.id === currentUserId} />
           ))}
 
-          {/* Show self below list if not in top 50 (global only) */}
           {tab === "total" && !selfInList && selfEntry && (
             <>
-              <div style={{ textAlign: "center", color: "#ccc", margin: "8px 0", fontSize: 13 }}>
-                · · ·
-              </div>
+              <div style={{ textAlign: "center", color: "#ccc", margin: "8px 0", fontSize: 13 }}>· · ·</div>
               <RankingRow entry={selfEntry} isSelf />
             </>
           )}

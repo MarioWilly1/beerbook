@@ -1,5 +1,6 @@
 import React from "react";
 import { useFeed } from "../hooks/useFeed";
+import Avatar from "../components/Avatar";
 
 const ACTION_LABEL = {
   register: "registró",
@@ -27,43 +28,24 @@ function timeAgo(dateStr) {
   return new Date(dateStr).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
 }
 
-const Avatar = ({ nombre }) => {
-  const initial = (nombre || "?")[0].toUpperCase();
-  const palette = ["#b8941f", "#2ecc71", "#3498db", "#9b59b6", "#e07b39"];
-  const color   = palette[initial.charCodeAt(0) % palette.length];
-  return (
-    <div style={{
-      width: 40, height: 40, borderRadius: "50%", background: color,
-      color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-      fontWeight: 700, fontSize: 17, flexShrink: 0,
-    }}>
-      {initial}
-    </div>
-  );
-};
-
 const FeedEntry = ({ entry }) => {
   const emoji = ACTION_EMOJI[entry.action] || "🍺";
   const label = ACTION_LABEL[entry.action] || "interactuó con";
 
   return (
     <div style={cardStyle}>
-      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <Avatar nombre={entry.nombre} />
+        <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
         <div style={{ flex: 1 }}>
           <span style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>{entry.nombre}</span>
           {" "}
-          <span style={{ fontSize: 14, color: "#555" }}>
-            {emoji} {label}
-          </span>
+          <span style={{ fontSize: 14, color: "#555" }}>{emoji} {label}</span>
           {" "}
           <span style={{ fontWeight: 700, fontSize: 14, color: "#8b6b2e" }}>{entry.beer_nombre}</span>
         </div>
         <span style={{ fontSize: 12, color: "#bbb", flexShrink: 0 }}>{timeAgo(entry.created_at)}</span>
       </div>
 
-      {/* Beer photo + details */}
       <div style={{ display: "flex", gap: 12 }}>
         {entry.beer_foto_url && (
           <img
@@ -125,7 +107,7 @@ const Feed = () => {
   );
 };
 
-const cardStyle  = { background: "#fff", border: "1px solid #eee", borderRadius: 12, padding: "16px", marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" };
+const cardStyle  = { background: "#fff", border: "1px solid #eee", borderRadius: 12, padding: 16, marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" };
 const emptyStyle = { textAlign: "center", padding: "60px 20px", background: "#fff", border: "1px solid #eee", borderRadius: 12 };
 
 export default Feed;

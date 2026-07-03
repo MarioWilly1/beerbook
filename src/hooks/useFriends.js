@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../services/supabase";
 
 export const useFriends = () => {
-  const [friends, setFriends]               = useState([]);
-  const [sentRequests, setSentRequests]     = useState([]);
+  const [friends, setFriends]                   = useState([]);
+  const [sentRequests, setSentRequests]         = useState([]);
   const [receivedRequests, setReceivedRequests] = useState([]);
-  const [loading, setLoading]               = useState(true);
+  const [loading, setLoading]                   = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -28,18 +28,20 @@ export const useFriends = () => {
     let profileMap = {};
     if (allIds.length > 0) {
       const { data: profiles } = await supabase
-        .from("profiles").select("id, nombre").in("id", allIds);
-      (profiles || []).forEach((p) => { profileMap[p.id] = p.nombre; });
+        .from("profiles").select("id, nombre, avatar_url").in("id", allIds);
+      (profiles || []).forEach((p) => { profileMap[p.id] = p; });
     }
 
-    setFriends(friendIds.map((id) => ({ id, nombre: profileMap[id] || "Usuario" })));
-    setSentRequests(receiverIds.map((id) => ({ id, nombre: profileMap[id] || "Usuario" })));
+    const resolve = (id) => ({
+      id,
+      nombre:     profileMap[id]?.nombre     || "Usuario",
+      avatar_url: profileMap[id]?.avatar_url || null,
+    });
+
+    setFriends(friendIds.map(resolve));
+    setSentRequests(receiverIds.map(resolve));
     setReceivedRequests(
-      senderData.map((r) => ({
-        id: r.sender_id,
-        nombre: profileMap[r.sender_id] || "Usuario",
-        created_at: r.created_at,
-      }))
+      senderData.map((r) => ({ ...resolve(r.sender_id), created_at: r.created_at }))
     );
     setLoading(false);
   }, []);
@@ -73,14 +75,7 @@ export const useFriends = () => {
   };
 
   return {
-    friends,
-    sentRequests,
-    receivedRequests,
-    loading,
-    refetch: load,
-    sendRequest,
-    acceptRequest,
-    rejectRequest,
-    removeFriend,
+    friends, sentRequests, receivedRequests, loading,
+    refetch: load, sendRequest, acceptRequest, rejectRequest, removeFriend,
   };
 };

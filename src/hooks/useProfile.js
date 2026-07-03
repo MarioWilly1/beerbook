@@ -15,7 +15,7 @@ export const useProfile = (session) => {
     setLoading(true);
     supabase
       .from("profiles")
-      .select("id, nombre")
+      .select("id, nombre, avatar_url")
       .eq("id", session.user.id)
       .single()
       .then(({ data }) => {

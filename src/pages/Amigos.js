@@ -3,14 +3,15 @@ import { supabase } from "../services/supabase";
 import { useFriends } from "../hooks/useFriends";
 import { checkSocialAchievements } from "../utils/achievements";
 import { useUserStats } from "../hooks/useUserStats";
+import Avatar from "../components/Avatar";
 
 const Amigos = () => {
   const { friends, sentRequests, receivedRequests, loading, sendRequest, acceptRequest, rejectRequest, removeFriend } = useFriends();
   const { refetch: refetchStats } = useUserStats();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm]     = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [actionMsg, setActionMsg] = useState("");
+  const [searching, setSearching]       = useState(false);
+  const [actionMsg, setActionMsg]       = useState("");
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -20,13 +21,11 @@ const Amigos = () => {
     setSearching(false);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSearch();
-  };
+  const handleKeyDown = (e) => { if (e.key === "Enter") handleSearch(); };
 
   const getUserStatus = (userId) => {
-    if (friends.some((f) => f.id === userId)) return "friend";
-    if (sentRequests.some((r) => r.id === userId)) return "sent";
+    if (friends.some((f) => f.id === userId))          return "friend";
+    if (sentRequests.some((r) => r.id === userId))     return "sent";
     if (receivedRequests.some((r) => r.id === userId)) return "received";
     return "none";
   };
@@ -76,9 +75,7 @@ const Amigos = () => {
         {friends.length} amigo{friends.length !== 1 ? "s" : ""}
       </p>
 
-      {actionMsg && (
-        <div style={flashStyle}>{actionMsg}</div>
-      )}
+      {actionMsg && <div style={flashStyle}>{actionMsg}</div>}
 
       {/* Solicitudes recibidas */}
       {receivedRequests.length > 0 && (
@@ -89,7 +86,7 @@ const Amigos = () => {
           </h3>
           {receivedRequests.map((req) => (
             <div key={req.id} style={rowStyle}>
-              <Avatar nombre={req.nombre} />
+              <Avatar avatarUrl={req.avatar_url} nombre={req.nombre} size={36} />
               <span style={{ flex: 1, fontWeight: 600 }}>{req.nombre}</span>
               <button onClick={() => handleAccept(req.id)} style={btnGreen}>Aceptar</button>
               <button onClick={() => handleReject(req.id)} style={btnGray}>Rechazar</button>
@@ -103,8 +100,7 @@ const Amigos = () => {
         <h3 style={sectionTitle}>Buscar usuarios</h3>
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           <input
-            type="text"
-            value={searchTerm}
+            type="text" value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Nombre de usuario..."
@@ -123,24 +119,18 @@ const Amigos = () => {
           const status = getUserStatus(user.id);
           return (
             <div key={user.id} style={rowStyle}>
-              <Avatar nombre={user.nombre} />
+              <Avatar avatarUrl={user.avatar_url} nombre={user.nombre} size={36} />
               <span style={{ flex: 1, fontWeight: 600 }}>{user.nombre}</span>
-              {status === "friend" && <span style={chipGreen}>✓ Amigos</span>}
-              {status === "sent" && <span style={chipGray}>Solicitud enviada</span>}
-              {status === "received" && (
-                <button onClick={() => handleAccept(user.id)} style={btnGreen}>Aceptar</button>
-              )}
-              {status === "none" && (
-                <button onClick={() => handleSend(user.id)} style={btnGold}>
-                  Agregar
-                </button>
-              )}
+              {status === "friend"   && <span style={chipGreen}>✓ Amigos</span>}
+              {status === "sent"     && <span style={chipGray}>Solicitud enviada</span>}
+              {status === "received" && <button onClick={() => handleAccept(user.id)} style={btnGreen}>Aceptar</button>}
+              {status === "none"     && <button onClick={() => handleSend(user.id)} style={btnGold}>Agregar</button>}
             </div>
           );
         })}
       </section>
 
-      {/* Lista de amigos */}
+      {/* Mis amigos */}
       <section style={sectionStyle}>
         <h3 style={sectionTitle}>Mis amigos</h3>
         {friends.length === 0 ? (
@@ -150,7 +140,7 @@ const Amigos = () => {
         ) : (
           friends.map((f) => (
             <div key={f.id} style={rowStyle}>
-              <Avatar nombre={f.nombre} />
+              <Avatar avatarUrl={f.avatar_url} nombre={f.nombre} size={36} />
               <span style={{ flex: 1, fontWeight: 600 }}>{f.nombre}</span>
               <button onClick={() => handleRemove(f.id)} style={btnDanger}>Eliminar</button>
             </div>
@@ -164,28 +154,13 @@ const Amigos = () => {
           <h3 style={sectionTitle}>Solicitudes enviadas ({sentRequests.length})</h3>
           {sentRequests.map((r) => (
             <div key={r.id} style={rowStyle}>
-              <Avatar nombre={r.nombre} />
+              <Avatar avatarUrl={r.avatar_url} nombre={r.nombre} size={36} />
               <span style={{ flex: 1, fontWeight: 600 }}>{r.nombre}</span>
               <span style={chipGray}>Pendiente...</span>
             </div>
           ))}
         </section>
       )}
-    </div>
-  );
-};
-
-const Avatar = ({ nombre }) => {
-  const initial = (nombre || "?")[0].toUpperCase();
-  const palette = ["#b8941f", "#2ecc71", "#3498db", "#9b59b6", "#e07b39"];
-  const color   = palette[initial.charCodeAt(0) % palette.length];
-  return (
-    <div style={{
-      width: 36, height: 36, borderRadius: "50%", background: color,
-      color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-      fontWeight: 700, fontSize: 15, flexShrink: 0,
-    }}>
-      {initial}
     </div>
   );
 };

@@ -64,7 +64,7 @@ function App() {
 
   // Fully authenticated → main app
   return (
-    <Layout session={session} profile={profile}>
+    <Layout session={session} profile={profile} onAvatarChange={(url) => setProfile((p) => ({ ...p, avatar_url: url }))}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/cuaderno" element={<MiCuaderno />} />

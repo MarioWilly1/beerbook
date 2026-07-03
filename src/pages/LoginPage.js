@@ -21,7 +21,10 @@ const LoginPage = ({ onSwitchToRegister }) => {
   const handleGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { queryParams: { prompt: "select_account" } },
+      options: {
+        redirectTo: window.location.origin,
+        queryParams: { prompt: "select_account" },
+      },
     });
   };
 

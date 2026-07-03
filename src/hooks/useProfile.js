@@ -12,6 +12,7 @@ export const useProfile = (session) => {
       return;
     }
 
+    setLoading(true);
     supabase
       .from("profiles")
       .select("id, nombre")

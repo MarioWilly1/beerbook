@@ -10,6 +10,8 @@ import Ranking from "./pages/Ranking";
 import Feed from "./pages/Feed";
 import Amigos from "./pages/Amigos";
 import SobreNosotros from "./pages/SobreNosotros";
+import Configuracion from "./pages/Configuracion";
+import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
@@ -73,6 +75,8 @@ function App() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/amigos" element={<Amigos />} />
         <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+        <Route path="/configuracion" element={<Configuracion />} />
+        <Route path="/perfil/:userId" element={<ProfilePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

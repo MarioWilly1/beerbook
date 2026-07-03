@@ -123,7 +123,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <SidebarButton label="⚙️ Configuración" onClick={() => alert("Sección de configuración")} />
+          <SidebarLink to="/configuracion" label="⚙️ Configuración" />
           <SidebarButton label="🚪 Cerrar sesión" onClick={handleLogout} />
         </div>
       </aside>

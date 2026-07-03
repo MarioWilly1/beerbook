@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRanking } from "../hooks/useRanking";
+import { supabase } from "../services/supabase";
 import { getLevelInfo } from "../utils/xp";
 import Avatar from "../components/Avatar";
 
@@ -41,12 +43,11 @@ const EMPTY_MSGS = {
 };
 
 // ── Row components ────────────────────────────────────────────────────────────
-
-const RankingRowXP = ({ entry, isSelf }) => {
+const RankingRowXP = ({ entry, isSelf, onClick }) => {
   const pos = Number(entry.rank_pos);
   const { levelName } = getLevelInfo(Number(entry.total_xp));
   return (
-    <div style={rowStyle(isSelf, pos)}>
+    <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#888" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
@@ -68,10 +69,10 @@ const RankingRowXP = ({ entry, isSelf }) => {
   );
 };
 
-const RankingRowBeers = ({ entry, isSelf }) => {
+const RankingRowBeers = ({ entry, isSelf, onClick }) => {
   const pos = Number(entry.rank_pos);
   return (
-    <div style={rowStyle(isSelf, pos)}>
+    <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#888" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
@@ -83,9 +84,7 @@ const RankingRowBeers = ({ entry, isSelf }) => {
         </div>
       </div>
       <div style={{ textAlign: "right" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#1e8449" }}>
-          🍺 {entry.total_beers}
-        </div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1e8449" }}>🍺 {entry.total_beers}</div>
         <div style={{ fontSize: 11, color: "#aaa" }}>verificadas</div>
       </div>
     </div>
@@ -93,7 +92,6 @@ const RankingRowBeers = ({ entry, isSelf }) => {
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
-
 const Ranking = () => {
   const {
     rankingTotal, rankingSemanal, rankingAmigos,
@@ -101,8 +99,38 @@ const Ranking = () => {
     loading, currentUserId,
   } = useRanking();
 
-  const [scope, setScope] = useState("total");
-  const [dim,   setDim]   = useState("xp");
+  const navigate = useNavigate();
+  const [scope, setScope]           = useState("total");
+  const [dim, setDim]               = useState("xp");
+  const [showConsent, setShowConsent] = useState(false);
+  const [consentSession, setConsentSession] = useState(null);
+
+  // Check if user needs to be asked about ranking consent
+  useEffect(() => {
+    const checkConsent = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("ranking_consent_shown")
+        .eq("id", session.user.id)
+        .single();
+      if (data && !data.ranking_consent_shown) {
+        setConsentSession(session);
+        setShowConsent(true);
+      }
+    };
+    checkConsent();
+  }, []);
+
+  const handleConsent = async (aparecer) => {
+    if (!consentSession) return;
+    await supabase.from("profiles").update({
+      aparecer_en_ranking: aparecer,
+      ranking_consent_shown: true,
+    }).eq("id", consentSession.user.id);
+    setShowConsent(false);
+  };
 
   const handleDimChange = (newDim) => {
     setDim(newDim);
@@ -121,103 +149,142 @@ const Ranking = () => {
   const selfEntry      = dim === "beers" ? selfEntryBeers : selfEntryXP;
   const selfInList     = list.some((e) => e.id === currentUserId);
 
-  const subtitle  = SUBTITLES[dim][scope]     || "";
-  const emptyMsg  = EMPTY_MSGS[dim][scope]    || "El ranking está vacío.";
+  const subtitle  = SUBTITLES[dim][scope] || "";
+  const emptyMsg  = EMPTY_MSGS[dim][scope] || "El ranking está vacío.";
   const RowComp   = dim === "beers" ? RankingRowBeers : RankingRowXP;
 
   if (loading) return <p style={{ padding: 24 }}>Cargando ranking...</p>;
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto" }}>
-      <h2 style={{ margin: "0 0 4px" }}>🏆 Ranking BeerBook</h2>
-      <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>{subtitle}</p>
+    <>
+      {/* ── Consent modal ───────────────────────────────────────────── */}
+      {showConsent && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: 20 }}>
+          <div style={{ background: "#fff", borderRadius: 18, padding: 36, maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+            <div style={{ fontSize: 52, marginBottom: 12 }}>🏆</div>
+            <h3 style={{ margin: "0 0 10px", fontSize: 20 }}>¿Querés aparecer en el ranking?</h3>
+            <p style={{ color: "#666", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
+              Tu XP siempre se acumula. Solo decidís si tu posición es visible para todos en el ranking global.
+              <br /><br />
+              Podés cambiar esto cuando quieras en{" "}
+              <strong>Configuración → Privacidad</strong>.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                onClick={() => handleConsent(false)}
+                style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid #e0e0e0", background: "#fafafa", color: "#555", fontWeight: 600, fontSize: 14, cursor: "pointer" }}
+              >
+                Mantenerme privado
+              </button>
+              <button
+                onClick={() => handleConsent(true)}
+                style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "#d4af37", color: "#111", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
+              >
+                Sí, aparecer 🏅
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Dimension switcher */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
-        {DIM_OPTIONS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => handleDimChange(key)}
-            style={{
-              padding: "6px 14px", borderRadius: 20,
-              border: dim === key ? "2px solid #b8941f" : "2px solid #e0e0e0",
-              fontWeight: 700, fontSize: 13, cursor: "pointer",
-              background: dim === key ? "#fffbee" : "#fafafa",
-              color:      dim === key ? "#b8941f" : "#888",
-              transition: "all 0.15s",
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {/* ── Main content ────────────────────────────────────────────── */}
+      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        <h2 style={{ margin: "0 0 4px" }}>🏆 Ranking BeerBook</h2>
+        <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>{subtitle}</p>
 
-      {/* Scope tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-        {SCOPE_TABS.map(({ key, label }) => {
-          const disabled = dim === "beers" && key === "semanal";
-          const active   = scope === key;
-          return (
+        {/* Dimension switcher */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+          {DIM_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => !disabled && setScope(key)}
-              disabled={disabled}
-              title={disabled ? "No disponible en modo Cervezas Verificadas" : undefined}
+              onClick={() => handleDimChange(key)}
               style={{
-                padding: "8px 16px", borderRadius: 8,
-                border: "none", fontWeight: 600, fontSize: 13,
-                cursor: disabled ? "not-allowed" : "pointer",
-                background: disabled ? "#f0f0f0" : active ? "#d4af37" : "#f0f0f0",
-                color:      disabled ? "#ccc"    : active ? "#111"    : "#666",
-                opacity:    disabled ? 0.5 : 1,
+                padding: "6px 14px", borderRadius: 20,
+                border: dim === key ? "2px solid #b8941f" : "2px solid #e0e0e0",
+                fontWeight: 700, fontSize: 13, cursor: "pointer",
+                background: dim === key ? "#fffbee" : "#fafafa",
+                color:      dim === key ? "#b8941f" : "#888",
                 transition: "all 0.15s",
               }}
             >
               {label}
             </button>
-          );
-        })}
-      </div>
-
-      {/* List */}
-      {list.length === 0 ? (
-        <p style={{ color: "#999", textAlign: "center", padding: 40 }}>{emptyMsg}</p>
-      ) : (
-        <>
-          {list.map((entry) => (
-            <RowComp key={entry.id} entry={entry} isSelf={entry.id === currentUserId} />
           ))}
+        </div>
 
-          {/* Self entry if not visible in list */}
-          {scope === "total" && !selfInList && selfEntry && (
-            <>
-              <div style={{ textAlign: "center", color: "#ccc", margin: "8px 0", fontSize: 13 }}>· · ·</div>
-              <RowComp entry={selfEntry} isSelf />
-            </>
-          )}
+        {/* Scope tabs */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+          {SCOPE_TABS.map(({ key, label }) => {
+            const disabled = dim === "beers" && key === "semanal";
+            const active   = scope === key;
+            return (
+              <button
+                key={key}
+                onClick={() => !disabled && setScope(key)}
+                disabled={disabled}
+                title={disabled ? "No disponible en modo Cervezas Verificadas" : undefined}
+                style={{
+                  padding: "8px 16px", borderRadius: 8, border: "none",
+                  fontWeight: 600, fontSize: 13,
+                  cursor: disabled ? "not-allowed" : "pointer",
+                  background: disabled ? "#f0f0f0" : active ? "#d4af37" : "#f0f0f0",
+                  color:      disabled ? "#ccc"    : active ? "#111"    : "#666",
+                  opacity: disabled ? 0.5 : 1,
+                  transition: "all 0.15s",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
 
-          {scope === "total" && !selfInList && !selfEntry && (
-            <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
-              {dim === "beers"
-                ? "Aún no aparecés — subí fotos de tus cervezas para entrar."
-                : "Aún no aparecés en el ranking — registrá tu primera cerveza para entrar."}
-            </p>
-          )}
+        {/* List */}
+        {list.length === 0 ? (
+          <p style={{ color: "#999", textAlign: "center", padding: 40 }}>{emptyMsg}</p>
+        ) : (
+          <>
+            {list.map((entry) => (
+              <RowComp
+                key={entry.id}
+                entry={entry}
+                isSelf={entry.id === currentUserId}
+                onClick={() => navigate(`/perfil/${entry.id}`)}
+              />
+            ))}
 
-          {scope === "amigos" && list.length === 1 && (
-            <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
-              Solo aparecés vos. Invitá amigos para tener más competencia.
-            </p>
-          )}
-        </>
-      )}
-    </div>
+            {scope === "total" && !selfInList && selfEntry && (
+              <>
+                <div style={{ textAlign: "center", color: "#ccc", margin: "8px 0", fontSize: 13 }}>· · ·</div>
+                <RowComp
+                  entry={selfEntry}
+                  isSelf
+                  onClick={() => navigate(`/perfil/${selfEntry.id}`)}
+                />
+              </>
+            )}
+
+            {scope === "total" && !selfInList && !selfEntry && (
+              <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
+                {dim === "beers"
+                  ? "Aún no aparecés — subí fotos de tus cervezas para entrar."
+                  : "Aún no aparecés en el ranking — registrá tu primera cerveza para entrar."}
+              </p>
+            )}
+
+            {scope === "amigos" && list.length === 1 && (
+              <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
+                Solo aparecés vos. Invitá amigos para tener más competencia.
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 };
 
-// ── Shared styles ─────────────────────────────────────────────────────────────
-
-const rowStyle = (isSelf, pos) => ({
+const rowStyle = (isSelf, pos, clickable) => ({
   display: "flex",
   alignItems: "center",
   gap: 12,
@@ -231,6 +298,8 @@ const rowStyle = (isSelf, pos) => ({
     ? `2px solid ${["#ffd700", "#c0c0c0", "#cd7f32"][pos - 1]}`
     : "1px solid #eee",
   fontWeight: isSelf ? 700 : 400,
+  cursor: clickable ? "pointer" : "default",
+  transition: "box-shadow 0.15s",
 });
 
 export default Ranking;

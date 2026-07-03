@@ -3,6 +3,33 @@ import { supabase } from "../services/supabase";
 import { PRESET_AVATARS } from "../utils/avatarPresets";
 import Avatar from "./Avatar";
 
+// Compresses an image file to JPEG, capped at maxDimension px on the longest side.
+function compressImage(file, maxDimension = 800, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > maxDimension || height > maxDimension) {
+        if (width >= height) {
+          height = Math.round((height * maxDimension) / width);
+          width  = maxDimension;
+        } else {
+          width  = Math.round((width * maxDimension) / height);
+          height = maxDimension;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width  = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
+    };
+    img.src = objectUrl;
+  });
+}
+
 const AvatarSelector = ({ profile, session, onSave, onClose }) => {
   const fileInputRef = useRef(null);
   const [file, setFile]           = useState(null);
@@ -13,8 +40,8 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
   const handleFileChange = (e) => {
     const f = e.target.files[0];
     if (!f) return;
-    if (f.size > 2 * 1024 * 1024) {
-      setError("La foto no puede superar 2 MB.");
+    if (f.size > 5 * 1024 * 1024) {
+      setError("La foto no puede superar 5 MB.");
       return;
     }
     setError("");
@@ -29,9 +56,11 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
 
     const path = `${session.user.id}/avatar`;
 
+    const compressed = await compressImage(file);
+
     const { error: uploadErr } = await supabase.storage
       .from("avatars")
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, compressed, { upsert: true, contentType: "image/jpeg" });
 
     if (uploadErr) {
       setError("Error al subir la foto. Intentá de nuevo.");
@@ -121,7 +150,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
               onClick={() => fileInputRef.current.click()}
               style={uploadBtnStyle}
             >
-              Elegir foto · máx. 2 MB
+              Elegir foto · máx. 5 MB
             </button>
           ) : (
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

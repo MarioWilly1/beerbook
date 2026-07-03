@@ -153,7 +153,16 @@ const MiCuaderno = () => {
             </div>
 
             <div style={{ flex: 1 }}>
-              <h3 style={{ margin: "0 0 8px" }}>{beer.nombre}</h3>
+              <h3 style={{ margin: "0 0 4px" }}>{beer.nombre}</h3>
+              {beer.user_photo_url?.trim() ? (
+                <span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, color: "#1e8449", background: "#d5f5e3", borderRadius: 5, padding: "2px 7px", marginBottom: 8 }}>
+                  📸 Verificada
+                </span>
+              ) : (
+                <span style={{ display: "inline-block", fontSize: 11, color: "#999", background: "#f0f0f0", borderRadius: 5, padding: "2px 7px", marginBottom: 8 }}>
+                  Sin foto · no verificada
+                </span>
+              )}
 
               <div style={rowStyle}>
                 <label style={labelStyle}>Veces probada</label>

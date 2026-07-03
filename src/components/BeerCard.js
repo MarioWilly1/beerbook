@@ -72,13 +72,25 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
 
   return (
     <div style={cardStyle}>
-      <img
-        src={beer.foto_url}
-        alt={beer.nombre}
-        onClick={() => beer.foto_url && setLightboxSrc(beer.foto_url)}
-        style={{ width: "100%", height: "140px", objectFit: "cover", borderRadius: "10px", cursor: beer.foto_url ? "zoom-in" : "default" }}
-      />
-      <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
+      <div style={{ position: "relative" }}>
+        <img
+          src={beer.foto_url}
+          alt={beer.nombre}
+          onClick={() => beer.foto_url && setLightboxSrc(beer.foto_url)}
+          style={{ width: "100%", height: "140px", objectFit: "cover", borderRadius: "10px", cursor: beer.foto_url ? "zoom-in" : "default", display: "block" }}
+        />
+        {photoUrl?.trim() && (
+          <span style={{
+            position: "absolute", bottom: 6, right: 6,
+            background: "rgba(0,0,0,0.6)", color: "#fff",
+            fontSize: 10, fontWeight: 700,
+            padding: "2px 6px", borderRadius: 5,
+          }}>
+            📸 Verificada
+          </span>
+        )}
+        <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
+      </div>
 
       <div style={{ padding: "10px 4px 0" }}>
         <h3 style={{ margin: "0 0 2px", fontSize: "15px" }}>{beer.nombre}</h3>

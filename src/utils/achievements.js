@@ -13,65 +13,65 @@ export const ACHIEVEMENTS = [
     slug: "seis-pack",
     emoji: "🎯",
     nombre: "Seis Pack",
-    descripcion: "6 cervezas registradas",
+    descripcion: "6 cervezas verificadas (con foto)",
     xpBonus: 20,
-    check: (s) => s.totalBeers >= 6,
+    check: (s) => s.verifiedBeers >= 6,
   },
   {
     slug: "caja-completa",
     emoji: "📦",
     nombre: "Caja Completa",
-    descripcion: "24 cervezas registradas",
+    descripcion: "24 cervezas verificadas (con foto)",
     xpBonus: 50,
-    check: (s) => s.totalBeers >= 24,
+    check: (s) => s.verifiedBeers >= 24,
   },
   {
     slug: "barril",
     emoji: "🛢️",
     nombre: "Barril",
-    descripcion: "50 cervezas registradas",
+    descripcion: "50 cervezas verificadas (con foto)",
     xpBonus: 100,
-    check: (s) => s.totalBeers >= 50,
+    check: (s) => s.verifiedBeers >= 50,
   },
   {
     slug: "coleccionista",
     emoji: "🏆",
     nombre: "Coleccionista",
-    descripcion: "100 cervezas registradas",
+    descripcion: "100 cervezas verificadas (con foto)",
     xpBonus: 200,
-    check: (s) => s.totalBeers >= 100,
+    check: (s) => s.verifiedBeers >= 100,
   },
   {
     slug: "viajero",
     emoji: "🌍",
     nombre: "Viajero",
-    descripcion: "Cervezas de 5 países distintos",
+    descripcion: "Cervezas verificadas de 5 países distintos",
     xpBonus: 30,
-    check: (s) => s.distinctCountries >= 5,
+    check: (s) => s.verifiedDistinctCountries >= 5,
   },
   {
     slug: "ciudadano-del-mundo",
     emoji: "✈️",
     nombre: "Ciudadano del Mundo",
-    descripcion: "Cervezas de 10 países distintos",
+    descripcion: "Cervezas verificadas de 10 países distintos",
     xpBonus: 80,
-    check: (s) => s.distinctCountries >= 10,
+    check: (s) => s.verifiedDistinctCountries >= 10,
   },
   {
     slug: "explorador-de-estilos",
     emoji: "🎨",
     nombre: "Explorador de Estilos",
-    descripcion: "5 estilos distintos probados",
+    descripcion: "5 estilos distintos (entradas verificadas)",
     xpBonus: 25,
-    check: (s) => s.distinctStyles >= 5,
+    check: (s) => s.verifiedDistinctStyles >= 5,
   },
   {
     slug: "polyglota-cervecero",
     emoji: "🔬",
     nombre: "Políglota Cervecero",
-    descripcion: "10 estilos distintos probados",
+    descripcion: "10 estilos distintos (entradas verificadas)",
     xpBonus: 60,
-    check: (s) => s.distinctStyles >= 10,
+    check: (s) => s.verifiedDistinctStyles >= 10,
   },
   {
     slug: "fotografo",
@@ -95,7 +95,7 @@ export const ACHIEVEMENTS = [
     nombre: "Crítico",
     descripcion: "10 entradas con puntuación",
     xpBonus: 35,
-    check: (s) => s.beersWithRatings >= 10,
+    check: (s) => s.verifiedWithRatings >= 10,
   },
   {
     slug: "perfeccionista",
@@ -148,16 +148,23 @@ export async function fetchAchievementStats(userId) {
 
   if (error || !data) return null;
 
+  const verified = data.filter((d) => d.user_photo_url?.trim());
+
   return {
     totalBeers: data.length,
     distinctStyles: new Set(data.map((d) => d.beers_new?.estilo).filter(Boolean)).size,
     distinctCountries: new Set(data.map((d) => d.beers_new?.pais).filter(Boolean)).size,
-    beersWithPhotos: data.filter((d) => d.user_photo_url?.trim()).length,
+    beersWithPhotos: verified.length,
     beersWithComments: data.filter((d) => d.comment?.trim()).length,
     beersWithRatings: data.filter((d) => d.Rating != null && Number(d.Rating) > 0).length,
     completeEntries: data.filter(
       (d) => Number(d.Rating) > 0 && d.comment?.trim() && d.user_photo_url?.trim()
     ).length,
+    verifiedBeers: verified.length,
+    verifiedDistinctCountries: new Set(verified.map((d) => d.beers_new?.pais).filter(Boolean)).size,
+    verifiedDistinctStyles: new Set(verified.map((d) => d.beers_new?.estilo).filter(Boolean)).size,
+    verifiedWithComments: verified.filter((d) => d.comment?.trim()).length,
+    verifiedWithRatings: verified.filter((d) => d.Rating != null && Number(d.Rating) > 0).length,
   };
 }
 

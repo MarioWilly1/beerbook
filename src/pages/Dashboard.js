@@ -89,7 +89,7 @@ const Dashboard = () => {
           fontSize: "14px",
         }}
       >
-        🏆 Nivel: {stats.level} | ⭐ XP: {stats.xp} | 🍺 Cervezas: {stats.beers}
+        🏆 Nivel: {stats.level} | ⭐ XP: {stats.xp} | 🍺 {stats.beers} cervezas ({stats.verifiedBeers} verificadas)
       </div>
 
       <BeerFilters

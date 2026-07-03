@@ -4,20 +4,20 @@ import { getLevelInfo } from "../utils/xp";
 
 export const useUserStats = () => {
   const [stats, setStats] = useState({
-    xp: 0, level: 1, beers: 0,
+    xp: 0, level: 1, beers: 0, verifiedBeers: 0,
     currentStreak: 0, longestStreak: 0,
   });
 
   const fetchStats = async (session) => {
     if (!session) {
-      setStats({ xp: 0, level: 1, beers: 0, currentStreak: 0, longestStreak: 0 });
+      setStats({ xp: 0, level: 1, beers: 0, verifiedBeers: 0, currentStreak: 0, longestStreak: 0 });
       return;
     }
 
     const uid = session.user.id;
 
     const [beersRes, achRes, badgesRes, profileRes] = await Promise.all([
-      supabase.from("user_beers").select('"XP"').eq("user_id", uid),
+      supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", uid),
       supabase.from("user_achievements").select("xp_awarded").eq("user_id", uid),
       supabase.from("user_badges").select("xp_awarded").eq("user_id", uid),
       supabase.from("profiles")
@@ -26,18 +26,21 @@ export const useUserStats = () => {
         .single(),
     ]);
 
-    const beerXP   = (beersRes.data   || []).reduce((s, b) => s + (b.XP         || 0), 0);
-    const achXP    = (achRes.data     || []).reduce((s, a) => s + (a.xp_awarded  || 0), 0);
-    const badgeXP  = (badgesRes.data  || []).reduce((s, b) => s + (b.xp_awarded  || 0), 0);
-    const totalXP  = beerXP + achXP + badgeXP;
-    const { level } = getLevelInfo(totalXP);
+    const beerData     = beersRes.data || [];
+    const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);
+    const achXP        = (achRes.data    || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
+    const badgeXP      = (badgesRes.data || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
+    const totalXP      = beerXP + achXP + badgeXP;
+    const { level }    = getLevelInfo(totalXP);
+    const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;
 
     setStats({
       xp: totalXP,
-      beers: (beersRes.data || []).length,
+      beers: beerData.length,
+      verifiedBeers,
       level,
-      currentStreak: profileRes.data?.current_streak  || 0,
-      longestStreak: profileRes.data?.longest_streak  || 0,
+      currentStreak: profileRes.data?.current_streak || 0,
+      longestStreak: profileRes.data?.longest_streak || 0,
     });
   };
 

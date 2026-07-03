@@ -77,6 +77,11 @@ const FeedEntry = ({ entry }) => {
                 style={{ width: 80, height: 60, objectFit: "cover", borderRadius: 6, cursor: "zoom-in" }}
               />
             )}
+            {entry.location_public && entry.location_name?.trim() && (
+              <div style={{ fontSize: 12, color: "#8b6b2e", marginTop: 6 }}>
+                📍 {entry.location_name}
+              </div>
+            )}
           </div>
         </div>
       </div>

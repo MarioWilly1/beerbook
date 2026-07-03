@@ -6,6 +6,7 @@ import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achie
 import { logActivity } from "../utils/activity";
 import { checkAndAwardBadges } from "../utils/badges";
 import Lightbox from "./Lightbox";
+import LocationPicker from "./LocationPicker";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -14,6 +15,11 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
   const [comment, setComment] = useState(myBeerData?.comment || "");
   const [rating, setRating]   = useState(myBeerData?.Rating ?? "");
   const [photoUrl, setPhotoUrl] = useState(myBeerData?.user_photo_url || "");
+  const [location, setLocation] = useState(
+    myBeerData?.location_lat
+      ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true }
+      : null
+  );
   const [saving, setSaving]   = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
 
@@ -38,6 +44,10 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
       Rating: rating !== "" ? Number(rating) : null,
       user_photo_url: photoUrl || null,
       XP: xp,
+      location_lat:    location?.lat    ?? null,
+      location_lng:    location?.lng    ?? null,
+      location_name:   location?.name   ?? null,
+      location_public: location?.isPublic ?? true,
     });
 
     if (error) { setSaving(false); return; }
@@ -145,6 +155,8 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
             style={inputStyle}
           />
         </div>
+
+        <LocationPicker value={location} onChange={setLocation} />
 
         {isComplete && (
           <div style={bonusBannerStyle}>

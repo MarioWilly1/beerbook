@@ -23,6 +23,10 @@ export const useMyBeers = () => {
           "Rating",
           user_photo_url,
           commercialized,
+          location_lat,
+          location_lng,
+          location_name,
+          location_public,
           beers_new (
             id,
             nombre,
@@ -43,6 +47,10 @@ export const useMyBeers = () => {
           Rating: row.Rating,
           user_photo_url: row.user_photo_url,
           commercialized: row.commercialized,
+          location_lat: row.location_lat,
+          location_lng: row.location_lng,
+          location_name: row.location_name,
+          location_public: row.location_public,
         }));
         setBeers(mapped);
       }

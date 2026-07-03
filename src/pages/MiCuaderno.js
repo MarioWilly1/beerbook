@@ -8,6 +8,7 @@ import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achie
 import { checkAndAwardBadges } from "../utils/badges";
 import { logActivity } from "../utils/activity";
 import Lightbox from "../components/Lightbox";
+import LocationPicker from "../components/LocationPicker";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -26,6 +27,9 @@ const MiCuaderno = () => {
         Rating: beer.Rating ?? "",
         commercialized: beer.commercialized ?? true,
         user_photo_url: beer.user_photo_url || "",
+        location: beer.location_lat
+          ? { lat: beer.location_lat, lng: beer.location_lng, name: beer.location_name, isPublic: beer.location_public ?? true }
+          : null,
       }))
     );
   }, [beers]);
@@ -64,6 +68,10 @@ const MiCuaderno = () => {
         user_photo_url: beer.user_photo_url || null,
         Rating: beer.Rating !== "" ? Number(beer.Rating) : null,
         XP: xp,
+        location_lat:    beer.location?.lat    ?? null,
+        location_lng:    beer.location?.lng    ?? null,
+        location_name:   beer.location?.name   ?? null,
+        location_public: beer.location?.isPublic ?? true,
       })
       .eq("user_id", session.user.id)
       .eq("beer_id", beer.id);
@@ -154,15 +162,23 @@ const MiCuaderno = () => {
 
             <div style={{ flex: 1 }}>
               <h3 style={{ margin: "0 0 4px" }}>{beer.nombre}</h3>
-              {beer.user_photo_url?.trim() ? (
-                <span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, color: "#1e8449", background: "#d5f5e3", borderRadius: 5, padding: "2px 7px", marginBottom: 8 }}>
-                  📸 Verificada
-                </span>
-              ) : (
-                <span style={{ display: "inline-block", fontSize: 11, color: "#999", background: "#f0f0f0", borderRadius: 5, padding: "2px 7px", marginBottom: 8 }}>
-                  Sin foto · no verificada
-                </span>
-              )}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                {beer.user_photo_url?.trim() ? (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e8449", background: "#d5f5e3", borderRadius: 5, padding: "2px 7px" }}>
+                    📸 Verificada
+                  </span>
+                ) : (
+                  <span style={{ fontSize: 11, color: "#999", background: "#f0f0f0", borderRadius: 5, padding: "2px 7px" }}>
+                    Sin foto · no verificada
+                  </span>
+                )}
+                {beer.location?.name && (
+                  <span style={{ fontSize: 11, color: "#8b6b2e", background: "#fffbee", border: "1px solid #f0d060", borderRadius: 5, padding: "2px 7px" }}>
+                    📍 {beer.location.name}
+                    {!beer.location.isPublic && " · privada"}
+                  </span>
+                )}
+              </div>
 
               <div style={rowStyle}>
                 <label style={labelStyle}>Veces probada</label>
@@ -226,6 +242,11 @@ const MiCuaderno = () => {
                   />
                 )}
               </div>
+
+              <LocationPicker
+                value={beer.location}
+                onChange={(loc) => handleChange(beer.id, "location", loc)}
+              />
 
               {isComplete && (
                 <div style={bonusBannerStyle}>

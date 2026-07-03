@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { supabase } from "../services/supabase";
+import Lightbox from "./Lightbox";
 
 const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
   const [times, setTimes] = useState(beer.times || 0);
   const [comment, setComment] = useState(beer.comment || "");
-  const [showImage, setShowImage] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
 
   const handleSave = async () => {
     const { error } = await supabase
@@ -51,13 +52,13 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
         <img
           src={beer.foto_url}
           alt={beer.nombre}
-          onClick={() => setShowImage(true)}
+          onClick={() => beer.foto_url && setLightboxSrc(beer.foto_url)}
           style={{
             width: "120px",
             height: "120px",
             objectFit: "cover",
             borderRadius: "8px",
-            cursor: "pointer",
+            cursor: "zoom-in",
           }}
         />
 
@@ -115,31 +116,7 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
         </div>
       </div>
 
-      {/* MODAL */}
-      {showImage && (
-        <div
-          onClick={() => setShowImage(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.8)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 999,
-          }}
-        >
-          <img
-            src={beer.foto_url}
-            alt={beer.nombre}
-            style={{
-              maxWidth: "90%",
-              maxHeight: "90%",
-              borderRadius: "10px",
-            }}
-          />
-        </div>
-      )}
+      <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
     </>
   );
 };

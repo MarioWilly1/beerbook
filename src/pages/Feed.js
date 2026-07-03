@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFeed } from "../hooks/useFeed";
 import Avatar from "../components/Avatar";
+import Lightbox from "../components/Lightbox";
 
 const ACTION_LABEL = {
   register: "registró",
@@ -29,52 +30,59 @@ function timeAgo(dateStr) {
 }
 
 const FeedEntry = ({ entry }) => {
+  const [lightboxSrc, setLightboxSrc] = useState(null);
   const emoji = ACTION_EMOJI[entry.action] || "🍺";
   const label = ACTION_LABEL[entry.action] || "interactuó con";
 
   return (
-    <div style={cardStyle}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
-        <div style={{ flex: 1 }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>{entry.nombre}</span>
-          {" "}
-          <span style={{ fontSize: 14, color: "#555" }}>{emoji} {label}</span>
-          {" "}
-          <span style={{ fontWeight: 700, fontSize: 14, color: "#8b6b2e" }}>{entry.beer_nombre}</span>
+    <>
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
+          <div style={{ flex: 1 }}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>{entry.nombre}</span>
+            {" "}
+            <span style={{ fontSize: 14, color: "#555" }}>{emoji} {label}</span>
+            {" "}
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#8b6b2e" }}>{entry.beer_nombre}</span>
+          </div>
+          <span style={{ fontSize: 12, color: "#bbb", flexShrink: 0 }}>{timeAgo(entry.created_at)}</span>
         </div>
-        <span style={{ fontSize: 12, color: "#bbb", flexShrink: 0 }}>{timeAgo(entry.created_at)}</span>
-      </div>
 
-      <div style={{ display: "flex", gap: 12 }}>
-        {entry.beer_foto_url && (
-          <img
-            src={entry.beer_foto_url}
-            alt={entry.beer_nombre}
-            style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
-          />
-        )}
-        <div style={{ flex: 1 }}>
-          {entry.rating != null && Number(entry.rating) > 0 && (
-            <div style={{ fontSize: 13, color: "#d4af37", fontWeight: 600, marginBottom: 4 }}>
-              ⭐ {Number(entry.rating).toFixed(1)} / 5
-            </div>
-          )}
-          {entry.comment?.trim() && (
-            <p style={{ margin: "0 0 6px", fontSize: 13, color: "#555", fontStyle: "italic" }}>
-              "{entry.comment.trim()}"
-            </p>
-          )}
-          {entry.user_photo_url?.trim() && (
+        <div style={{ display: "flex", gap: 12 }}>
+          {entry.beer_foto_url && (
             <img
-              src={entry.user_photo_url}
-              alt="Foto del usuario"
-              style={{ width: 80, height: 60, objectFit: "cover", borderRadius: 6 }}
+              src={entry.beer_foto_url}
+              alt={entry.beer_nombre}
+              onClick={() => setLightboxSrc(entry.beer_foto_url)}
+              style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 8, flexShrink: 0, cursor: "zoom-in" }}
             />
           )}
+          <div style={{ flex: 1 }}>
+            {entry.rating != null && Number(entry.rating) > 0 && (
+              <div style={{ fontSize: 13, color: "#d4af37", fontWeight: 600, marginBottom: 4 }}>
+                ⭐ {Number(entry.rating).toFixed(1)} / 5
+              </div>
+            )}
+            {entry.comment?.trim() && (
+              <p style={{ margin: "0 0 6px", fontSize: 13, color: "#555", fontStyle: "italic" }}>
+                "{entry.comment.trim()}"
+              </p>
+            )}
+            {entry.user_photo_url?.trim() && (
+              <img
+                src={entry.user_photo_url}
+                alt="Foto del usuario"
+                onClick={() => setLightboxSrc(entry.user_photo_url)}
+                style={{ width: 80, height: 60, objectFit: "cover", borderRadius: 6, cursor: "zoom-in" }}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+    </>
   );
 };
 

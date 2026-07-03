@@ -6,6 +6,7 @@ import { computeEntryXP, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { logActivity } from "../utils/activity";
+import Lightbox from "../components/Lightbox";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -232,14 +233,7 @@ const MiCuaderno = () => {
         );
       })}
 
-      {showImage && (
-        <div
-          onClick={() => setShowImage(null)}
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999 }}
-        >
-          <img src={showImage} alt="Vista ampliada" style={{ maxWidth: "90%", maxHeight: "90%" }} />
-        </div>
-      )}
+      <Lightbox src={showImage} onClose={() => setShowImage(null)} />
     </div>
   );
 };

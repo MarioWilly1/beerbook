@@ -4,6 +4,7 @@ import { computeEntryXP, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { logActivity } from "../utils/activity";
+import Lightbox from "./Lightbox";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -13,6 +14,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
   const [rating, setRating]   = useState(myBeerData?.Rating ?? "");
   const [photoUrl, setPhotoUrl] = useState(myBeerData?.user_photo_url || "");
   const [saving, setSaving]   = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
 
   const xpPreview = computeEntryXP({ rating, comment, photo: photoUrl });
   const isComplete =
@@ -69,8 +71,10 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
       <img
         src={beer.foto_url}
         alt={beer.nombre}
-        style={{ width: "100%", height: "140px", objectFit: "cover", borderRadius: "10px" }}
+        onClick={() => beer.foto_url && setLightboxSrc(beer.foto_url)}
+        style={{ width: "100%", height: "140px", objectFit: "cover", borderRadius: "10px", cursor: beer.foto_url ? "zoom-in" : "default" }}
       />
+      <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
 
       <div style={{ padding: "10px 4px 0" }}>
         <h3 style={{ margin: "0 0 2px", fontSize: "15px" }}>{beer.nombre}</h3>

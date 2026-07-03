@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
-import { BADGE_DEFS, TIER_META, TIERS } from "../utils/badges";
+import { BADGE_DEFS, TIERS } from "../utils/badges";
 import { fetchAchievementStats } from "../utils/achievements";
 
 export const useBadges = () => {

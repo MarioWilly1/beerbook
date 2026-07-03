@@ -16,18 +16,20 @@ export const useUserStats = () => {
 
     const uid = session.user.id;
 
-    const [beersRes, achRes, profileRes] = await Promise.all([
+    const [beersRes, achRes, badgesRes, profileRes] = await Promise.all([
       supabase.from("user_beers").select('"XP"').eq("user_id", uid),
       supabase.from("user_achievements").select("xp_awarded").eq("user_id", uid),
+      supabase.from("user_badges").select("xp_awarded").eq("user_id", uid),
       supabase.from("profiles")
         .select("current_streak, longest_streak")
         .eq("id", uid)
         .single(),
     ]);
 
-    const beerXP = (beersRes.data || []).reduce((s, b) => s + (b.XP || 0), 0);
-    const achXP  = (achRes.data  || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
-    const totalXP = beerXP + achXP;
+    const beerXP   = (beersRes.data   || []).reduce((s, b) => s + (b.XP         || 0), 0);
+    const achXP    = (achRes.data     || []).reduce((s, a) => s + (a.xp_awarded  || 0), 0);
+    const badgeXP  = (badgesRes.data  || []).reduce((s, b) => s + (b.xp_awarded  || 0), 0);
+    const totalXP  = beerXP + achXP + badgeXP;
     const { level } = getLevelInfo(totalXP);
 
     setStats({

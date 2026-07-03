@@ -5,6 +5,7 @@ import { supabase } from "../services/supabase";
 import { computeEntryXP, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
+import { checkAndAwardBadges } from "../utils/badges";
 import { logActivity } from "../utils/activity";
 import Lightbox from "../components/Lightbox";
 
@@ -80,9 +81,10 @@ const MiCuaderno = () => {
       fetchAchievementStats(session.user.id),
     ]);
 
-    const newAchievements = achStats
-      ? await checkAndAwardAchievements(session.user.id, achStats, newStreak)
-      : [];
+    const [newAchievements, newBadges] = await Promise.all([
+      achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
+      achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
+    ]);
 
     refetchStats();
 
@@ -90,9 +92,11 @@ const MiCuaderno = () => {
     if (isComplete) msg += " 🎯 ¡Entrada completa!";
     if (newAchievements.length > 0) {
       msg += "\n\n🏅 ¡Logro desbloqueado!";
-      newAchievements.forEach((a) => {
-        msg += `\n${a.emoji} ${a.nombre} (+${a.xpBonus} XP)`;
-      });
+      newAchievements.forEach((a) => { msg += `\n${a.emoji} ${a.nombre} (+${a.xpBonus} XP)`; });
+    }
+    if (newBadges.length > 0) {
+      msg += "\n\n🏷️ ¡Insignia desbloqueada!";
+      newBadges.forEach((b) => { msg += `\n${b.icon} ${b.nombre} ${b.tierLabel} (+${b.xp} XP)`; });
     }
     alert(msg);
   };

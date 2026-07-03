@@ -4,9 +4,12 @@ import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
 import Avatar from "./Avatar";
 import AvatarSelector from "./AvatarSelector";
+import { useBadges } from "../hooks/useBadges";
+import { TIER_META } from "../utils/badges";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const { badges } = useBadges();
 
   const username =
     profile?.nombre ||
@@ -67,6 +70,46 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           </div>
 
           <UserLevelCard />
+
+          {/* Badge strip */}
+          {badges.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 10,
+                marginBottom: 16,
+              }}
+            >
+              {badges.map((b) => (
+                <div
+                  key={b.slug}
+                  title={`${b.nombre}: ${b.currentTier ? TIER_META[b.currentTier].label : "Sin desbloquear"}`}
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}
+                >
+                  <span
+                    style={{
+                      fontSize: 18,
+                      filter: !b.currentTier ? "grayscale(1)" : "none",
+                      opacity: b.currentTier ? 1 : 0.35,
+                    }}
+                  >
+                    {b.icon}
+                  </span>
+                  <div
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: b.currentTier
+                        ? TIER_META[b.currentTier].color
+                        : "rgba(255,255,255,0.2)",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <SidebarLink to="/" label="Catálogo" />

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getCountryName } from "../utils/countryDisplay";
 
 const RANGE_CSS = `
   .bf-thumb {
@@ -198,7 +199,7 @@ const BeerFilters = ({
   styles,
   countries,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const [low, high] = alcoholFilter;
@@ -324,7 +325,7 @@ const BeerFilters = ({
           )}
           {countryFilter && (
             <Badge
-              label={countryFilter}
+              label={getCountryName(countryFilter, i18n.language)}
               onRemove={() => setCountryFilter(null)}
             />
           )}
@@ -372,7 +373,7 @@ const BeerFilters = ({
                 {countries.map((c) => (
                   <Chip
                     key={c}
-                    label={c}
+                    label={getCountryName(c, i18n.language)}
                     active={countryFilter === c}
                     onClick={() =>
                       setCountryFilter(countryFilter === c ? null : c)

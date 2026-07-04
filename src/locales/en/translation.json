@@ -237,6 +237,31 @@
       "btnPublic":   "Yes, show me"
     }
   },
+  "avatar": {
+    "ui": {
+      "title":         "Your avatar",
+      "uploadSection": "📁 Upload your own photo",
+      "choosePhoto":   "Choose photo · max. 5 MB",
+      "saving":        "Saving...",
+      "savePhoto":     "💾 Save",
+      "errorUpload":   "Error uploading photo. Please try again.",
+      "errorSave":     "Error saving. Please try again.",
+      "errorSize":     "Photo cannot exceed 5 MB.",
+      "presetSection": "🎨 Choose character"
+    },
+    "clasico":    "The Classic",
+    "maestro":    "The Brewmaster",
+    "sommelier":  "The Sommelier",
+    "explorador": "The Explorer",
+    "lenador":    "The Lumberjack",
+    "aventurera": "The Adventurer",
+    "cientifico": "The Scientist",
+    "historico":  "The Historian",
+    "festera":    "The Party Girl",
+    "tranquilo":  "The Laid-Back One",
+    "critico":    "The Critic",
+    "novato":     "The Rookie"
+  },
   "achievement": {
     "primera-ronda":         { "name": "First Round",         "desc": "Register your first beer" },
     "seis-pack":             { "name": "Six Pack",            "desc": "6 verified beers (with photo)" },

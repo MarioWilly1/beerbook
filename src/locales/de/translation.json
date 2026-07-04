@@ -237,6 +237,31 @@
       "btnPublic":   "Ja, erscheinen"
     }
   },
+  "avatar": {
+    "ui": {
+      "title":         "Dein Avatar",
+      "uploadSection": "📁 Eigenes Foto hochladen",
+      "choosePhoto":   "Foto wählen · max. 5 MB",
+      "saving":        "Speichern...",
+      "savePhoto":     "💾 Speichern",
+      "errorUpload":   "Fehler beim Hochladen. Bitte erneut versuchen.",
+      "errorSave":     "Fehler beim Speichern. Bitte erneut versuchen.",
+      "errorSize":     "Das Foto darf 5 MB nicht überschreiten.",
+      "presetSection": "🎨 Charakter wählen"
+    },
+    "clasico":    "Der Klassiker",
+    "maestro":    "Der Braumeister",
+    "sommelier":  "Die Sommelière",
+    "explorador": "Der Entdecker",
+    "lenador":    "Der Holzfäller",
+    "aventurera": "Die Abenteurerin",
+    "cientifico": "Der Wissenschaftler",
+    "historico":  "Der Historiker",
+    "festera":    "Die Feiernde",
+    "tranquilo":  "Der Entspannte",
+    "critico":    "Der Kritiker",
+    "novato":     "Der Neuling"
+  },
   "achievement": {
     "primera-ronda":         { "name": "Erste Runde",          "desc": "Registriere dein erstes Bier" },
     "seis-pack":             { "name": "Sixpack",              "desc": "6 verifizierte Biere (mit Foto)" },

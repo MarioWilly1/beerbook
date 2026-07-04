@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getCountryName } from "../utils/countryDisplay";
 import { supabase } from "../services/supabase";
 import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
@@ -15,7 +16,7 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [times, setTimes]     = useState(myBeerData?.times || 0);
   const [comment, setComment] = useState(myBeerData?.comment || "");
   const [rating, setRating]   = useState(myBeerData?.Rating ?? "");
@@ -122,7 +123,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
 
       <div style={{ padding: "10px 4px 0" }}>
         <h3 style={{ margin: "0 0 2px", fontSize: "15px" }}>{beer.nombre}</h3>
-        <p style={metaStyle}>{beer.estilo} · {beer.pais} · {beer.alcohol}%</p>
+        <p style={metaStyle}>{beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%</p>
 
         <div style={fieldStyle}>
           <label style={labelStyle}>{t("beerform.timesLabel")}</label>

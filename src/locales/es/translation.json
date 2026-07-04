@@ -237,6 +237,31 @@
       "btnPublic":   "Sí, aparecer"
     }
   },
+  "avatar": {
+    "ui": {
+      "title":         "Tu avatar",
+      "uploadSection": "📁 Subir foto propia",
+      "choosePhoto":   "Elegir foto · máx. 5 MB",
+      "saving":        "Guardando...",
+      "savePhoto":     "💾 Guardar",
+      "errorUpload":   "Error al subir la foto. Intentá de nuevo.",
+      "errorSave":     "Error al guardar. Intentá de nuevo.",
+      "errorSize":     "La foto no puede superar 5 MB.",
+      "presetSection": "🎨 Elegir personaje"
+    },
+    "clasico":    "El Clásico",
+    "maestro":    "El Maestro",
+    "sommelier":  "La Sommelier",
+    "explorador": "El Explorador",
+    "lenador":    "El Leñador",
+    "aventurera": "La Aventurera",
+    "cientifico": "El Científico",
+    "historico":  "El Histórico",
+    "festera":    "La Festera",
+    "tranquilo":  "El Tranquilo",
+    "critico":    "El Crítico",
+    "novato":     "El Novato"
+  },
   "achievement": {
     "primera-ronda":         { "name": "Primera Ronda",         "desc": "Registrá tu primera cerveza" },
     "seis-pack":             { "name": "Seis Pack",             "desc": "6 cervezas verificadas (con foto)" },

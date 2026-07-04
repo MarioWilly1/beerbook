@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { PRESET_AVATARS } from "../utils/avatarPresets";
 import Avatar from "./Avatar";
 
-// Compresses an image file to JPEG, capped at maxDimension px on the longest side.
 function compressImage(file, maxDimension = 800, quality = 0.82) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -31,17 +31,18 @@ function compressImage(file, maxDimension = 800, quality = 0.82) {
 }
 
 const AvatarSelector = ({ profile, session, onSave, onClose }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef(null);
-  const [file, setFile]           = useState(null);
+  const [file, setFile]             = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError]         = useState("");
+  const [uploading, setUploading]   = useState(false);
+  const [error, setError]           = useState("");
 
   const handleFileChange = (e) => {
     const f = e.target.files[0];
     if (!f) return;
     if (f.size > 5 * 1024 * 1024) {
-      setError("La foto no puede superar 5 MB.");
+      setError(t("avatar.ui.errorSize"));
       return;
     }
     setError("");
@@ -55,7 +56,6 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
     setError("");
 
     const path = `${session.user.id}/avatar`;
-
     const compressed = await compressImage(file);
 
     const { error: uploadErr } = await supabase.storage
@@ -63,7 +63,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
       .upload(path, compressed, { upsert: true, contentType: "image/jpeg" });
 
     if (uploadErr) {
-      setError("Error al subir la foto. Intentá de nuevo.");
+      setError(t("avatar.ui.errorUpload"));
       setUploading(false);
       return;
     }
@@ -80,7 +80,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
       .eq("id", session.user.id);
 
     if (dbErr) {
-      setError("Error al guardar. Intentá de nuevo.");
+      setError(t("avatar.ui.errorSave"));
       setUploading(false);
       return;
     }
@@ -100,7 +100,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
       .eq("id", session.user.id);
 
     if (dbErr) {
-      setError("Error al guardar. Intentá de nuevo.");
+      setError(t("avatar.ui.errorSave"));
       setUploading(false);
       return;
     }
@@ -119,7 +119,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#111" }}>Tu avatar</h2>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#111" }}>{t("avatar.ui.title")}</h2>
           <button onClick={onClose} style={closeBtnStyle}>✕</button>
         </div>
 
@@ -136,7 +136,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
 
         {/* Upload section */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>📁 Subir foto propia</p>
+          <p style={sectionTitleStyle}>{t("avatar.ui.uploadSection")}</p>
           <input
             ref={fileInputRef}
             type="file"
@@ -150,7 +150,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
               onClick={() => fileInputRef.current.click()}
               style={uploadBtnStyle}
             >
-              Elegir foto · máx. 5 MB
+              {t("avatar.ui.choosePhoto")}
             </button>
           ) : (
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -168,7 +168,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
                 disabled={uploading}
                 style={{ ...saveBtnStyle, opacity: uploading ? 0.6 : 1 }}
               >
-                {uploading ? "Guardando..." : "💾 Guardar"}
+                {uploading ? t("avatar.ui.saving") : t("avatar.ui.savePhoto")}
               </button>
             </div>
           )}
@@ -176,30 +176,31 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
 
         {/* Preset section */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>🎨 Elegir personaje</p>
+          <p style={sectionTitleStyle}>{t("avatar.ui.presetSection")}</p>
           <div style={gridStyle}>
             {PRESET_AVATARS.map((preset) => {
               const isSelected = profile?.avatar_url === preset.url;
+              const presetName = t(`avatar.${preset.id}`);
               return (
                 <button
                   key={preset.id}
                   onClick={() => handlePreset(preset)}
                   disabled={uploading}
-                  title={preset.nombre}
+                  title={presetName}
                   style={{
                     ...presetBtnStyle,
-                    border:      isSelected ? "2px solid #d4af37" : "2px solid transparent",
-                    background:  isSelected ? "#fffbee"           : "#f4f4f4",
-                    opacity:     uploading ? 0.6 : 1,
+                    border:     isSelected ? "2px solid #d4af37" : "2px solid transparent",
+                    background: isSelected ? "#fffbee"           : "#f4f4f4",
+                    opacity:    uploading ? 0.6 : 1,
                   }}
                 >
                   <img
                     src={preset.url}
-                    alt={preset.nombre}
+                    alt={presetName}
                     style={{ width: 52, height: 52, borderRadius: "50%" }}
                   />
                   <span style={{ fontSize: 9, color: "#555", marginTop: 4, textAlign: "center", lineHeight: 1.2 }}>
-                    {preset.nombre}
+                    {presetName}
                   </span>
                 </button>
               );

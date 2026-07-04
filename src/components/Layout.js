@@ -49,7 +49,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           {/* Avatar + username — clickable to open selector */}
           <div
             onClick={() => setShowAvatarSelector(true)}
-            title="Cambiar avatar"
+            title={t("sidebar.changeAvatar")}
             style={{
               display: "flex", flexDirection: "column", alignItems: "center",
               marginBottom: 16, cursor: "pointer",

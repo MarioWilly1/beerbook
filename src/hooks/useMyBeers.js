@@ -35,7 +35,8 @@ export const useMyBeers = () => {
             estilo,
             alcohol,
             descripcion,
-            foto_url
+            foto_url,
+            info_detallada
           )
         `)
         .eq("user_id", session.user.id);

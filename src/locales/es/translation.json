@@ -309,6 +309,11 @@
       "start":    "{{value}}/{{threshold}} para {{tier}}"
     }
   },
+  "beerInfo": {
+    "btnTitle":     "Ver descripción técnica",
+    "sectionLabel": "Descripción técnica",
+    "unavailable":  "Descripción no disponible todavía."
+  },
   "stories": {
     "myStory": "Tu historia",
     "emptyBar": "Tus amigos no publicaron historias hoy",

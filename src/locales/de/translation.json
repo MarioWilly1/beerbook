@@ -309,6 +309,11 @@
       "start":    "{{value}}/{{threshold}} für {{tier}}"
     }
   },
+  "beerInfo": {
+    "btnTitle":     "Technische Beschreibung anzeigen",
+    "sectionLabel": "Technische Beschreibung",
+    "unavailable":  "Beschreibung noch nicht verfügbar."
+  },
   "stories": {
     "myStory": "Deine Story",
     "emptyBar": "Deine Freunde haben heute keine Stories gepostet",

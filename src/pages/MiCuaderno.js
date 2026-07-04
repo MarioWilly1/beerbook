@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import BeerInfoModal from "../components/BeerInfoModal";
 import { useMyBeers } from "../hooks/useMyBeers";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
@@ -22,6 +23,7 @@ const MiCuaderno = () => {
   const { refetch: refetchStats } = useUserStats();
   const [editableBeers, setEditableBeers] = useState([]);
   const [showImage, setShowImage] = useState(null);
+  const [infoModal, setInfoModal] = useState(null);
 
   useEffect(() => {
     setEditableBeers(
@@ -179,7 +181,16 @@ const MiCuaderno = () => {
             </div>
 
             <div style={{ flex: 1 }}>
-              <h3 style={{ margin: "0 0 4px", color: "#f0e4cc" }}>{beer.nombre}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 4px" }}>
+                <h3 style={{ margin: 0, color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
+                <button
+                  onClick={() => setInfoModal(beer)}
+                  title={t("beerInfo.btnTitle")}
+                  style={infoBtnStyle}
+                >
+                  ⓘ
+                </button>
+              </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                 {beer.user_photo_url?.trim() ? (
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#2a6b3a", background: "#0f2a18", borderRadius: 5, padding: "2px 7px" }}>
@@ -286,6 +297,7 @@ const MiCuaderno = () => {
       })}
 
       <Lightbox src={showImage} onClose={() => setShowImage(null)} />
+      {infoModal && <BeerInfoModal beer={infoModal} onClose={() => setInfoModal(null)} />}
     </div>
   );
 };
@@ -294,6 +306,7 @@ const XpBadge = ({ xp }) => (
   <span style={{ fontSize: "10px", color: "#d4af37", fontWeight: 700, marginLeft: "4px" }}>+{xp} XP</span>
 );
 
+const infoBtnStyle    = { background: "none", border: "none", color: "#8b6b2e", fontSize: 16, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 };
 const rowStyle        = { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" };
 const labelStyle      = { fontSize: "12px", fontWeight: "600", color: "#9a7d62", minWidth: "120px", textTransform: "uppercase", letterSpacing: "0.4px" };
 const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };

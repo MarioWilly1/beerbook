@@ -8,6 +8,7 @@ import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achie
 import { logActivity } from "../utils/activity";
 import { checkAndAwardBadges } from "../utils/badges";
 import Lightbox from "./Lightbox";
+import BeerInfoModal from "./BeerInfoModal";
 import LocationPicker from "./LocationPicker";
 import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
 import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
@@ -28,6 +29,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
   );
   const [saving, setSaving]   = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   const xpPreview = computeEntryXP({ rating, comment, photo: photoUrl });
   const isComplete =
@@ -121,7 +123,16 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
       </div>
 
       <div style={{ padding: "10px 4px 0" }}>
-        <h3 style={{ margin: "0 0 2px", fontSize: "15px", color: "#f0e4cc" }}>{beer.nombre}</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 2px" }}>
+          <h3 style={{ margin: 0, fontSize: "15px", color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
+          <button
+            onClick={() => setInfoOpen(true)}
+            title={t("beerInfo.btnTitle")}
+            style={infoBtnStyle}
+          >
+            ⓘ
+          </button>
+        </div>
         <p style={metaStyle}>{beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%</p>
 
         <div style={fieldStyle}>
@@ -196,6 +207,8 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
           </p>
         )}
       </div>
+
+      {infoOpen && <BeerInfoModal beer={beer} onClose={() => setInfoOpen(false)} />}
     </div>
   );
 };
@@ -206,6 +219,7 @@ const XpBadge = ({ xp }) => (
   </span>
 );
 
+const infoBtnStyle = { background: "none", border: "none", color: "#8b6b2e", fontSize: 15, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
 const cardStyle   = { border: "1px solid #2e2215", borderRadius: "12px", padding: "12px", background: "#1c1409", display: "flex", flexDirection: "column" };
 const metaStyle   = { margin: "0 0 10px", fontSize: "12px", color: "#9a7d62" };
 const fieldStyle  = { marginBottom: "8px" };

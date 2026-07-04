@@ -309,6 +309,11 @@
       "start":    "{{value}}/{{threshold}} for {{tier}}"
     }
   },
+  "beerInfo": {
+    "btnTitle":     "View technical description",
+    "sectionLabel": "Technical description",
+    "unavailable":  "Description not available yet."
+  },
   "stories": {
     "myStory": "Your story",
     "emptyBar": "Your friends haven't posted stories today",

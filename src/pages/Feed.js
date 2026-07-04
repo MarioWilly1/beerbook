@@ -1,14 +1,8 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useFeed } from "../hooks/useFeed";
 import Avatar from "../components/Avatar";
 import Lightbox from "../components/Lightbox";
-
-const ACTION_LABEL = {
-  register: "registró",
-  rate:     "valoró",
-  comment:  "comentó sobre",
-  photo:    "subió una foto de",
-};
 
 const ACTION_EMOJI = {
   register: "🍺",
@@ -17,22 +11,23 @@ const ACTION_EMOJI = {
   photo:    "📸",
 };
 
-function timeAgo(dateStr) {
+function timeAgo(dateStr, t) {
   const diff    = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60_000);
   const hours   = Math.floor(minutes / 60);
   const days    = Math.floor(hours / 24);
-  if (minutes < 1)  return "ahora mismo";
-  if (minutes < 60) return `hace ${minutes} min`;
-  if (hours < 24)   return `hace ${hours}h`;
-  if (days < 7)     return `hace ${days} día${days !== 1 ? "s" : ""}`;
-  return new Date(dateStr).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
+  if (minutes < 1)  return t("feed.timeAgo.now");
+  if (minutes < 60) return t("feed.timeAgo.minutesAgo", { n: minutes });
+  if (hours < 24)   return t("feed.timeAgo.hoursAgo", { n: hours });
+  if (days < 7)     return t("feed.timeAgo.daysAgo", { count: days });
+  return new Date(dateStr).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
 const FeedEntry = ({ entry }) => {
+  const { t } = useTranslation();
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const emoji = ACTION_EMOJI[entry.action] || "🍺";
-  const label = ACTION_LABEL[entry.action] || "interactuó con";
+  const label = t(`feed.action.${entry.action}`, { defaultValue: t("feed.action.default") });
 
   return (
     <>
@@ -46,7 +41,7 @@ const FeedEntry = ({ entry }) => {
             {" "}
             <span style={{ fontWeight: 700, fontSize: 14, color: "#8b6b2e" }}>{entry.beer_nombre}</span>
           </div>
-          <span style={{ fontSize: 12, color: "#bbb", flexShrink: 0 }}>{timeAgo(entry.created_at)}</span>
+          <span style={{ fontSize: 12, color: "#bbb", flexShrink: 0 }}>{timeAgo(entry.created_at, t)}</span>
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
@@ -72,7 +67,7 @@ const FeedEntry = ({ entry }) => {
             {entry.user_photo_url?.trim() && (
               <img
                 src={entry.user_photo_url}
-                alt="Foto del usuario"
+                alt={t("feed.userPhotoAlt")}
                 onClick={() => setLightboxSrc(entry.user_photo_url)}
                 style={{ width: 80, height: 60, objectFit: "cover", borderRadius: 6, cursor: "zoom-in" }}
               />
@@ -92,23 +87,24 @@ const FeedEntry = ({ entry }) => {
 };
 
 const Feed = () => {
+  const { t } = useTranslation();
   const { feed, loading } = useFeed();
 
-  if (loading) return <p style={{ padding: 24 }}>Cargando feed...</p>;
+  if (loading) return <p style={{ padding: 24 }}>{t("feed.loading")}</p>;
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
-      <h2 style={{ margin: "0 0 4px" }}>📡 Feed</h2>
+      <h2 style={{ margin: "0 0 4px" }}>📡 {t("feed.title")}</h2>
       <p style={{ color: "#888", fontSize: 13, margin: "0 0 24px" }}>
-        Actividad reciente de tus amigos
+        {t("feed.subtitle")}
       </p>
 
       {feed.length === 0 ? (
         <div style={emptyStyle}>
           <p style={{ fontSize: 40, margin: "0 0 12px" }}>🍺</p>
-          <p style={{ margin: 0, fontWeight: 600, color: "#555" }}>Nada por aquí todavía</p>
+          <p style={{ margin: 0, fontWeight: 600, color: "#555" }}>{t("feed.empty.title")}</p>
           <p style={{ margin: "6px 0 0", fontSize: 13, color: "#999" }}>
-            Agregá amigos en <strong>Amigos</strong> para ver su actividad.
+            {t("feed.empty.bodyPre")}<strong>{t("feed.empty.bodyLink")}</strong>{t("feed.empty.bodyPost")}
           </p>
         </div>
       ) : (

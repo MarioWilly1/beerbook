@@ -95,11 +95,11 @@ const Configuracion = ({ onProfileChange }) => {
     if (!session) return;
     const trimmedNombre = nombre.trim();
     if (!trimmedNombre) {
-      setNombreError("El nombre no puede estar vacío.");
+      setNombreError(t("settings.profile.errorEmpty"));
       return;
     }
     if (trimmedNombre.length < 2) {
-      setNombreError("Mínimo 2 caracteres.");
+      setNombreError(t("settings.profile.errorMinLength"));
       return;
     }
     setNombreError("");
@@ -148,12 +148,12 @@ const Configuracion = ({ onProfileChange }) => {
   };
 
   if (!localProfile && !session) {
-    return <p style={{ padding: 24 }}>Cargando configuración...</p>;
+    return <p style={{ padding: 24 }}>{t("settings.loading")}</p>;
   }
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
-      <h2 style={{ margin: "0 0 24px" }}>⚙️ Configuración</h2>
+      <h2 style={{ margin: "0 0 24px" }}>⚙️ {t("settings.pageTitle")}</h2>
 
       {/* ── Tabs ─────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #f0f0f0" }}>
@@ -191,14 +191,14 @@ const Configuracion = ({ onProfileChange }) => {
                 onClick={() => setShowAvatarSelector(true)}
                 style={{ fontSize: 12, color: "#b8941f", background: "none", border: "none", cursor: "pointer", padding: 0, marginTop: 4 }}
               >
-                Cambiar avatar →
+                {t("settings.profile.changeAvatar")}
               </button>
             </div>
           </div>
 
           {/* Nombre de usuario */}
           <div style={{ marginBottom: 20 }}>
-            <label style={labelStyle}>Nombre de usuario</label>
+            <label style={labelStyle}>{t("settings.profile.usernameLabel")}</label>
             <input
               type="text"
               value={nombre}
@@ -206,7 +206,7 @@ const Configuracion = ({ onProfileChange }) => {
                 if (e.target.value.length <= 30) setNombre(e.target.value);
                 if (nombreError) setNombreError("");
               }}
-              placeholder="Tu nombre visible en la app"
+              placeholder={t("settings.profile.usernamePlaceholder")}
               style={{ ...inputStyle, borderColor: nombreError ? "#c0392b" : "#e0e0e0" }}
             />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
@@ -219,11 +219,11 @@ const Configuracion = ({ onProfileChange }) => {
 
           {/* Biografía */}
           <div style={{ marginBottom: 20 }}>
-            <label style={labelStyle}>Biografía</label>
+            <label style={labelStyle}>{t("settings.profile.bioLabel")}</label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value.slice(0, 200))}
-              placeholder="Contá algo sobre vos como tomador de cerveza..."
+              placeholder={t("settings.profile.bioPlaceholder")}
               rows={3}
               style={{ ...inputStyle, resize: "vertical" }}
             />
@@ -234,12 +234,12 @@ const Configuracion = ({ onProfileChange }) => {
 
           {/* País de origen */}
           <div style={{ marginBottom: 28 }}>
-            <label style={labelStyle}>País de origen</label>
+            <label style={labelStyle}>{t("settings.profile.countryLabel")}</label>
             <input
               type="text"
               value={pais}
               onChange={(e) => setPais(e.target.value)}
-              placeholder="Ej: Argentina, España..."
+              placeholder={t("settings.profile.countryPlaceholder")}
               style={inputStyle}
             />
           </div>
@@ -247,14 +247,14 @@ const Configuracion = ({ onProfileChange }) => {
           {/* Insignias destacadas */}
           <div style={{ marginBottom: 32 }}>
             <label style={labelStyle}>
-              Insignias destacadas{" "}
+              {t("settings.profile.featuredBadgesLabel")}{" "}
               <span style={{ fontWeight: 400, color: "#bbb", textTransform: "none" }}>
-                ({featuredBadges.length}/3 seleccionadas)
+                {t("settings.profile.featuredBadgesCount", { count: featuredBadges.length })}
               </span>
             </label>
             {unlockedBadges.length === 0 ? (
               <p style={{ color: "#bbb", fontSize: 13, margin: "8px 0" }}>
-                Desbloqueá insignias en Logros para poder destacarlas aquí.
+                {t("settings.profile.noBadgesHint")}
               </p>
             ) : (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
@@ -269,7 +269,7 @@ const Configuracion = ({ onProfileChange }) => {
                       onClick={() => !disabled && toggleFeaturedBadge(badge.slug)}
                       title={
                         disabled
-                          ? "Máximo 3 insignias"
+                          ? t("settings.profile.maxBadgesHint")
                           : `${badge.nombre} · ${TIER_META[badge.currentTier].label}`
                       }
                       style={{
@@ -306,7 +306,7 @@ const Configuracion = ({ onProfileChange }) => {
               transition: "all 0.2s",
             }}
           >
-            {saved ? "✓ Guardado" : saving ? "Guardando..." : "Guardar cambios"}
+            {saved ? t("settings.profile.savedBtn") : saving ? t("settings.profile.savingBtn") : t("settings.profile.saveBtn")}
           </button>
         </div>
       )}
@@ -315,30 +315,22 @@ const Configuracion = ({ onProfileChange }) => {
       {tab === "privacidad" && (
         <div>
           <p style={{ color: "#888", fontSize: 13, margin: "0 0 4px", lineHeight: 1.5 }}>
-            Estas dos configuraciones son independientes entre sí.
+            {t("settings.privacy.intro")}
           </p>
           <Toggle
             value={perfilPublico}
             onChange={(v) => handlePrivacyToggle("perfil_publico", v)}
-            label="Perfil público"
-            description={
-              perfilPublico
-                ? "Cualquier usuario puede ver tus estadísticas, rachas e insignias."
-                : "Solo tus amigos ven tus estadísticas. Los demás solo ven tu nombre y avatar."
-            }
+            label={t("settings.privacy.publicProfileLabel")}
+            description={t(perfilPublico ? "settings.privacy.publicProfileOn" : "settings.privacy.publicProfileOff")}
           />
           <Toggle
             value={aparecer}
             onChange={(v) => handlePrivacyToggle("aparecer_en_ranking", v)}
-            label="Aparecer en rankings globales"
-            description={
-              aparecer
-                ? "Tu posición aparece en el ranking global y semanal."
-                : "Tu XP sigue acumulándose normalmente, pero no aparecés en los rankings públicos. Sí seguís visible en el ranking entre amigos."
-            }
+            label={t("settings.privacy.rankingLabel")}
+            description={t(aparecer ? "settings.privacy.rankingOn" : "settings.privacy.rankingOff")}
           />
           <p style={{ fontSize: 12, color: "#ccc", marginTop: 20, lineHeight: 1.5 }}>
-            Los cambios de privacidad se aplican de inmediato.
+            {t("settings.privacy.note")}
           </p>
         </div>
       )}

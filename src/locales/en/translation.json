@@ -19,10 +19,40 @@
     "levelUp":       "Level unlocked — {{levelName}}"
   },
   "settings": {
+    "pageTitle": "Settings",
+    "loading":   "Loading settings...",
     "tabs": {
       "profile":     "Profile",
       "privacy":     "Privacy",
       "preferences": "Preferences"
+    },
+    "profile": {
+      "changeAvatar":         "Change avatar →",
+      "usernameLabel":        "Username",
+      "usernamePlaceholder":  "Your visible name in the app",
+      "errorEmpty":           "Name cannot be empty.",
+      "errorMinLength":       "Minimum 2 characters.",
+      "bioLabel":             "Bio",
+      "bioPlaceholder":       "Tell us something about you as a beer drinker...",
+      "countryLabel":         "Country of origin",
+      "countryPlaceholder":   "E.g.: Argentina, Spain...",
+      "featuredBadgesLabel":  "Featured badges",
+      "featuredBadgesCount":  "({{count}}/3 selected)",
+      "noBadgesHint":         "Unlock badges in Achievements to feature them here.",
+      "maxBadgesHint":        "Maximum 3 badges",
+      "saveBtn":              "Save changes",
+      "savingBtn":            "Saving...",
+      "savedBtn":             "✓ Saved"
+    },
+    "privacy": {
+      "intro":              "These two settings are independent of each other.",
+      "publicProfileLabel": "Public profile",
+      "publicProfileOn":    "Any user can see your stats, streaks and badges.",
+      "publicProfileOff":   "Only your friends see your stats. Others only see your name and avatar.",
+      "rankingLabel":       "Appear in global rankings",
+      "rankingOn":          "Your position appears in the global and weekly ranking.",
+      "rankingOff":         "Your XP keeps accumulating normally, but you won't appear in public rankings. You'll still be visible in the friends ranking.",
+      "note":               "Privacy changes take effect immediately."
     },
     "prefs": {
       "audioTitle":    "Sound effects",
@@ -32,6 +62,86 @@
       "languageTitle": "Language",
       "languageNote":  "Preference syncs to your account."
     }
+  },
+  "logros": {
+    "loading":             "Loading achievements...",
+    "badgesTitle":         "Progress Badges",
+    "badgesSummary":       "{{unlocked}}/{{total}} categories with badge",
+    "achievementsTitle":   "Achievements",
+    "achievementsSummary": "{{unlocked}}/{{total}} unlocked",
+    "xpEarned":            "· +{{xp}} XP earned"
+  },
+  "feed": {
+    "loading":      "Loading feed...",
+    "title":        "Feed",
+    "subtitle":     "Recent activity from your friends",
+    "userPhotoAlt": "User photo",
+    "empty": {
+      "title":    "Nothing here yet",
+      "bodyPre":  "Add friends in ",
+      "bodyLink": "Friends",
+      "bodyPost": " to see their activity."
+    },
+    "timeAgo": {
+      "now":          "just now",
+      "minutesAgo":   "{{n}} min ago",
+      "hoursAgo":     "{{n}}h ago",
+      "daysAgo_one":  "{{count}} day ago",
+      "daysAgo_other":"{{count}} days ago"
+    },
+    "action": {
+      "register": "registered",
+      "rate":     "rated",
+      "comment":  "commented on",
+      "photo":    "uploaded a photo of",
+      "default":  "interacted with"
+    }
+  },
+  "friends": {
+    "loading":             "Loading...",
+    "title":               "Friends",
+    "count_one":           "{{count}} friend",
+    "count_other":         "{{count}} friends",
+    "receivedRequests":    "Received requests",
+    "accept":              "Accept",
+    "reject":              "Reject",
+    "searchTitle":         "Search users",
+    "searchPlaceholder":   "Username...",
+    "searchBtn":           "Search",
+    "noResults":           "No results for \"{{term}}\"",
+    "statusFriends":       "Friends",
+    "statusSent":          "Request sent",
+    "addBtn":              "Add",
+    "myFriends":           "My friends",
+    "empty":               "You don't have any friends in BeerBook yet. Search above!",
+    "removeBtn":           "Remove",
+    "sentRequests":        "Sent requests ({{count}})",
+    "pending":             "Pending...",
+    "requestSent":         "Request sent ✓",
+    "achievementUnlocked": "🏅 Achievement unlocked!",
+    "nowFriends":          "You're now friends! 🎉",
+    "requestRejected":     "Request rejected",
+    "confirmRemove":       "Remove this friend?",
+    "friendRemoved":       "Friend removed"
+  },
+  "profile": {
+    "loading":             "Loading profile...",
+    "notFound":            "Profile not found.",
+    "statLevel":           "Level",
+    "statXP":              "Total XP",
+    "statBeers":           "Beers",
+    "statVerified":        "{{count}} verified",
+    "statStreak":          "Streak",
+    "statStreakSub":       "days in a row",
+    "featuredBadgesLabel": "Featured badges",
+    "privateTitle":        "Private profile",
+    "privateBody":         "Only {{nombre}}'s friends can see their stats.",
+    "requestSentPending":  "Request sent · pending",
+    "sending":             "Sending...",
+    "addFriend":           "Send friend request",
+    "editProfile":         "Edit profile",
+    "areFriends":          "Friends",
+    "back":                "← Back"
   },
   "dashboard": {
     "title":        "Beer Catalog",

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import { BADGE_DEFS, TIER_META, TIERS } from "../utils/badges";
@@ -6,6 +7,7 @@ import { getLevelInfo } from "../utils/xp";
 import Avatar from "../components/Avatar";
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const { userId }   = useParams();
   const navigate     = useNavigate();
 
@@ -117,8 +119,8 @@ const ProfilePage = () => {
     setReqLoading(false);
   };
 
-  if (loading) return <p style={{ padding: 24 }}>Cargando perfil...</p>;
-  if (!profileData) return <p style={{ padding: 24 }}>Perfil no encontrado.</p>;
+  if (loading) return <p style={{ padding: 24 }}>{t("profile.loading")}</p>;
+  if (!profileData) return <p style={{ padding: 24 }}>{t("profile.notFound")}</p>;
 
   const isSelf       = currentUserId === userId;
   const canSeeStats  = isSelf || (profileData.perfil_publico ?? true) || isFriend;
@@ -148,16 +150,16 @@ const ProfilePage = () => {
       {canSeeStats && stats && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 12, marginBottom: 20 }}>
-            <StatCard label="Nivel" value={`⚡ ${stats.level}`} sub={stats.levelName} />
-            <StatCard label="XP Total" value={`⭐ ${stats.totalXP.toLocaleString()}`} />
-            <StatCard label="Cervezas" value={`🍺 ${stats.totalBeers}`} sub={`${stats.verifiedBeers} verificadas`} />
-            <StatCard label="Racha" value={`🔥 ${profileData.current_streak ?? 0}`} sub="días seguidos" />
+            <StatCard label={t("profile.statLevel")} value={`⚡ ${stats.level}`} sub={stats.levelName} />
+            <StatCard label={t("profile.statXP")} value={`⭐ ${stats.totalXP.toLocaleString()}`} />
+            <StatCard label={t("profile.statBeers")} value={`🍺 ${stats.totalBeers}`} sub={t("profile.statVerified", { count: stats.verifiedBeers })} />
+            <StatCard label={t("profile.statStreak")} value={`🔥 ${profileData.current_streak ?? 0}`} sub={t("profile.statStreakSub")} />
           </div>
 
           {featuredDetails.length > 0 && (
             <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #eee", padding: "18px 20px", marginBottom: 20 }}>
               <p style={{ margin: "0 0 14px", fontSize: 12, fontWeight: 700, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                Insignias destacadas
+                {t("profile.featuredBadgesLabel")}
               </p>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                 {featuredDetails.map((b) => {
@@ -190,14 +192,14 @@ const ProfilePage = () => {
       {!canSeeStats && (
         <div style={{ textAlign: "center", padding: "32px 24px", background: "#fff", borderRadius: 14, border: "1px solid #eee", marginBottom: 20 }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
-          <p style={{ fontWeight: 700, color: "#333", margin: "0 0 8px" }}>Perfil privado</p>
+          <p style={{ fontWeight: 700, color: "#333", margin: "0 0 8px" }}>{t("profile.privateTitle")}</p>
           <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px", lineHeight: 1.5 }}>
-            Solo los amigos de <strong>{profileData.nombre}</strong> pueden ver sus estadísticas.
+            {t("profile.privateBody", { nombre: profileData.nombre })}
           </p>
           {currentUserId && !isSelf && (
             hasSentReq ? (
               <span style={{ fontSize: 13, color: "#888", background: "#f5f5f5", padding: "8px 18px", borderRadius: 20 }}>
-                Solicitud enviada · pendiente
+                {t("profile.requestSentPending")}
               </span>
             ) : (
               <button
@@ -205,7 +207,7 @@ const ProfilePage = () => {
                 disabled={reqLoading}
                 style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#d4af37", color: "#111", fontWeight: 700, fontSize: 14, cursor: reqLoading ? "not-allowed" : "pointer", opacity: reqLoading ? 0.6 : 1 }}
               >
-                {reqLoading ? "Enviando..." : "Solicitar amistad"}
+                {reqLoading ? t("profile.sending") : t("profile.addFriend")}
               </button>
             )
           )}
@@ -219,13 +221,13 @@ const ProfilePage = () => {
             onClick={() => navigate("/configuracion")}
             style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid #e0e0e0", background: "#fafafa", color: "#555", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
           >
-            ⚙️ Editar perfil
+            ⚙️ {t("profile.editProfile")}
           </button>
         )}
         {!isSelf && canSeeStats && !isFriend && currentUserId && (
           hasSentReq ? (
             <span style={{ fontSize: 13, color: "#888", background: "#f5f5f5", padding: "10px 18px", borderRadius: 20 }}>
-              Solicitud enviada · pendiente
+              {t("profile.requestSentPending")}
             </span>
           ) : (
             <button
@@ -233,20 +235,20 @@ const ProfilePage = () => {
               disabled={reqLoading}
               style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#d4af37", color: "#111", fontWeight: 700, fontSize: 13, cursor: reqLoading ? "not-allowed" : "pointer" }}
             >
-              {reqLoading ? "Enviando..." : "Solicitar amistad"}
+              {reqLoading ? t("profile.sending") : t("profile.addFriend")}
             </button>
           )
         )}
         {isFriend && (
           <span style={{ fontSize: 13, color: "#1e8449", background: "#d5f5e3", padding: "10px 18px", borderRadius: 20, fontWeight: 600 }}>
-            ✓ Son amigos
+            ✓ {t("profile.areFriends")}
           </span>
         )}
         <button
           onClick={() => navigate(-1)}
           style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid #e0e0e0", background: "none", color: "#888", fontSize: 13, cursor: "pointer" }}
         >
-          ← Volver
+          {t("profile.back")}
         </button>
       </div>
     </div>

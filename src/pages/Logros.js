@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { ACHIEVEMENTS } from "../utils/achievements";
 import { useBadges } from "../hooks/useBadges";
 import BadgeCard from "../components/BadgeCard";
 
 const Logros = () => {
+  const { t, i18n } = useTranslation();
   const [unlocked, setUnlocked]       = useState(new Set());
   const [unlockedData, setUnlockedData] = useState({});
   const [loading, setLoading]         = useState(true);
@@ -29,7 +31,7 @@ const Logros = () => {
     load();
   }, []);
 
-  if (loading || badgesLoading) return <p style={{ padding: 24 }}>Cargando logros...</p>;
+  if (loading || badgesLoading) return <p style={{ padding: 24 }}>{t("logros.loading")}</p>;
 
   const totalAchXP = Object.values(unlockedData).reduce((s, a) => s + (a.xp_awarded || 0), 0);
   const unlockedBadgeCount = badges.filter((b) => b.currentTier).length;
@@ -40,10 +42,10 @@ const Logros = () => {
       {/* ── INSIGNIAS DE PROGRESIÓN ── */}
       <div style={{ marginBottom: 36 }}>
         <div style={{ marginBottom: 20 }}>
-          <h2 style={{ margin: "0 0 4px" }}>🏷️ Insignias de Progresión</h2>
+          <h2 style={{ margin: "0 0 4px" }}>🏷️ {t("logros.badgesTitle")}</h2>
           <p style={{ color: "#666", margin: 0, fontSize: 14 }}>
-            {unlockedBadgeCount}/{badges.length} categorías con insignia
-            {totalBadgeXP > 0 && ` · +${totalBadgeXP} XP ganados`}
+            {t("logros.badgesSummary", { unlocked: unlockedBadgeCount, total: badges.length })}
+            {totalBadgeXP > 0 && ` ${t("logros.xpEarned", { xp: totalBadgeXP })}`}
           </p>
         </div>
 
@@ -63,10 +65,10 @@ const Logros = () => {
       {/* ── LOGROS ── */}
       <div>
         <div style={{ marginBottom: 20 }}>
-          <h2 style={{ margin: "0 0 4px" }}>🏅 Logros</h2>
+          <h2 style={{ margin: "0 0 4px" }}>🏅 {t("logros.achievementsTitle")}</h2>
           <p style={{ color: "#666", margin: 0, fontSize: 14 }}>
-            {unlocked.size}/{ACHIEVEMENTS.length} desbloqueados
-            {totalAchXP > 0 && ` · +${totalAchXP} XP ganados`}
+            {t("logros.achievementsSummary", { unlocked: unlocked.size, total: ACHIEVEMENTS.length })}
+            {totalAchXP > 0 && ` ${t("logros.xpEarned", { xp: totalAchXP })}`}
           </p>
         </div>
 
@@ -81,7 +83,7 @@ const Logros = () => {
             const isUnlocked = unlocked.has(ach.slug);
             const data = unlockedData[ach.slug];
             const date = data?.unlocked_at
-              ? new Date(data.unlocked_at).toLocaleDateString("es-AR", {
+              ? new Date(data.unlocked_at).toLocaleDateString(i18n.language, {
                   day: "2-digit", month: "short", year: "numeric",
                 })
               : null;

@@ -19,10 +19,40 @@
     "levelUp":       "Nivel desbloqueado — {{levelName}}"
   },
   "settings": {
+    "pageTitle": "Configuración",
+    "loading":   "Cargando configuración...",
     "tabs": {
       "profile":     "Perfil",
       "privacy":     "Privacidad",
       "preferences": "Preferencias"
+    },
+    "profile": {
+      "changeAvatar":         "Cambiar avatar →",
+      "usernameLabel":        "Nombre de usuario",
+      "usernamePlaceholder":  "Tu nombre visible en la app",
+      "errorEmpty":           "El nombre no puede estar vacío.",
+      "errorMinLength":       "Mínimo 2 caracteres.",
+      "bioLabel":             "Biografía",
+      "bioPlaceholder":       "Contá algo sobre vos como tomador de cerveza...",
+      "countryLabel":         "País de origen",
+      "countryPlaceholder":   "Ej: Argentina, España...",
+      "featuredBadgesLabel":  "Insignias destacadas",
+      "featuredBadgesCount":  "({{count}}/3 seleccionadas)",
+      "noBadgesHint":         "Desbloqueá insignias en Logros para poder destacarlas aquí.",
+      "maxBadgesHint":        "Máximo 3 insignias",
+      "saveBtn":              "Guardar cambios",
+      "savingBtn":            "Guardando...",
+      "savedBtn":             "✓ Guardado"
+    },
+    "privacy": {
+      "intro":              "Estas dos configuraciones son independientes entre sí.",
+      "publicProfileLabel": "Perfil público",
+      "publicProfileOn":    "Cualquier usuario puede ver tus estadísticas, rachas e insignias.",
+      "publicProfileOff":   "Solo tus amigos ven tus estadísticas. Los demás solo ven tu nombre y avatar.",
+      "rankingLabel":       "Aparecer en rankings globales",
+      "rankingOn":          "Tu posición aparece en el ranking global y semanal.",
+      "rankingOff":         "Tu XP sigue acumulándose normalmente, pero no aparecés en los rankings públicos. Sí seguís visible en el ranking entre amigos.",
+      "note":               "Los cambios de privacidad se aplican de inmediato."
     },
     "prefs": {
       "audioTitle":    "Efectos de sonido",
@@ -32,6 +62,86 @@
       "languageTitle": "Idioma",
       "languageNote":  "La preferencia se sincroniza con tu cuenta."
     }
+  },
+  "logros": {
+    "loading":              "Cargando logros...",
+    "badgesTitle":          "Insignias de Progresión",
+    "badgesSummary":        "{{unlocked}}/{{total}} categorías con insignia",
+    "achievementsTitle":    "Logros",
+    "achievementsSummary":  "{{unlocked}}/{{total}} desbloqueados",
+    "xpEarned":             "· +{{xp}} XP ganados"
+  },
+  "feed": {
+    "loading":      "Cargando feed...",
+    "title":        "Feed",
+    "subtitle":     "Actividad reciente de tus amigos",
+    "userPhotoAlt": "Foto del usuario",
+    "empty": {
+      "title":    "Nada por aquí todavía",
+      "bodyPre":  "Agregá amigos en ",
+      "bodyLink": "Amigos",
+      "bodyPost": " para ver su actividad."
+    },
+    "timeAgo": {
+      "now":         "ahora mismo",
+      "minutesAgo":  "hace {{n}} min",
+      "hoursAgo":    "hace {{n}}h",
+      "daysAgo_one": "hace {{count}} día",
+      "daysAgo_other":"hace {{count}} días"
+    },
+    "action": {
+      "register": "registró",
+      "rate":     "valoró",
+      "comment":  "comentó sobre",
+      "photo":    "subió una foto de",
+      "default":  "interactuó con"
+    }
+  },
+  "friends": {
+    "loading":              "Cargando...",
+    "title":                "Amigos",
+    "count_one":            "{{count}} amigo",
+    "count_other":          "{{count}} amigos",
+    "receivedRequests":     "Solicitudes recibidas",
+    "accept":               "Aceptar",
+    "reject":               "Rechazar",
+    "searchTitle":          "Buscar usuarios",
+    "searchPlaceholder":    "Nombre de usuario...",
+    "searchBtn":            "Buscar",
+    "noResults":            "Sin resultados para \"{{term}}\"",
+    "statusFriends":        "Amigos",
+    "statusSent":           "Solicitud enviada",
+    "addBtn":               "Agregar",
+    "myFriends":            "Mis amigos",
+    "empty":                "Aún no tenés amigos en BeerBook. ¡Buscalos arriba!",
+    "removeBtn":            "Eliminar",
+    "sentRequests":         "Solicitudes enviadas ({{count}})",
+    "pending":              "Pendiente...",
+    "requestSent":          "Solicitud enviada ✓",
+    "achievementUnlocked":  "🏅 ¡Logro desbloqueado!",
+    "nowFriends":           "¡Ahora son amigos! 🎉",
+    "requestRejected":      "Solicitud rechazada",
+    "confirmRemove":        "¿Eliminar este amigo?",
+    "friendRemoved":        "Amigo eliminado"
+  },
+  "profile": {
+    "loading":              "Cargando perfil...",
+    "notFound":             "Perfil no encontrado.",
+    "statLevel":            "Nivel",
+    "statXP":               "XP Total",
+    "statBeers":            "Cervezas",
+    "statVerified":         "{{count}} verificadas",
+    "statStreak":           "Racha",
+    "statStreakSub":        "días seguidos",
+    "featuredBadgesLabel":  "Insignias destacadas",
+    "privateTitle":         "Perfil privado",
+    "privateBody":          "Solo los amigos de {{nombre}} pueden ver sus estadísticas.",
+    "requestSentPending":   "Solicitud enviada · pendiente",
+    "sending":              "Enviando...",
+    "addFriend":            "Solicitar amistad",
+    "editProfile":          "Editar perfil",
+    "areFriends":           "Son amigos",
+    "back":                 "← Volver"
   },
   "dashboard": {
     "title":        "Catálogo de Cervezas",

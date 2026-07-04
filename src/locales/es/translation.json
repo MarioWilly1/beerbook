@@ -309,6 +309,17 @@
       "start":    "{{value}}/{{threshold}} para {{tier}}"
     }
   },
+  "lugar": {
+    "loading":      "Cargando lugar...",
+    "notFound":     "Lugar no encontrado.",
+    "backHome":     "← Inicio",
+    "viewMap":      "Ver en mapa",
+    "unclaimed":    "Lugar no reclamado",
+    "beersRanking": "Cervezas más registradas aquí",
+    "visitors":     "Quiénes pasaron por aquí",
+    "noBeers":      "Aún no hay cervezas registradas aquí.",
+    "noVisitors":   "Aún no hay visitantes con perfil público."
+  },
   "beerInfo": {
     "btnTitle":     "Ver descripción técnica",
     "sectionLabel": "Descripción técnica",

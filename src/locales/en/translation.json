@@ -309,6 +309,17 @@
       "start":    "{{value}}/{{threshold}} for {{tier}}"
     }
   },
+  "lugar": {
+    "loading":      "Loading place...",
+    "notFound":     "Place not found.",
+    "backHome":     "← Home",
+    "viewMap":      "View on map",
+    "unclaimed":    "Unclaimed place",
+    "beersRanking": "Most registered beers here",
+    "visitors":     "Who's been here",
+    "noBeers":      "No beers registered here yet.",
+    "noVisitors":   "No public visitors yet."
+  },
   "beerInfo": {
     "btnTitle":     "View technical description",
     "sectionLabel": "Technical description",

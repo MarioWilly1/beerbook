@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import i18n from "./i18n";
 import { useAuth } from "./hooks/useAuth";
@@ -17,8 +17,10 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
+import LugarPage from "./pages/LugarPage";
 
 function App() {
+  const location = useLocation();
   const { session, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, setProfile } = useProfile(session);
   const [showRegister, setShowRegister] = useState(false);
@@ -30,6 +32,15 @@ function App() {
       i18n.changeLanguage(profile.preferred_language);
     }
   }, [profile?.preferred_language]);
+
+  // Ruta pública /lugar/:id — accessible sin autenticación
+  if (location.pathname.startsWith("/lugar/")) {
+    return (
+      <Routes>
+        <Route path="/lugar/:id" element={<LugarPage />} />
+      </Routes>
+    );
+  }
 
   // Show a minimal spinner while auth state is being resolved
   if (authLoading || (session && profileLoading)) {

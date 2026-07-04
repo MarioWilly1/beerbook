@@ -28,6 +28,7 @@ export const useMyBeers = () => {
           location_lng,
           location_name,
           location_public,
+          place_id,
           beers_new (
             id,
             nombre,
@@ -54,6 +55,7 @@ export const useMyBeers = () => {
           location_lng: row.location_lng,
           location_name: row.location_name,
           location_public: row.location_public,
+          place_id: row.place_id,
         }));
         setBeers(mapped);
       }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import BeerInfoModal from "../components/BeerInfoModal";
 import { useMyBeers } from "../hooks/useMyBeers";
@@ -202,10 +203,17 @@ const MiCuaderno = () => {
                   </span>
                 )}
                 {beer.location?.name && (
-                  <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
-                    📍 {beer.location.name}
-                    {!beer.location.isPublic && ` · ${t("location.private")}`}
-                  </span>
+                  beer.place_id && beer.location.isPublic
+                    ? <Link
+                        to={`/lugar/${beer.place_id}`}
+                        style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px", textDecoration: "none" }}
+                      >
+                        📍 {beer.location.name}
+                      </Link>
+                    : <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
+                        📍 {beer.location.name}
+                        {!beer.location.isPublic && ` · ${t("location.private")}`}
+                      </span>
                 )}
               </div>
 

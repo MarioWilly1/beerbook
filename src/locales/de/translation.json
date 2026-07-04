@@ -309,6 +309,17 @@
       "start":    "{{value}}/{{threshold}} für {{tier}}"
     }
   },
+  "lugar": {
+    "loading":      "Ort wird geladen...",
+    "notFound":     "Ort nicht gefunden.",
+    "backHome":     "← Startseite",
+    "viewMap":      "Auf Karte anzeigen",
+    "unclaimed":    "Nicht beansprucht",
+    "beersRanking": "Meistregistrierte Biere hier",
+    "visitors":     "Wer war hier",
+    "noBeers":      "Noch keine Biere hier registriert.",
+    "noVisitors":   "Noch keine öffentlichen Besucher."
+  },
   "beerInfo": {
     "btnTitle":     "Technische Beschreibung anzeigen",
     "sectionLabel": "Technische Beschreibung",

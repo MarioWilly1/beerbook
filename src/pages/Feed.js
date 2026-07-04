@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFeed } from "../hooks/useFeed";
 import { useFeedReactions } from "../hooks/useFeedReactions";
@@ -80,8 +81,13 @@ const FeedEntry = ({ entry, reactionData, currentUserId, onToggle }) => {
               />
             )}
             {entry.location_public && entry.location_name?.trim() && (
-              <div style={{ fontSize: 12, color: "#8b6b2e", marginTop: 6 }}>
-                📍 {entry.location_name}
+              <div style={{ fontSize: 12, marginTop: 6 }}>
+                {entry.place_id
+                  ? <Link to={`/lugar/${entry.place_id}`} style={{ color: "#8b6b2e", textDecoration: "none" }}>
+                      📍 {entry.location_name}
+                    </Link>
+                  : <span style={{ color: "#8b6b2e" }}>📍 {entry.location_name}</span>
+                }
               </div>
             )}
           </div>

@@ -180,13 +180,14 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
           <div style={gridStyle}>
             {PRESET_AVATARS.map((preset) => {
               const isSelected = profile?.avatar_url === preset.url;
-              const presetName = t(`avatar.${preset.id}`);
+              const presetName = t(`avatar.${preset.id}.name`);
+              const presetDesc = t(`avatar.${preset.id}.desc`);
               return (
                 <button
                   key={preset.id}
                   onClick={() => handlePreset(preset)}
                   disabled={uploading}
-                  title={presetName}
+                  title={`${presetName} · ${presetDesc}`}
                   style={{
                     ...presetBtnStyle,
                     border:     isSelected ? "2px solid #d4af37" : "2px solid transparent",
@@ -199,8 +200,11 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
                     alt={presetName}
                     style={{ width: 52, height: 52, borderRadius: "50%" }}
                   />
-                  <span style={{ fontSize: 9, color: "#555", marginTop: 4, textAlign: "center", lineHeight: 1.2 }}>
+                  <span style={{ fontSize: 9, color: "#555", marginTop: 4, textAlign: "center", lineHeight: 1.2, fontWeight: 600 }}>
                     {presetName}
+                  </span>
+                  <span style={{ fontSize: 8, color: "#999", textAlign: "center", lineHeight: 1.2, marginTop: 1 }}>
+                    {presetDesc}
                   </span>
                 </button>
               );

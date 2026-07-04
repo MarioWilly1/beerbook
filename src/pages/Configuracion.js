@@ -5,6 +5,7 @@ import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
 import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
+import HiddenStoriesManager from "../components/HiddenStoriesManager";
 
 const TABS = [
   { key: "perfil",       icon: "👤", tKey: "settings.tabs.profile"     },
@@ -329,6 +330,17 @@ const Configuracion = ({ onProfileChange }) => {
           <p style={{ fontSize: 12, color: "#5a4535", marginTop: 20, lineHeight: 1.5 }}>
             {t("settings.privacy.note")}
           </p>
+
+          {/* Ocultar historias de amigos específicos */}
+          <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid #2e2215" }}>
+            <div style={{ fontWeight: 700, color: "#f0e4cc", marginBottom: 4, fontSize: 15 }}>
+              🫣 {t("settings.privacy.hiddenStories.title")}
+            </div>
+            <p style={{ fontSize: 13, color: "#9a7d62", margin: "0 0 14px", lineHeight: 1.5 }}>
+              {t("settings.privacy.hiddenStories.description")}
+            </p>
+            {session && <HiddenStoriesManager currentUserId={session.user.id} />}
+          </div>
         </div>
       )}
 

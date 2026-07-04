@@ -24,6 +24,7 @@ const StoryViewer = ({
   onMarkSeen,
   onClose,
   onOpenCreator,
+  onDelete,
 }) => {
   const { t } = useTranslation();
 
@@ -33,7 +34,8 @@ const StoryViewer = ({
   const [urlLoading, setUrlLoading] = useState(false);
   const [paused,     setPaused]     = useState(false);
   const [viewers,    setViewers]    = useState(null); // lista de viewers de historia propia
-  const [showViewers, setShowViewers] = useState(false);
+  const [showViewers,   setShowViewers]   = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Progress bar: valor 0→1 animado
   const [progress, setProgress] = useState(0);
@@ -56,6 +58,7 @@ const StoryViewer = ({
   useEffect(() => {
     setSignedUrl(null);
     setShowViewers(false);
+    setConfirmDelete(false);
     if (!story) return;
 
     if (isPhoto && story.photo_path) {
@@ -108,23 +111,23 @@ const StoryViewer = ({
   // Esperar a que la imagen cargue antes de iniciar la barra (foto)
   useEffect(() => {
     if (!story) return;
-    if (paused || showViewers) return;
+    if (paused || showViewers || confirmDelete) return;
     if (isPhoto && !signedUrl) return; // esperar la URL
 
     startProgress(0);
     return stopProgress;
-  }, [story, signedUrl, paused, showViewers, isPhoto]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [story, signedUrl, paused, showViewers, confirmDelete, isPhoto]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pausar / reanudar
   useEffect(() => {
-    if (paused || showViewers) {
+    if (paused || showViewers || confirmDelete) {
       stopProgress();
       pausedAtRef.current = progress;
     } else if (story) {
       if (isPhoto && !signedUrl) return;
       startProgress(pausedAtRef.current);
     }
-  }, [paused, showViewers]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [paused, showViewers, confirmDelete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Navegación ────────────────────────────────────────────────────────────
   const goNext = useCallback(() => {
@@ -283,6 +286,17 @@ const StoryViewer = ({
           </div>
         </div>
 
+        {/* Botón borrar (solo mis historias) */}
+        {isMine && onDelete && (
+          <button
+            title={t("stories.deleteBtn")}
+            onClick={(e) => { e.stopPropagation(); stopProgress(); setPaused(true); setConfirmDelete(true); }}
+            style={{ ...closeBtnStyle, fontSize: 16 }}
+          >
+            🗑
+          </button>
+        )}
+
         {/* Botón cerrar */}
         <button onClick={(e) => { e.stopPropagation(); onClose(); }} style={closeBtnStyle}>
           ✕
@@ -297,6 +311,29 @@ const StoryViewer = ({
         >
           👁 {viewers ? viewers.length : "—"} {t("stories.viewers")}
         </button>
+      )}
+
+      {/* Panel de confirmación de borrado */}
+      {confirmDelete && (
+        <div style={confirmPanelStyle} onClick={(e) => e.stopPropagation()}>
+          <p style={{ color: "#f0e4cc", fontSize: 14, fontWeight: 600, margin: "0 0 16px", textAlign: "center" }}>
+            {t("stories.deleteConfirm")}
+          </p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+            <button
+              onClick={() => { setConfirmDelete(false); setPaused(false); }}
+              style={cancelBtnStyle}
+            >
+              {t("stories.deleteCancel")}
+            </button>
+            <button
+              onClick={() => onDelete?.(story)}
+              style={deleteBtnStyle}
+            >
+              {t("stories.deleteConfirmBtn")}
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Panel de viewers */}
@@ -504,6 +541,40 @@ const spinnerStyle = {
   borderTop:      "3px solid #d4af37",
   borderRadius:   "50%",
   animation:      "spin 0.8s linear infinite",
+};
+
+const confirmPanelStyle = {
+  position:       "absolute",
+  bottom:         0,
+  left:           0,
+  right:          0,
+  background:     "rgba(28,20,9,0.97)",
+  borderTop:      "1px solid #2e2215",
+  borderRadius:   "16px 16px 0 0",
+  padding:        "24px 20px",
+  zIndex:         20,
+};
+
+const cancelBtnStyle = {
+  background:   "#2a1e0f",
+  border:       "1px solid #2e2215",
+  borderRadius: 20,
+  color:        "#9a7d62",
+  fontSize:     13,
+  fontWeight:   600,
+  padding:      "8px 24px",
+  cursor:       "pointer",
+};
+
+const deleteBtnStyle = {
+  background:   "rgba(139,32,32,0.25)",
+  border:       "1px solid #8b2020",
+  borderRadius: 20,
+  color:        "#e07070",
+  fontSize:     13,
+  fontWeight:   700,
+  padding:      "8px 24px",
+  cursor:       "pointer",
 };
 
 export default StoryViewer;

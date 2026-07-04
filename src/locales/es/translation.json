@@ -52,7 +52,16 @@
       "rankingLabel":       "Aparecer en rankings globales",
       "rankingOn":          "Tu posición aparece en el ranking global y semanal.",
       "rankingOff":         "Tu XP sigue acumulándose normalmente, pero no aparecés en los rankings públicos. Sí seguís visible en el ranking entre amigos.",
-      "note":               "Los cambios de privacidad se aplican de inmediato."
+      "note":               "Los cambios de privacidad se aplican de inmediato.",
+      "hiddenStories": {
+        "title":       "Ocultar historia de...",
+        "description": "Estas personas no verán tus historias, pero vos seguís viendo las de ellas.",
+        "loading":     "Cargando amigos...",
+        "noFriends":   "Todavía no tenés amigos. Agregá amigos para gestionar la visibilidad de tus historias.",
+        "show":        "Mostrar",
+        "hide":        "Ocultar",
+        "note":        "Tu historia está oculta para {{count}} persona(s)."
+      }
     },
     "prefs": {
       "audioTitle":    "Efectos de sonido",
@@ -308,6 +317,11 @@
     "viewedBy": "Visto por",
     "noViewersYet": "Nadie la vio todavía",
     "photoUnavailable": "Foto no disponible",
+    "addStory": "Agregar historia",
+    "deleteBtn": "Borrar historia",
+    "deleteConfirm": "¿Borrar esta historia?",
+    "deleteCancel": "Cancelar",
+    "deleteConfirmBtn": "Sí, borrar",
     "creator": {
       "title": "Nueva historia",
       "tabPhoto": "Foto",

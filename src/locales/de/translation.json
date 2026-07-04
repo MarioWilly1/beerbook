@@ -52,7 +52,16 @@
       "rankingLabel":       "In globalen Rankings erscheinen",
       "rankingOn":          "Deine Position erscheint im globalen und wöchentlichen Ranking.",
       "rankingOff":         "Dein XP sammelt sich weiterhin an, aber du erscheinst nicht in öffentlichen Rankings. Im Freundes-Ranking bist du weiterhin sichtbar.",
-      "note":               "Datenschutzänderungen werden sofort wirksam."
+      "note":               "Datenschutzänderungen werden sofort wirksam.",
+      "hiddenStories": {
+        "title":       "Story verbergen für...",
+        "description": "Diese Personen sehen deine Stories nicht, aber du siehst weiterhin ihre.",
+        "loading":     "Freunde werden geladen...",
+        "noFriends":   "Du hast noch keine Freunde. Füge Freunde hinzu, um die Story-Sichtbarkeit zu verwalten.",
+        "show":        "Anzeigen",
+        "hide":        "Verbergen",
+        "note":        "Deine Story ist für {{count}} Person(en) verborgen."
+      }
     },
     "prefs": {
       "audioTitle":    "Soundeffekte",
@@ -308,6 +317,11 @@
     "viewedBy": "Gesehen von",
     "noViewersYet": "Noch niemand hat es gesehen",
     "photoUnavailable": "Foto nicht verfügbar",
+    "addStory": "Story hinzufügen",
+    "deleteBtn": "Story löschen",
+    "deleteConfirm": "Diese Story löschen?",
+    "deleteCancel": "Abbrechen",
+    "deleteConfirmBtn": "Ja, löschen",
     "creator": {
       "title": "Neue Story",
       "tabPhoto": "Foto",

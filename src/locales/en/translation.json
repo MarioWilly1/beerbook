@@ -52,7 +52,16 @@
       "rankingLabel":       "Appear in global rankings",
       "rankingOn":          "Your position appears in the global and weekly ranking.",
       "rankingOff":         "Your XP keeps accumulating normally, but you won't appear in public rankings. You'll still be visible in the friends ranking.",
-      "note":               "Privacy changes take effect immediately."
+      "note":               "Privacy changes take effect immediately.",
+      "hiddenStories": {
+        "title":       "Hide story from...",
+        "description": "These people won't see your stories, but you'll still see theirs.",
+        "loading":     "Loading friends...",
+        "noFriends":   "You have no friends yet. Add friends to manage story visibility.",
+        "show":        "Show",
+        "hide":        "Hide",
+        "note":        "Your story is hidden from {{count}} person(s)."
+      }
     },
     "prefs": {
       "audioTitle":    "Sound effects",
@@ -308,6 +317,11 @@
     "viewedBy": "Viewed by",
     "noViewersYet": "No one has viewed it yet",
     "photoUnavailable": "Photo unavailable",
+    "addStory": "Add story",
+    "deleteBtn": "Delete story",
+    "deleteConfirm": "Delete this story?",
+    "deleteCancel": "Cancel",
+    "deleteConfirmBtn": "Yes, delete",
     "creator": {
       "title": "New story",
       "tabPhoto": "Photo",

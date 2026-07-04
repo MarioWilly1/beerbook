@@ -11,11 +11,10 @@ export const getSignedStoryUrl = async (photoPath) => {
 };
 
 export const useStories = () => {
-  const [myGroup,      setMyGroup]      = useState(null);
-  const [friendGroups, setFriendGroups] = useState([]);
-  const [loading,      setLoading]      = useState(true);
+  const [myGroup,       setMyGroup]       = useState(null);
+  const [friendGroups,  setFriendGroups]  = useState([]);
+  const [loading,       setLoading]       = useState(true);
   const [currentUserId, setCurrentUserId] = useState(null);
-  // Ref (no estado) para evitar re-renders al marcar vistas
   const seenIds = useRef(new Set());
 
   useEffect(() => {
@@ -30,10 +29,15 @@ export const useStories = () => {
 
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    const [{ data: rows }, { data: myProfile }] = await Promise.all([
+    // 1. Stories + perfil propio en paralelo
+    //    Sin embedded join "profiles(...)" para evitar dependencia del schema cache
+    const [
+      { data: rows, error: storiesErr },
+      { data: myProfile },
+    ] = await Promise.all([
       supabase
         .from("stories")
-        .select("id, user_id, type, photo_path, text_content, text_bg, created_at, profiles(nombre, avatar_url)")
+        .select("id, user_id, type, photo_path, text_content, text_bg, created_at")
         .gt("created_at", cutoff)
         .order("created_at", { ascending: true }),
       supabase
@@ -43,10 +47,27 @@ export const useStories = () => {
         .single(),
     ]);
 
-    // Cargar qué historias ya vio el usuario actual
+    if (storiesErr) {
+      console.error("[useStories] stories query error:", storiesErr.message, storiesErr);
+    }
+
+    // 2. Perfiles de todos los autores en un solo query batch
+    const uniqueUserIds = [...new Set((rows || []).map((r) => r.user_id))];
+    const profilesMap = {};
+    if (uniqueUserIds.length > 0) {
+      const { data: profiles, error: profilesErr } = await supabase
+        .from("profiles")
+        .select("id, nombre, avatar_url")
+        .in("id", uniqueUserIds);
+      if (profilesErr) {
+        console.error("[useStories] profiles query error:", profilesErr.message);
+      }
+      (profiles || []).forEach((p) => { profilesMap[p.id] = p; });
+    }
+
+    // 3. Qué historias ya vio el usuario actual
     const storyIds = (rows || []).map((r) => r.id);
     const localSeen = new Set(seenIds.current);
-
     if (storyIds.length > 0) {
       const { data: myViews } = await supabase
         .from("story_views")
@@ -57,35 +78,36 @@ export const useStories = () => {
       seenIds.current = localSeen;
     }
 
-    // Agrupar por user_id
+    // 4. Agrupar por user_id
     const groups = {};
     for (const row of rows || []) {
+      const profile = profilesMap[row.user_id];
       if (!groups[row.user_id]) {
         groups[row.user_id] = {
           userId:    row.user_id,
-          nombre:    row.profiles?.nombre    || "?",
-          avatarUrl: row.profiles?.avatar_url || null,
+          nombre:    profile?.nombre     || "?",
+          avatarUrl: profile?.avatar_url || null,
           stories:   [],
         };
       }
       groups[row.user_id].stories.push(row);
     }
 
-    // Calcular hasUnseen por grupo
+    // 5. hasUnseen por grupo
     for (const g of Object.values(groups)) {
       g.hasUnseen = g.stories.some((s) => !localSeen.has(s.id));
     }
 
-    // Grupo propio (puede estar vacío si no publicó nada hoy)
+    // 6. Grupo propio
     const mine = groups[uid] ?? {
       userId:    uid,
-      nombre:    myProfile?.nombre    || "Yo",
+      nombre:    myProfile?.nombre     || "Yo",
       avatarUrl: myProfile?.avatar_url || null,
       stories:   [],
       hasUnseen: false,
     };
 
-    // Grupos de amigos: primero no vistos, luego por historia más reciente
+    // 7. Grupos de amigos: no vistos primero, luego por historia más reciente
     const friends = Object.values(groups)
       .filter((g) => g.userId !== uid)
       .sort((a, b) => {
@@ -104,12 +126,10 @@ export const useStories = () => {
     if (currentUserId) load(currentUserId);
   }, [currentUserId, load]);
 
-  // Marca una historia como vista (optimista + DB)
   const markSeen = useCallback(async (storyId, storyOwnerId) => {
     if (seenIds.current.has(storyId) || !currentUserId) return;
     seenIds.current.add(storyId);
 
-    // Actualizar hasUnseen en el grupo correspondiente
     const updateGroup = (g) => {
       if (!g.stories.some((s) => s.id === storyId)) return g;
       return { ...g, hasUnseen: g.stories.some((s) => !seenIds.current.has(s.id)) };

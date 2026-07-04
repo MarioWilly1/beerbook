@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useStories } from "../hooks/useStories";
 import StoryRing from "./StoryRing";
@@ -82,8 +83,8 @@ const StoryBar = () => {
         )}
       </div>
 
-      {/* Viewer */}
-      {viewer !== null && (
+      {/* Viewer — portal a document.body para escapar cualquier stacking context */}
+      {viewer !== null && ReactDOM.createPortal(
         <StoryViewer
           groups={allGroups}
           initialGroupIndex={viewer.groupIndex}
@@ -92,16 +93,18 @@ const StoryBar = () => {
           onMarkSeen={markSeen}
           onClose={() => setViewer(null)}
           onOpenCreator={() => { setViewer(null); setCreatorOpen(true); }}
-        />
+        />,
+        document.body
       )}
 
-      {/* Creator */}
-      {creatorOpen && (
+      {/* Creator — portal a document.body */}
+      {creatorOpen && ReactDOM.createPortal(
         <StoryCreator
           currentUserId={currentUserId}
           onClose={() => setCreatorOpen(false)}
           onSuccess={() => { setCreatorOpen(false); reload(); }}
-        />
+        />,
+        document.body
       )}
     </>
   );

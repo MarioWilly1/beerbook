@@ -44,6 +44,8 @@ const StoryViewer = ({
 
   // Touch tracking para swipe
   const touchRef = useRef({ startX: 0, startY: 0, active: false });
+  // Ref para que startProgress siempre llame al goNext actualizado (evita closure viejo)
+  const goNextRef = useRef(null);
 
   const group   = groups[groupIdx];
   const story   = group?.stories[storyIdx];
@@ -97,7 +99,7 @@ const StoryViewer = ({
       if (fraction < 1) {
         progressRef.current = requestAnimationFrame(tick);
       } else {
-        goNext();
+        goNextRef.current?.();
       }
     };
     progressRef.current = requestAnimationFrame(tick);
@@ -137,6 +139,8 @@ const StoryViewer = ({
       onClose();
     }
   }, [groupIdx, storyIdx, groups, stopProgress, onClose]);
+  // Mantener la ref siempre actualizada para que startProgress use la versión correcta
+  goNextRef.current = goNext;
 
   const goPrev = useCallback(() => {
     setProgress(0);

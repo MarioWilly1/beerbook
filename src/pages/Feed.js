@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFeed } from "../hooks/useFeed";
+import { useFeedReactions } from "../hooks/useFeedReactions";
 import Avatar from "../components/Avatar";
 import Lightbox from "../components/Lightbox";
+import ReactionBar from "../components/ReactionBar";
 
 const ACTION_EMOJI = {
   register: "🍺",
@@ -23,7 +25,7 @@ function timeAgo(dateStr, t) {
   return new Date(dateStr).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
-const FeedEntry = ({ entry }) => {
+const FeedEntry = ({ entry, reactionData, currentUserId, onToggle }) => {
   const { t } = useTranslation();
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const emoji = ACTION_EMOJI[entry.action] || "🍺";
@@ -32,6 +34,7 @@ const FeedEntry = ({ entry }) => {
   return (
     <>
       <div style={cardStyle}>
+        {/* Header: avatar + action + timestamp */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
           <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
           <div style={{ flex: 1 }}>
@@ -41,9 +44,12 @@ const FeedEntry = ({ entry }) => {
             {" "}
             <span style={{ fontWeight: 700, fontSize: 14, color: "#d4af37" }}>{entry.beer_nombre}</span>
           </div>
-          <span style={{ fontSize: 12, color: "#5a4535", flexShrink: 0 }}>{timeAgo(entry.created_at, t)}</span>
+          <span style={{ fontSize: 12, color: "#5a4535", flexShrink: 0 }}>
+            {timeAgo(entry.created_at, t)}
+          </span>
         </div>
 
+        {/* Content: beer photo + rating/comment/user photo */}
         <div style={{ display: "flex", gap: 12 }}>
           {entry.beer_foto_url && (
             <img
@@ -79,6 +85,15 @@ const FeedEntry = ({ entry }) => {
             )}
           </div>
         </div>
+
+        {/* Reaction bar */}
+        <ReactionBar
+          activityUserId={entry.user_id}
+          activityBeerId={entry.beer_id}
+          data={reactionData}
+          currentUserId={currentUserId}
+          onToggle={onToggle}
+        />
       </div>
 
       <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
@@ -89,6 +104,7 @@ const FeedEntry = ({ entry }) => {
 const Feed = () => {
   const { t } = useTranslation();
   const { feed, loading } = useFeed();
+  const { reactionsMap, toggleReaction, currentUserId } = useFeedReactions(feed);
 
   if (loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("feed.loading")}</p>;
 
@@ -104,19 +120,43 @@ const Feed = () => {
           <p style={{ fontSize: 40, margin: "0 0 12px" }}>🍺</p>
           <p style={{ margin: 0, fontWeight: 600, color: "#f0e4cc" }}>{t("feed.empty.title")}</p>
           <p style={{ margin: "6px 0 0", fontSize: 13, color: "#9a7d62" }}>
-            {t("feed.empty.bodyPre")}<strong style={{ color: "#d4af37" }}>{t("feed.empty.bodyLink")}</strong>{t("feed.empty.bodyPost")}
+            {t("feed.empty.bodyPre")}
+            <strong style={{ color: "#d4af37" }}>{t("feed.empty.bodyLink")}</strong>
+            {t("feed.empty.bodyPost")}
           </p>
         </div>
       ) : (
-        feed.map((entry, i) => (
-          <FeedEntry key={`${entry.user_id}-${entry.beer_id}-${i}`} entry={entry} />
-        ))
+        feed.map((entry, i) => {
+          const key          = `${entry.user_id}_${entry.beer_id}`;
+          const reactionData = reactionsMap[key];
+          return (
+            <FeedEntry
+              key={`${entry.user_id}-${entry.beer_id}-${i}`}
+              entry={entry}
+              reactionData={reactionData}
+              currentUserId={currentUserId}
+              onToggle={toggleReaction}
+            />
+          );
+        })
       )}
     </div>
   );
 };
 
-const cardStyle  = { background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: 16, marginBottom: 16 };
-const emptyStyle = { textAlign: "center", padding: "60px 20px", background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12 };
+const cardStyle  = {
+  background: "#1c1409",
+  border: "1px solid #2e2215",
+  borderRadius: 12,
+  padding: 16,
+  marginBottom: 16,
+};
+const emptyStyle = {
+  textAlign: "center",
+  padding: "60px 20px",
+  background: "#1c1409",
+  border: "1px solid #2e2215",
+  borderRadius: 12,
+};
 
 export default Feed;

@@ -1,17 +1,27 @@
-const BASE = "https://api.dicebear.com/9.x/adventurer/svg";
-const BG   = "b8941f";
+import clasico    from "../assets/avatars/clasico.png";
+import maestro    from "../assets/avatars/maestro_cervecero.png";
+import sommelier  from "../assets/avatars/sommelier.png";
+import explorador from "../assets/avatars/explorador.png";
+import lenador    from "../assets/avatars/lenador.png";
+import aventurera from "../assets/avatars/aventurera.png";
+import cientifico from "../assets/avatars/cientifico.png";
+import historico  from "../assets/avatars/historico.png";
+import festera    from "../assets/avatars/festera.png";
+import tranquilo  from "../assets/avatars/tranquilo.png";
+import critico    from "../assets/avatars/critico.png";
+import novato     from "../assets/avatars/novato.png";
 
 export const PRESET_AVATARS = [
-  { id: "clasico",    nombre: "El Clásico",          url: `${BASE}?seed=Carlos&backgroundColor=${BG}` },
-  { id: "maestro",    nombre: "El Maestro",           url: `${BASE}?seed=Maestro&backgroundColor=${BG}` },
-  { id: "sommelier",  nombre: "La Sommelier",         url: `${BASE}?seed=Sofia&backgroundColor=${BG}` },
-  { id: "explorador", nombre: "El Explorador",        url: `${BASE}?seed=Explorer&backgroundColor=${BG}` },
-  { id: "lenador",    nombre: "El Leñador",           url: `${BASE}?seed=Lumberjack&backgroundColor=${BG}` },
-  { id: "aventurera", nombre: "La Aventurera",        url: `${BASE}?seed=Valentina&backgroundColor=${BG}` },
-  { id: "cientifico", nombre: "El Científico",        url: `${BASE}?seed=Newton&backgroundColor=${BG}` },
-  { id: "historico",  nombre: "El Histórico",         url: `${BASE}?seed=Augusto&backgroundColor=${BG}` },
-  { id: "festera",    nombre: "La Festera",           url: `${BASE}?seed=Fiesta&backgroundColor=${BG}` },
-  { id: "tranquilo",  nombre: "El Tranquilo",         url: `${BASE}?seed=Bruno&backgroundColor=${BG}` },
-  { id: "critico",    nombre: "El Crítico",           url: `${BASE}?seed=Critico&backgroundColor=${BG}` },
-  { id: "novato",     nombre: "El Novato",            url: `${BASE}?seed=Novato&backgroundColor=${BG}` },
+  { id: "clasico",    nombre: "El Clásico",    url: clasico    },
+  { id: "maestro",    nombre: "El Maestro",    url: maestro    },
+  { id: "sommelier",  nombre: "La Sommelier",  url: sommelier  },
+  { id: "explorador", nombre: "El Explorador", url: explorador },
+  { id: "lenador",    nombre: "El Leñador",    url: lenador    },
+  { id: "aventurera", nombre: "La Aventurera", url: aventurera },
+  { id: "cientifico", nombre: "El Científico", url: cientifico },
+  { id: "historico",  nombre: "El Histórico",  url: historico  },
+  { id: "festera",    nombre: "La Festera",    url: festera    },
+  { id: "tranquilo",  nombre: "El Tranquilo",  url: tranquilo  },
+  { id: "critico",    nombre: "El Crítico",    url: critico    },
+  { id: "novato",     nombre: "El Novato",     url: novato     },
 ];

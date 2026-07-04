@@ -236,5 +236,43 @@
       "btnPrivate":  "Stay private",
       "btnPublic":   "Yes, show me"
     }
+  },
+  "achievement": {
+    "primera-ronda":         { "name": "First Round",         "desc": "Register your first beer" },
+    "seis-pack":             { "name": "Six Pack",            "desc": "6 verified beers (with photo)" },
+    "caja-completa":         { "name": "Full Case",           "desc": "24 verified beers (with photo)" },
+    "barril":                { "name": "Barrel",              "desc": "50 verified beers (with photo)" },
+    "coleccionista":         { "name": "Collector",           "desc": "100 verified beers (with photo)" },
+    "viajero":               { "name": "Traveler",            "desc": "Verified beers from 5 different countries" },
+    "ciudadano-del-mundo":   { "name": "World Citizen",       "desc": "Verified beers from 10 different countries" },
+    "explorador-de-estilos": { "name": "Style Explorer",      "desc": "5 different styles (verified entries)" },
+    "polyglota-cervecero":   { "name": "Beer Polyglot",       "desc": "10 different styles (verified entries)" },
+    "fotografo":             { "name": "Beer Photographer",   "desc": "First photo uploaded" },
+    "cronista":              { "name": "Chronicler",          "desc": "First comment written" },
+    "critico":               { "name": "Critic",              "desc": "10 entries with a rating" },
+    "perfeccionista":        { "name": "Perfectionist",       "desc": "5 entries with all fields complete" },
+    "constante":             { "name": "Consistent",          "desc": "7-day streak" },
+    "leyenda-activa":        { "name": "Active Legend",       "desc": "30-day streak" },
+    "primer-contacto":       { "name": "First Contact",       "desc": "Followed your first friend" },
+    "companeros-de-cata":    { "name": "Tasting Buddies",     "desc": "5 friends in the app" }
+  },
+  "badge": {
+    "catador":    { "name": "Taster",       "desc": "Verified beers (with photo)" },
+    "viajero":    { "name": "Traveler",     "desc": "Different countries (verified entries)" },
+    "explorador": { "name": "Explorer",     "desc": "Different styles (verified entries)" },
+    "fotografo":  { "name": "Photographer", "desc": "Photos uploaded" },
+    "critico":    { "name": "Critic",       "desc": "Comments on verified entries" },
+    "tier": {
+      "bronce":  "Bronze",
+      "plata":   "Silver",
+      "oro":     "Gold",
+      "platino": "Platinum"
+    },
+    "locked": "Locked",
+    "progress": {
+      "next":     "{{value}}/{{threshold}} for {{tier}} (+{{xp}} XP)",
+      "maxLevel": "Max level reached",
+      "start":    "{{value}}/{{threshold}} for {{tier}}"
+    }
   }
 }

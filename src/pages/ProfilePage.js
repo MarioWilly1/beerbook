@@ -176,8 +176,8 @@ const ProfilePage = () => {
                     >
                       <span style={{ fontSize: 22 }}>{b.icon}</span>
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{b.nombre}</div>
-                        <div style={{ fontSize: 11, color: "#aaa" }}>{meta.label}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{t(`badge.${b.slug}.name`)}</div>
+                        <div style={{ fontSize: 11, color: "#aaa" }}>{t(`badge.tier.${b.currentTier}`)}</div>
                       </div>
                     </div>
                   );

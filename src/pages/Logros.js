@@ -110,10 +110,10 @@ const Logros = () => {
                   {ach.emoji}
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 4 }}>
-                  {ach.nombre}
+                  {t(`achievement.${ach.slug}.name`)}
                 </div>
                 <div style={{ fontSize: 12, color: "#777", lineHeight: 1.4, marginBottom: 8 }}>
-                  {ach.descripcion}
+                  {t(`achievement.${ach.slug}.desc`)}
                 </div>
                 <div
                   style={{

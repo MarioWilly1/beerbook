@@ -236,5 +236,43 @@
       "btnPrivate":  "Privat bleiben",
       "btnPublic":   "Ja, erscheinen"
     }
+  },
+  "achievement": {
+    "primera-ronda":         { "name": "Erste Runde",          "desc": "Registriere dein erstes Bier" },
+    "seis-pack":             { "name": "Sixpack",              "desc": "6 verifizierte Biere (mit Foto)" },
+    "caja-completa":         { "name": "Volle Kiste",          "desc": "24 verifizierte Biere (mit Foto)" },
+    "barril":                { "name": "Fass",                 "desc": "50 verifizierte Biere (mit Foto)" },
+    "coleccionista":         { "name": "Sammler",              "desc": "100 verifizierte Biere (mit Foto)" },
+    "viajero":               { "name": "Reisender",            "desc": "Verifizierte Biere aus 5 verschiedenen Ländern" },
+    "ciudadano-del-mundo":   { "name": "Weltbürger",           "desc": "Verifizierte Biere aus 10 verschiedenen Ländern" },
+    "explorador-de-estilos": { "name": "Stil-Entdecker",       "desc": "5 verschiedene Bierstile (verifizierte Einträge)" },
+    "polyglota-cervecero":   { "name": "Bier-Vielsprachiger",  "desc": "10 verschiedene Bierstile (verifizierte Einträge)" },
+    "fotografo":             { "name": "Bierfotograf",         "desc": "Erstes Foto hochgeladen" },
+    "cronista":              { "name": "Chronist",             "desc": "Erster Kommentar geschrieben" },
+    "critico":               { "name": "Kritiker",             "desc": "10 Einträge mit Bewertung" },
+    "perfeccionista":        { "name": "Perfektionist",        "desc": "5 Einträge mit allen Feldern ausgefüllt" },
+    "constante":             { "name": "Beständig",            "desc": "7 Tage Streak" },
+    "leyenda-activa":        { "name": "Aktive Legende",       "desc": "30 Tage Streak" },
+    "primer-contacto":       { "name": "Erster Kontakt",       "desc": "Deinem ersten Freund gefolgt" },
+    "companeros-de-cata":    { "name": "Verkostungskumpel",    "desc": "5 Freunde in der App" }
+  },
+  "badge": {
+    "catador":    { "name": "Verkoster",  "desc": "Verifizierte Biere (mit Foto)" },
+    "viajero":    { "name": "Reisender",  "desc": "Verschiedene Länder (verifizierte Einträge)" },
+    "explorador": { "name": "Entdecker",  "desc": "Verschiedene Bierstile (verifizierte Einträge)" },
+    "fotografo":  { "name": "Fotograf",   "desc": "Hochgeladene Fotos" },
+    "critico":    { "name": "Kritiker",   "desc": "Kommentare in verifizierten Einträgen" },
+    "tier": {
+      "bronce":  "Bronze",
+      "plata":   "Silber",
+      "oro":     "Gold",
+      "platino": "Platin"
+    },
+    "locked": "Nicht freigeschaltet",
+    "progress": {
+      "next":     "{{value}}/{{threshold}} für {{tier}} (+{{xp}} XP)",
+      "maxLevel": "Maximalstufe erreicht",
+      "start":    "{{value}}/{{threshold}} für {{tier}}"
+    }
   }
 }

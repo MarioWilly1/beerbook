@@ -87,7 +87,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
               {badges.map((b) => (
                 <div
                   key={b.slug}
-                  title={`${b.nombre}: ${b.currentTier ? TIER_META[b.currentTier].label : "Sin desbloquear"}`}
+                  title={`${t(`badge.${b.slug}.name`)}: ${b.currentTier ? t(`badge.tier.${b.currentTier}`) : t("badge.locked")}`}
                   style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}
                 >
                   <span

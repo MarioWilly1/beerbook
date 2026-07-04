@@ -236,5 +236,43 @@
       "btnPrivate":  "Mantenerme privado",
       "btnPublic":   "Sí, aparecer"
     }
+  },
+  "achievement": {
+    "primera-ronda":         { "name": "Primera Ronda",         "desc": "Registrá tu primera cerveza" },
+    "seis-pack":             { "name": "Seis Pack",             "desc": "6 cervezas verificadas (con foto)" },
+    "caja-completa":         { "name": "Caja Completa",         "desc": "24 cervezas verificadas (con foto)" },
+    "barril":                { "name": "Barril",                "desc": "50 cervezas verificadas (con foto)" },
+    "coleccionista":         { "name": "Coleccionista",         "desc": "100 cervezas verificadas (con foto)" },
+    "viajero":               { "name": "Viajero",               "desc": "Cervezas verificadas de 5 países distintos" },
+    "ciudadano-del-mundo":   { "name": "Ciudadano del Mundo",   "desc": "Cervezas verificadas de 10 países distintos" },
+    "explorador-de-estilos": { "name": "Explorador de Estilos", "desc": "5 estilos distintos (entradas verificadas)" },
+    "polyglota-cervecero":   { "name": "Políglota Cervecero",   "desc": "10 estilos distintos (entradas verificadas)" },
+    "fotografo":             { "name": "Fotógrafo Cervecero",   "desc": "Primera foto subida" },
+    "cronista":              { "name": "Cronista",              "desc": "Primer comentario escrito" },
+    "critico":               { "name": "Crítico",               "desc": "10 entradas con puntuación" },
+    "perfeccionista":        { "name": "Perfeccionista",        "desc": "5 entradas con todos los campos completos" },
+    "constante":             { "name": "Constante",             "desc": "Racha de 7 días seguidos" },
+    "leyenda-activa":        { "name": "Leyenda Activa",        "desc": "Racha de 30 días seguidos" },
+    "primer-contacto":       { "name": "Primer Contacto",       "desc": "Seguí a tu primer amigo" },
+    "companeros-de-cata":    { "name": "Compañeros de Cata",    "desc": "5 amigos en la app" }
+  },
+  "badge": {
+    "catador":    { "name": "Catador",    "desc": "Cervezas verificadas (con foto)" },
+    "viajero":    { "name": "Viajero",    "desc": "Países distintos (entradas verificadas)" },
+    "explorador": { "name": "Explorador", "desc": "Estilos distintos (entradas verificadas)" },
+    "fotografo":  { "name": "Fotógrafo",  "desc": "Fotos subidas" },
+    "critico":    { "name": "Crítico",    "desc": "Comentarios en entradas verificadas" },
+    "tier": {
+      "bronce":  "Bronce",
+      "plata":   "Plata",
+      "oro":     "Oro",
+      "platino": "Platino"
+    },
+    "locked": "Sin desbloquear",
+    "progress": {
+      "next":     "{{value}}/{{threshold}} para {{tier}} (+{{xp}} XP)",
+      "maxLevel": "Nivel máximo alcanzado",
+      "start":    "{{value}}/{{threshold}} para {{tier}}"
+    }
   }
 }

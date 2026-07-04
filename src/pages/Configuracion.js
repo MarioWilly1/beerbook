@@ -270,7 +270,7 @@ const Configuracion = ({ onProfileChange }) => {
                       title={
                         disabled
                           ? t("settings.profile.maxBadgesHint")
-                          : `${badge.nombre} · ${TIER_META[badge.currentTier].label}`
+                          : `${t(`badge.${badge.slug}.name`)} · ${t(`badge.tier.${badge.currentTier}`)}`
                       }
                       style={{
                         display: "flex", alignItems: "center", gap: 8,
@@ -284,7 +284,7 @@ const Configuracion = ({ onProfileChange }) => {
                       }}
                     >
                       <span style={{ fontSize: 18 }}>{badge.icon}</span>
-                      <span style={{ color: selected ? tierColor : "#666" }}>{badge.nombre}</span>
+                      <span style={{ color: selected ? tierColor : "#666" }}>{t(`badge.${badge.slug}.name`)}</span>
                       {selected && <span style={{ fontSize: 11, color: "#1e8449" }}>✓</span>}
                     </button>
                   );

@@ -1,14 +1,15 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { TIERS, TIER_META } from "../utils/badges";
 
 const TIER_ICON = { bronce: "🥉", plata: "🥈", oro: "🥇", platino: "💎" };
 
 const BadgeCard = ({ badge }) => {
-  const { icon, nombre, descripcion, unlockedTiers, currentTier, nextTier, value, thresholds } = badge;
+  const { t } = useTranslation();
+  const { slug, icon, unlockedTiers, currentTier, nextTier, value, thresholds } = badge;
   const tierMeta = currentTier ? TIER_META[currentTier] : null;
   const nextMeta = nextTier    ? TIER_META[nextTier]    : null;
 
-  // Platino has a gradient bg string, others are solid hex
   const bg          = tierMeta?.bg    || "#f8f8f8";
   const borderColor = tierMeta?.color || "#e0e0e0";
 
@@ -39,10 +40,10 @@ const BadgeCard = ({ badge }) => {
 
       {/* Name + description */}
       <div style={{ fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 2 }}>
-        {nombre}
+        {t(`badge.${slug}.name`)}
       </div>
       <div style={{ fontSize: 11, color: "#888", lineHeight: 1.4, marginBottom: 12 }}>
-        {descripcion}
+        {t(`badge.${slug}.desc`)}
       </div>
 
       {/* Tier progress bars */}
@@ -50,7 +51,7 @@ const BadgeCard = ({ badge }) => {
         {TIERS.map((tier) => (
           <div
             key={tier}
-            title={TIER_META[tier].label}
+            title={t(`badge.tier.${tier}`)}
             style={{
               flex: 1,
               height: 6,
@@ -80,24 +81,33 @@ const BadgeCard = ({ badge }) => {
             marginBottom: 8,
           }}
         >
-          {TIER_ICON[currentTier]} {tierMeta.label} · +{TIER_META[currentTier].xp} XP
+          {TIER_ICON[currentTier]} {t(`badge.tier.${currentTier}`)} · +{TIER_META[currentTier].xp} XP
         </div>
       ) : (
         <div style={{ fontSize: 11, color: "#bbb", fontWeight: 600, marginBottom: 8 }}>
-          🔒 Sin desbloquear
+          🔒 {t("badge.locked")}
         </div>
       )}
 
       {/* Progress hint */}
       <div style={{ fontSize: 11, color: "#999", marginTop: "auto" }}>
         {nextTier ? (
-          `${value}/${thresholds[nextTier]} para ${nextMeta.label} (+${nextMeta.xp} XP)`
+          t("badge.progress.next", {
+            value,
+            threshold: thresholds[nextTier],
+            tier: t(`badge.tier.${nextTier}`),
+            xp: nextMeta.xp,
+          })
         ) : currentTier ? (
           <span style={{ color: tierMeta?.color, fontWeight: 700 }}>
-            💎 Nivel máximo alcanzado
+            💎 {t("badge.progress.maxLevel")}
           </span>
         ) : (
-          `${value}/${thresholds.bronce} para Bronce`
+          t("badge.progress.start", {
+            value,
+            threshold: thresholds.bronce,
+            tier: t("badge.tier.bronce"),
+          })
         )}
       </div>
     </div>

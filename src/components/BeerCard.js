@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
@@ -14,6 +15,7 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
+  const { t } = useTranslation();
   const [times, setTimes]     = useState(myBeerData?.times || 0);
   const [comment, setComment] = useState(myBeerData?.comment || "");
   const [rating, setRating]   = useState(myBeerData?.Rating ?? "");
@@ -112,7 +114,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
             fontSize: 10, fontWeight: 700,
             padding: "2px 6px", borderRadius: 5,
           }}>
-            📸 Verificada
+            📸 {t("beerform.verified")}
           </span>
         )}
         <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
@@ -123,7 +125,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
         <p style={metaStyle}>{beer.estilo} · {beer.pais} · {beer.alcohol}%</p>
 
         <div style={fieldStyle}>
-          <label style={labelStyle}>Veces probada</label>
+          <label style={labelStyle}>{t("beerform.timesLabel")}</label>
           <input
             type="number"
             value={times}
@@ -135,12 +137,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
 
         <div style={fieldStyle}>
           <label style={labelStyle}>
-            Puntuación ⭐ <XpBadge xp={XP_VALUES.RATING} />
+            {t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} />
           </label>
           <select value={rating} onChange={(e) => setRating(e.target.value)} style={inputStyle}>
             {RATING_OPTIONS.map((v) => (
               <option key={v} value={v}>
-                {v === "" ? "— Sin puntuación —" : `${v} / 5`}
+                {v === "" ? t("beerform.noRating") : `${v} / 5`}
               </option>
             ))}
           </select>
@@ -148,20 +150,20 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
 
         <div style={fieldStyle}>
           <label style={labelStyle}>
-            Comentario <XpBadge xp={XP_VALUES.COMMENT} />
+            {t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} />
           </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={2}
-            placeholder="¿Qué te pareció?"
+            placeholder={t("beerform.commentPlaceholder")}
             style={{ ...inputStyle, resize: "none" }}
           />
         </div>
 
         <div style={fieldStyle}>
           <label style={labelStyle}>
-            URL foto tuya <XpBadge xp={XP_VALUES.PHOTO} />
+            {t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} />
           </label>
           <input
             type="text"
@@ -176,7 +178,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
 
         {isComplete && (
           <div style={bonusBannerStyle}>
-            🎯 +{XP_VALUES.COMPLETE_BONUS} XP bonus por entrada completa
+            🎯 {t("beerform.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
           </div>
         )}
 
@@ -185,12 +187,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
           disabled={saving}
           style={{ ...saveBtn, opacity: saving ? 0.6 : 1 }}
         >
-          {saving ? "Guardando..." : `💾 Guardar · +${xpPreview} XP`}
+          {saving ? t("beerform.saving") : `💾 ${t("beerform.saveBtn", { xp: xpPreview })}`}
         </button>
 
         {isInMyBeers && (
           <p style={{ marginTop: "6px", fontSize: "12px", color: "#888", textAlign: "center" }}>
-            ✅ En tu cuaderno
+            ✅ {t("beerform.inNotebook")}
           </p>
         )}
       </div>

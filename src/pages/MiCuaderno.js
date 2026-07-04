@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useMyBeers } from "../hooks/useMyBeers";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
@@ -16,6 +17,7 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 const MiCuaderno = () => {
+  const { t } = useTranslation();
   const { beers, loading } = useMyBeers();
   const { refetch: refetchStats } = useUserStats();
   const [editableBeers, setEditableBeers] = useState([]);
@@ -38,9 +40,9 @@ const MiCuaderno = () => {
     );
   }, [beers]);
 
-  if (loading) return <p>Cargando tu cuaderno...</p>;
+  if (loading) return <p>{t("notebook.loading")}</p>;
   if (editableBeers.length === 0)
-    return <p>No has guardado ninguna cerveza aún.</p>;
+    return <p>{t("notebook.empty")}</p>;
 
   const handleChange = (id, field, value) => {
     setEditableBeers((prev) =>
@@ -129,7 +131,7 @@ const MiCuaderno = () => {
   const handleDelete = async (beerId) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
-    if (!window.confirm("¿Seguro que quieres borrar esta cerveza?")) return;
+    if (!window.confirm(t("notebook.confirmDelete"))) return;
 
     await supabase
       .from("user_beers")
@@ -143,7 +145,7 @@ const MiCuaderno = () => {
 
   return (
     <div>
-      <h2>📘 Mi Cuaderno</h2>
+      <h2>📘 {t("notebook.title")}</h2>
 
       {editableBeers.map((beer) => {
         const xpPreview = computeEntryXP({
@@ -182,23 +184,23 @@ const MiCuaderno = () => {
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                 {beer.user_photo_url?.trim() ? (
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e8449", background: "#d5f5e3", borderRadius: 5, padding: "2px 7px" }}>
-                    📸 Verificada
+                    📸 {t("beerform.verified")}
                   </span>
                 ) : (
                   <span style={{ fontSize: 11, color: "#999", background: "#f0f0f0", borderRadius: 5, padding: "2px 7px" }}>
-                    Sin foto · no verificada
+                    {t("notebook.noPhoto")}
                   </span>
                 )}
                 {beer.location?.name && (
                   <span style={{ fontSize: 11, color: "#8b6b2e", background: "#fffbee", border: "1px solid #f0d060", borderRadius: 5, padding: "2px 7px" }}>
                     📍 {beer.location.name}
-                    {!beer.location.isPublic && " · privada"}
+                    {!beer.location.isPublic && ` · ${t("location.private")}`}
                   </span>
                 )}
               </div>
 
               <div style={rowStyle}>
-                <label style={labelStyle}>Veces probada</label>
+                <label style={labelStyle}>{t("beerform.timesLabel")}</label>
                 <input
                   type="number" min="0" value={beer.times}
                   onChange={(e) => handleChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
@@ -208,7 +210,7 @@ const MiCuaderno = () => {
 
               <div style={rowStyle}>
                 <label style={labelStyle}>
-                  Puntuación ⭐ <XpBadge xp={XP_VALUES.RATING} />
+                  {t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} />
                 </label>
                 <select
                   value={beer.Rating ?? ""}
@@ -216,35 +218,35 @@ const MiCuaderno = () => {
                   style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #ddd" }}
                 >
                   {RATING_OPTIONS.map((v) => (
-                    <option key={v} value={v}>{v === "" ? "— Sin puntuación —" : `${v} / 5`}</option>
+                    <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
                   ))}
                 </select>
               </div>
 
               <div style={rowStyle}>
-                <label style={labelStyle}>Comercializada</label>
+                <label style={labelStyle}>{t("notebook.commercializedLabel")}</label>
                 <select
                   value={beer.commercialized ? "yes" : "no"}
                   onChange={(e) => handleChange(beer.id, "commercialized", e.target.value === "yes")}
                   style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #ddd" }}
                 >
-                  <option value="yes">Sí</option>
-                  <option value="no">No</option>
+                  <option value="yes">{t("notebook.yes")}</option>
+                  <option value="no">{t("notebook.no")}</option>
                 </select>
               </div>
 
               <div style={{ marginBottom: "8px" }}>
-                <label style={labelStyle}>Comentario <XpBadge xp={XP_VALUES.COMMENT} /></label>
+                <label style={labelStyle}>{t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} /></label>
                 <textarea
                   value={beer.comment}
                   onChange={(e) => handleChange(beer.id, "comment", e.target.value)}
-                  rows={3} placeholder="Comentarios o anécdotas..."
+                  rows={3} placeholder={t("notebook.commentPlaceholder")}
                   style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #ddd", resize: "vertical", boxSizing: "border-box" }}
                 />
               </div>
 
               <div style={{ marginBottom: "8px" }}>
-                <label style={labelStyle}>URL foto tuya <XpBadge xp={XP_VALUES.PHOTO} /></label>
+                <label style={labelStyle}>{t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} /></label>
                 <input
                   type="text" placeholder="https://..."
                   value={beer.user_photo_url}
@@ -267,16 +269,16 @@ const MiCuaderno = () => {
 
               {isComplete && (
                 <div style={bonusBannerStyle}>
-                  🎯 +{XP_VALUES.COMPLETE_BONUS} XP bonus — entrada completa
+                  🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
                 </div>
               )}
 
               <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
                 <button onClick={() => handleSave(beer)} style={saveBtnStyle}>
-                  💾 Guardar · {xpPreview} XP
+                  💾 {t("notebook.saveBtn", { xp: xpPreview })}
                 </button>
                 <button onClick={() => handleDelete(beer.id)} style={deleteBtnStyle}>
-                  🗑️ Borrar
+                  🗑️ {t("notebook.deleteBtn")}
                 </button>
               </div>
             </div>

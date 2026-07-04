@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useBeers } from "../hooks/useBeers";
 import { useUserBeers } from "../hooks/useUserBeers";
 import BeerCard from "../components/BeerCard";
@@ -19,6 +20,7 @@ function normalizeStr(str) {
 }
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const { beers, loading, error } = useBeers();
   const { userBeers, refetch } = useUserBeers();
   const { stats, refetch: refetchStats } = useUserStats();
@@ -60,7 +62,7 @@ const Dashboard = () => {
     [beers]
   );
 
-  if (loading) return <p>Cargando cervezas...</p>;
+  if (loading) return <p>{t("dashboard.loading")}</p>;
   if (error) return <p>Error: {error}</p>;
 
   const [minAlc, maxAlc] = alcoholFilter;
@@ -77,7 +79,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1>🍺 Catálogo de Cervezas</h1>
+      <h1>🍺 {t("dashboard.title")}</h1>
 
       <div
         style={{
@@ -89,7 +91,7 @@ const Dashboard = () => {
           fontSize: "14px",
         }}
       >
-        🏆 Nivel: {stats.level} | ⭐ XP: {stats.xp} | 🍺 {stats.beers} cervezas ({stats.verifiedBeers} verificadas)
+        {t("dashboard.statsBar", { level: stats.level, xp: stats.xp, beers: stats.beers, verified: stats.verifiedBeers })}
       </div>
 
       <BeerFilters
@@ -106,8 +108,7 @@ const Dashboard = () => {
       />
 
       <p style={{ color: "#999", fontSize: 13, margin: "0 0 14px" }}>
-        {filteredBeers.length} cerveza{filteredBeers.length !== 1 ? "s" : ""} encontrada
-        {filteredBeers.length !== 1 ? "s" : ""}
+        {t("dashboard.found", { count: filteredBeers.length })}
       </p>
 
       <div

@@ -32,5 +32,99 @@
       "languageTitle": "Idioma",
       "languageNote":  "La preferencia se sincroniza con tu cuenta."
     }
+  },
+  "dashboard": {
+    "title":        "Catálogo de Cervezas",
+    "loading":      "Cargando cervezas...",
+    "statsBar":     "🏆 Nivel: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} cervezas ({{verified}} verificadas)",
+    "found_one":    "{{count}} cerveza encontrada",
+    "found_other":  "{{count}} cervezas encontradas"
+  },
+  "filters": {
+    "searchPlaceholder": "Buscar cervezas...",
+    "filtersBtn":        "Filtros",
+    "clearBtn":          "Limpiar filtros",
+    "styleSection":      "ESTILO",
+    "countrySection":    "PAÍS",
+    "alcoholSection":    "GRADO ALCOHÓLICO"
+  },
+  "beerform": {
+    "verified":           "Verificada",
+    "timesLabel":         "Veces probada",
+    "ratingLabel":        "Puntuación",
+    "noRating":           "— Sin puntuación —",
+    "commentLabel":       "Comentario",
+    "commentPlaceholder": "¿Qué te pareció?",
+    "photoLabel":         "URL foto tuya",
+    "bonusComplete":      "+{{xp}} XP bonus por entrada completa",
+    "saving":             "Guardando...",
+    "saveBtn":            "Guardar · +{{xp}} XP",
+    "inNotebook":         "En tu cuaderno"
+  },
+  "notebook": {
+    "title":              "Mi Cuaderno",
+    "loading":            "Cargando tu cuaderno...",
+    "empty":              "No has guardado ninguna cerveza aún.",
+    "confirmDelete":      "¿Seguro que quieres borrar esta cerveza?",
+    "noPhoto":            "Sin foto · no verificada",
+    "commercializedLabel":"Comercializada",
+    "yes":                "Sí",
+    "no":                 "No",
+    "commentPlaceholder": "Comentarios o anécdotas...",
+    "bonusComplete":      "+{{xp}} XP bonus — entrada completa",
+    "saveBtn":            "Guardar · {{xp}} XP",
+    "deleteBtn":          "Borrar"
+  },
+  "location": {
+    "addBtn":       "Agregar ubicación",
+    "getting":      "Obteniendo ubicación...",
+    "visibleFeed":  "Visible en feed y perfil",
+    "privateOnly":  "Solo en tu cuaderno",
+    "removeBtn":    "Quitar",
+    "errorDenied":  "Permiso denegado. Podés continuar sin ubicación.",
+    "errorTimeout": "No se pudo obtener la ubicación. Intentá de nuevo.",
+    "errorSupport": "Tu navegador no soporta geolocalización.",
+    "private":      "privada"
+  },
+  "ranking": {
+    "title":               "Ranking BeerBook",
+    "loading":             "Cargando ranking...",
+    "self":                "← vos",
+    "verifiedLabel":       "verificadas",
+    "disabledWeekly":      "No disponible en modo Cervezas Verificadas",
+    "notInRankingBeers":   "Aún no aparecés — subí fotos de tus cervezas para entrar.",
+    "notInRankingXP":      "Aún no aparecés en el ranking — registrá tu primera cerveza para entrar.",
+    "onlyYou":             "Solo aparecés vos. Invitá amigos para tener más competencia.",
+    "scope": {
+      "total":   "Total histórico",
+      "weekly":  "Esta semana",
+      "friends": "Entre amigos"
+    },
+    "dim": {
+      "xp":    "XP Total",
+      "beers": "Cervezas Verificadas"
+    },
+    "subtitles": {
+      "xpTotal":     "XP histórico acumulado · solo entradas con foto",
+      "xpWeekly":    "Cervezas verificadas nuevas en los últimos 7 días",
+      "xpFriends":   "Vos y tus amigos, ordenados por XP total",
+      "beersTotal":  "Quién registró más cervezas verificadas (con foto)",
+      "beersFriends":"Quién registró más cervezas verificadas entre tus amigos"
+    },
+    "empty": {
+      "xpTotal":     "El ranking está vacío.",
+      "xpWeekly":    "Nadie agregó cervezas verificadas esta semana todavía.",
+      "xpFriends":   "Agregá amigos para ver el ranking entre amigos.",
+      "beersTotal":  "Nadie tiene cervezas verificadas todavía.",
+      "beersFriends":"Ninguno de tus amigos tiene cervezas verificadas todavía."
+    },
+    "consent": {
+      "title":       "¿Querés aparecer en el ranking?",
+      "body":        "Tu XP siempre se acumula. Solo decidís si tu posición es visible para todos en el ranking global.",
+      "settingsHint":"Podés cambiar esto cuando quieras en",
+      "settingsLink":"Configuración → Privacidad",
+      "btnPrivate":  "Mantenerme privado",
+      "btnPublic":   "Sí, aparecer"
+    }
   }
 }

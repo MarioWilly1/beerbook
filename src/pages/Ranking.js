@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useRanking } from "../hooks/useRanking";
 import { supabase } from "../services/supabase";
@@ -8,42 +9,18 @@ import Avatar from "../components/Avatar";
 const MEDAL = ["🥇", "🥈", "🥉"];
 
 const SCOPE_TABS = [
-  { key: "total",   label: "🏅 Total histórico" },
-  { key: "semanal", label: "📅 Esta semana"      },
-  { key: "amigos",  label: "👥 Entre amigos"     },
+  { key: "total",   emoji: "🏅", tKey: "ranking.scope.total"   },
+  { key: "semanal", emoji: "📅", tKey: "ranking.scope.weekly"  },
+  { key: "amigos",  emoji: "👥", tKey: "ranking.scope.friends" },
 ];
 
 const DIM_OPTIONS = [
-  { key: "xp",    label: "⭐ XP Total"             },
-  { key: "beers", label: "🍺 Cervezas Verificadas" },
+  { key: "xp",    emoji: "⭐", tKey: "ranking.dim.xp"    },
+  { key: "beers", emoji: "🍺", tKey: "ranking.dim.beers" },
 ];
 
-const SUBTITLES = {
-  xp: {
-    total:   "XP histórico acumulado · solo entradas con foto",
-    semanal: "Cervezas verificadas nuevas en los últimos 7 días",
-    amigos:  "Vos y tus amigos, ordenados por XP total",
-  },
-  beers: {
-    total:  "Quién registró más cervezas verificadas (con foto)",
-    amigos: "Quién registró más cervezas verificadas entre tus amigos",
-  },
-};
-
-const EMPTY_MSGS = {
-  xp: {
-    total:   "El ranking está vacío.",
-    semanal: "Nadie agregó cervezas verificadas esta semana todavía.",
-    amigos:  "Agregá amigos para ver el ranking entre amigos.",
-  },
-  beers: {
-    total:  "Nadie tiene cervezas verificadas todavía.",
-    amigos: "Ninguno de tus amigos tiene cervezas verificadas todavía.",
-  },
-};
-
 // ── Row components ────────────────────────────────────────────────────────────
-const RankingRowXP = ({ entry, isSelf, onClick }) => {
+const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
   const pos = Number(entry.rank_pos);
   const { levelName } = getLevelInfo(Number(entry.total_xp));
   return (
@@ -55,7 +32,7 @@ const RankingRowXP = ({ entry, isSelf, onClick }) => {
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: "#111" }}>
           {entry.nombre || "Usuario"}
-          {isSelf && <span style={{ fontSize: 11, color: "#d4af37", marginLeft: 8 }}>← vos</span>}
+          {isSelf && <span style={{ fontSize: 11, color: "#d4af37", marginLeft: 8 }}>{selfLabel}</span>}
         </div>
         <div style={{ fontSize: 12, color: "#999" }}>{levelName}</div>
       </div>
@@ -63,13 +40,13 @@ const RankingRowXP = ({ entry, isSelf, onClick }) => {
         <div style={{ fontSize: 14, fontWeight: 700, color: "#b8941f" }}>
           ⭐ {Number(entry.total_xp).toLocaleString()} XP
         </div>
-        <div style={{ fontSize: 11, color: "#aaa" }}>🍺 {entry.total_beers} verificadas</div>
+        <div style={{ fontSize: 11, color: "#aaa" }}>🍺 {entry.total_beers} {verifiedLabel}</div>
       </div>
     </div>
   );
 };
 
-const RankingRowBeers = ({ entry, isSelf, onClick }) => {
+const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
   const pos = Number(entry.rank_pos);
   return (
     <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
@@ -80,12 +57,12 @@ const RankingRowBeers = ({ entry, isSelf, onClick }) => {
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: "#111" }}>
           {entry.nombre || "Usuario"}
-          {isSelf && <span style={{ fontSize: 11, color: "#d4af37", marginLeft: 8 }}>← vos</span>}
+          {isSelf && <span style={{ fontSize: 11, color: "#d4af37", marginLeft: 8 }}>{selfLabel}</span>}
         </div>
       </div>
       <div style={{ textAlign: "right" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#1e8449" }}>🍺 {entry.total_beers}</div>
-        <div style={{ fontSize: 11, color: "#aaa" }}>verificadas</div>
+        <div style={{ fontSize: 11, color: "#aaa" }}>{verifiedLabel}</div>
       </div>
     </div>
   );
@@ -93,6 +70,7 @@ const RankingRowBeers = ({ entry, isSelf, onClick }) => {
 
 // ── Main component ────────────────────────────────────────────────────────────
 const Ranking = () => {
+  const { t } = useTranslation();
   const {
     rankingTotal, rankingSemanal, rankingAmigos,
     rankingTotalBeers, rankingAmigosBeers,
@@ -149,11 +127,25 @@ const Ranking = () => {
   const selfEntry      = dim === "beers" ? selfEntryBeers : selfEntryXP;
   const selfInList     = list.some((e) => e.id === currentUserId);
 
-  const subtitle  = SUBTITLES[dim][scope] || "";
-  const emptyMsg  = EMPTY_MSGS[dim][scope] || "El ranking está vacío.";
-  const RowComp   = dim === "beers" ? RankingRowBeers : RankingRowXP;
+  const subtitleKey = dim === "xp"
+    ? scope === "semanal" ? "ranking.subtitles.xpWeekly"
+      : scope === "amigos"  ? "ranking.subtitles.xpFriends"
+      : "ranking.subtitles.xpTotal"
+    : scope === "amigos" ? "ranking.subtitles.beersFriends"
+    : "ranking.subtitles.beersTotal";
 
-  if (loading) return <p style={{ padding: 24 }}>Cargando ranking...</p>;
+  const emptyKey = dim === "xp"
+    ? scope === "semanal" ? "ranking.empty.xpWeekly"
+      : scope === "amigos"  ? "ranking.empty.xpFriends"
+      : "ranking.empty.xpTotal"
+    : scope === "amigos" ? "ranking.empty.beersFriends"
+    : "ranking.empty.beersTotal";
+
+  const selfLabel     = t("ranking.self");
+  const verifiedLabel = t("ranking.verifiedLabel");
+  const RowComp       = dim === "beers" ? RankingRowBeers : RankingRowXP;
+
+  if (loading) return <p style={{ padding: 24 }}>{t("ranking.loading")}</p>;
 
   return (
     <>
@@ -162,25 +154,25 @@ const Ranking = () => {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: 20 }}>
           <div style={{ background: "#fff", borderRadius: 18, padding: 36, maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🏆</div>
-            <h3 style={{ margin: "0 0 10px", fontSize: 20 }}>¿Querés aparecer en el ranking?</h3>
+            <h3 style={{ margin: "0 0 10px", fontSize: 20 }}>{t("ranking.consent.title")}</h3>
             <p style={{ color: "#666", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
-              Tu XP siempre se acumula. Solo decidís si tu posición es visible para todos en el ranking global.
+              {t("ranking.consent.body")}
               <br /><br />
-              Podés cambiar esto cuando quieras en{" "}
-              <strong>Configuración → Privacidad</strong>.
+              {t("ranking.consent.settingsHint")}{" "}
+              <strong>{t("ranking.consent.settingsLink")}</strong>.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <button
                 onClick={() => handleConsent(false)}
                 style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid #e0e0e0", background: "#fafafa", color: "#555", fontWeight: 600, fontSize: 14, cursor: "pointer" }}
               >
-                Mantenerme privado
+                {t("ranking.consent.btnPrivate")}
               </button>
               <button
                 onClick={() => handleConsent(true)}
                 style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "#d4af37", color: "#111", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
               >
-                Sí, aparecer 🏅
+                {t("ranking.consent.btnPublic")} 🏅
               </button>
             </div>
           </div>
@@ -189,12 +181,12 @@ const Ranking = () => {
 
       {/* ── Main content ────────────────────────────────────────────── */}
       <div style={{ maxWidth: 640, margin: "0 auto" }}>
-        <h2 style={{ margin: "0 0 4px" }}>🏆 Ranking BeerBook</h2>
-        <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>{subtitle}</p>
+        <h2 style={{ margin: "0 0 4px" }}>🏆 {t("ranking.title")}</h2>
+        <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>{t(subtitleKey)}</p>
 
         {/* Dimension switcher */}
         <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
-          {DIM_OPTIONS.map(({ key, label }) => (
+          {DIM_OPTIONS.map(({ key, emoji, tKey }) => (
             <button
               key={key}
               onClick={() => handleDimChange(key)}
@@ -207,14 +199,14 @@ const Ranking = () => {
                 transition: "all 0.15s",
               }}
             >
-              {label}
+              {emoji} {t(tKey)}
             </button>
           ))}
         </div>
 
         {/* Scope tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-          {SCOPE_TABS.map(({ key, label }) => {
+          {SCOPE_TABS.map(({ key, emoji, tKey }) => {
             const disabled = dim === "beers" && key === "semanal";
             const active   = scope === key;
             return (
@@ -222,7 +214,7 @@ const Ranking = () => {
                 key={key}
                 onClick={() => !disabled && setScope(key)}
                 disabled={disabled}
-                title={disabled ? "No disponible en modo Cervezas Verificadas" : undefined}
+                title={disabled ? t("ranking.disabledWeekly") : undefined}
                 style={{
                   padding: "8px 16px", borderRadius: 8, border: "none",
                   fontWeight: 600, fontSize: 13,
@@ -233,7 +225,7 @@ const Ranking = () => {
                   transition: "all 0.15s",
                 }}
               >
-                {label}
+                {emoji} {t(tKey)}
               </button>
             );
           })}
@@ -241,7 +233,7 @@ const Ranking = () => {
 
         {/* List */}
         {list.length === 0 ? (
-          <p style={{ color: "#999", textAlign: "center", padding: 40 }}>{emptyMsg}</p>
+          <p style={{ color: "#999", textAlign: "center", padding: 40 }}>{t(emptyKey)}</p>
         ) : (
           <>
             {list.map((entry) => (
@@ -250,6 +242,8 @@ const Ranking = () => {
                 entry={entry}
                 isSelf={entry.id === currentUserId}
                 onClick={() => navigate(`/perfil/${entry.id}`)}
+                selfLabel={selfLabel}
+                verifiedLabel={verifiedLabel}
               />
             ))}
 
@@ -260,6 +254,8 @@ const Ranking = () => {
                   entry={selfEntry}
                   isSelf
                   onClick={() => navigate(`/perfil/${selfEntry.id}`)}
+                  selfLabel={selfLabel}
+                  verifiedLabel={verifiedLabel}
                 />
               </>
             )}
@@ -267,14 +263,14 @@ const Ranking = () => {
             {scope === "total" && !selfInList && !selfEntry && (
               <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
                 {dim === "beers"
-                  ? "Aún no aparecés — subí fotos de tus cervezas para entrar."
-                  : "Aún no aparecés en el ranking — registrá tu primera cerveza para entrar."}
+                  ? t("ranking.notInRankingBeers")
+                  : t("ranking.notInRankingXP")}
               </p>
             )}
 
             {scope === "amigos" && list.length === 1 && (
               <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
-                Solo aparecés vos. Invitá amigos para tener más competencia.
+                {t("ranking.onlyYou")}
               </p>
             )}
           </>

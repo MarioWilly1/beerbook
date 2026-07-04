@@ -32,5 +32,99 @@
       "languageTitle": "Sprache",
       "languageNote":  "Die Einstellung wird mit deinem Konto synchronisiert."
     }
+  },
+  "dashboard": {
+    "title":        "Bierkatalog",
+    "loading":      "Biere werden geladen...",
+    "statsBar":     "🏆 Stufe: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} Biere ({{verified}} verifiziert)",
+    "found_one":    "{{count}} Bier gefunden",
+    "found_other":  "{{count}} Biere gefunden"
+  },
+  "filters": {
+    "searchPlaceholder": "Biere suchen...",
+    "filtersBtn":        "Filter",
+    "clearBtn":          "Filter löschen",
+    "styleSection":      "STIL",
+    "countrySection":    "LAND",
+    "alcoholSection":    "ALKOHOLGEHALT"
+  },
+  "beerform": {
+    "verified":           "Verifiziert",
+    "timesLabel":         "Probiert",
+    "ratingLabel":        "Bewertung",
+    "noRating":           "— Keine Bewertung —",
+    "commentLabel":       "Kommentar",
+    "commentPlaceholder": "Was hast du gedacht?",
+    "photoLabel":         "Deine Foto-URL",
+    "bonusComplete":      "+{{xp}} XP Bonus für vollständigen Eintrag",
+    "saving":             "Speichern...",
+    "saveBtn":            "Speichern · +{{xp}} XP",
+    "inNotebook":         "In deinem Notizbuch"
+  },
+  "notebook": {
+    "title":              "Mein Notizbuch",
+    "loading":            "Notizbuch wird geladen...",
+    "empty":              "Du hast noch keine Biere gespeichert.",
+    "confirmDelete":      "Möchtest du dieses Bier wirklich löschen?",
+    "noPhoto":            "Kein Foto · nicht verifiziert",
+    "commercializedLabel":"Kommerzialisiert",
+    "yes":                "Ja",
+    "no":                 "Nein",
+    "commentPlaceholder": "Kommentare oder Anekdoten...",
+    "bonusComplete":      "+{{xp}} XP Bonus — vollständiger Eintrag",
+    "saveBtn":            "Speichern · {{xp}} XP",
+    "deleteBtn":          "Löschen"
+  },
+  "location": {
+    "addBtn":       "Standort hinzufügen",
+    "getting":      "Standort wird ermittelt...",
+    "visibleFeed":  "Im Feed und Profil sichtbar",
+    "privateOnly":  "Nur in deinem Notizbuch",
+    "removeBtn":    "Entfernen",
+    "errorDenied":  "Zugriff verweigert. Du kannst ohne Standort fortfahren.",
+    "errorTimeout": "Standort konnte nicht ermittelt werden. Versuche es erneut.",
+    "errorSupport": "Dein Browser unterstützt keine Standortbestimmung.",
+    "private":      "privat"
+  },
+  "ranking": {
+    "title":               "BeerBook Rangliste",
+    "loading":             "Rangliste wird geladen...",
+    "self":                "← du",
+    "verifiedLabel":       "verifiziert",
+    "disabledWeekly":      "Im Modus 'Verifizierte Biere' nicht verfügbar",
+    "notInRankingBeers":   "Noch nicht dabei — lade Fotos deiner Biere hoch, um einzusteigen.",
+    "notInRankingXP":      "Noch nicht in der Rangliste — registriere dein erstes Bier.",
+    "onlyYou":             "Nur du erscheinst. Lade Freunde ein für mehr Wettbewerb.",
+    "scope": {
+      "total":   "Gesamt",
+      "weekly":  "Diese Woche",
+      "friends": "Freunde"
+    },
+    "dim": {
+      "xp":    "Gesamt-XP",
+      "beers": "Verifizierte Biere"
+    },
+    "subtitles": {
+      "xpTotal":     "Angesammelter XP · nur Einträge mit Foto",
+      "xpWeekly":    "Neue verifizierte Biere in den letzten 7 Tagen",
+      "xpFriends":   "Du und deine Freunde, nach gesamt XP sortiert",
+      "beersTotal":  "Wer die meisten verifizierten Biere protokolliert hat",
+      "beersFriends":"Wer die meisten verifizierten Biere unter deinen Freunden hat"
+    },
+    "empty": {
+      "xpTotal":     "Die Rangliste ist leer.",
+      "xpWeekly":    "Diese Woche hat noch niemand verifizierte Biere hinzugefügt.",
+      "xpFriends":   "Füge Freunde hinzu, um die Freundes-Rangliste zu sehen.",
+      "beersTotal":  "Noch niemand hat verifizierte Biere.",
+      "beersFriends":"Keiner deiner Freunde hat verifizierte Biere."
+    },
+    "consent": {
+      "title":       "Möchtest du in der Rangliste erscheinen?",
+      "body":        "Dein XP sammelt sich immer an. Du entscheidest nur, ob deine Position für alle sichtbar ist.",
+      "settingsHint":"Du kannst dies jederzeit ändern in",
+      "settingsLink":"Einstellungen → Datenschutz",
+      "btnPrivate":  "Privat bleiben",
+      "btnPublic":   "Ja, erscheinen"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -43,6 +44,7 @@ async function reverseGeocode(lat, lng) {
 }
 
 const LocationPicker = ({ value, onChange }) => {
+  const { t } = useTranslation();
   const [status, setStatus] = useState("idle"); // idle | loading | error
 
   const handleGetLocation = () => {
@@ -74,7 +76,7 @@ const LocationPicker = ({ value, onChange }) => {
   if (status === "loading") {
     return (
       <div style={wrapperStyle}>
-        <span style={{ fontSize: 13, color: "#888" }}>⏳ Obteniendo ubicación...</span>
+        <span style={{ fontSize: 13, color: "#888" }}>⏳ {t("location.getting")}</span>
       </div>
     );
   }
@@ -83,16 +85,16 @@ const LocationPicker = ({ value, onChange }) => {
     return (
       <div style={wrapperStyle}>
         <button type="button" onClick={handleGetLocation} style={addBtnStyle}>
-          📍 Agregar ubicación
+          📍 {t("location.addBtn")}
         </button>
         {status === "error_denied" && (
-          <p style={errorStyle}>Permiso denegado. Podés continuar sin ubicación.</p>
+          <p style={errorStyle}>{t("location.errorDenied")}</p>
         )}
         {status === "error_timeout" && (
-          <p style={errorStyle}>No se pudo obtener la ubicación. Intentá de nuevo.</p>
+          <p style={errorStyle}>{t("location.errorTimeout")}</p>
         )}
         {status === "error_support" && (
-          <p style={errorStyle}>Tu navegador no soporta geolocalización.</p>
+          <p style={errorStyle}>{t("location.errorSupport")}</p>
         )}
       </div>
     );
@@ -139,11 +141,11 @@ const LocationPicker = ({ value, onChange }) => {
             }} />
           </span>
           <span style={{ fontSize: 12, color: "#555" }}>
-            {value.isPublic ? "Visible en feed y perfil" : "Solo en tu cuaderno"}
+            {value.isPublic ? t("location.visibleFeed") : t("location.privateOnly")}
           </span>
         </button>
         <button type="button" onClick={handleRemove} style={removeBtnStyle}>
-          ✕ Quitar
+          ✕ {t("location.removeBtn")}
         </button>
       </div>
     </div>

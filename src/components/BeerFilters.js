@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const RANGE_CSS = `
   .bf-thumb {
@@ -197,6 +198,7 @@ const BeerFilters = ({
   styles,
   countries,
 }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const [low, high] = alcoholFilter;
@@ -247,7 +249,7 @@ const BeerFilters = ({
           </span>
           <input
             type="text"
-            placeholder="Buscar cervezas..."
+            placeholder={t("filters.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -285,7 +287,7 @@ const BeerFilters = ({
             whiteSpace: "nowrap",
           }}
         >
-          ⚙️ Filtros
+          ⚙️ {t("filters.filtersBtn")}
           {activeCount > 0 && (
             <span
               style={{
@@ -343,10 +345,10 @@ const BeerFilters = ({
             padding: "16px 14px",
           }}
         >
-          {/* Estilo */}
+          {/* Style */}
           {styles.length > 0 && (
             <div style={{ marginBottom: 18 }}>
-              <p style={sectionLabel}>ESTILO</p>
+              <p style={sectionLabel}>{t("filters.styleSection")}</p>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {styles.map((s) => (
                   <Chip
@@ -362,10 +364,10 @@ const BeerFilters = ({
             </div>
           )}
 
-          {/* País */}
+          {/* Country */}
           {countries.length > 0 && (
             <div style={{ marginBottom: 18 }}>
-              <p style={sectionLabel}>PAÍS</p>
+              <p style={sectionLabel}>{t("filters.countrySection")}</p>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {countries.map((c) => (
                   <Chip
@@ -383,7 +385,7 @@ const BeerFilters = ({
 
           {/* Alcohol range slider */}
           <div style={{ marginBottom: 8 }}>
-            <p style={sectionLabel}>GRADO ALCOHÓLICO</p>
+            <p style={sectionLabel}>{t("filters.alcoholSection")}</p>
             <RangeSlider
               low={low}
               high={high}
@@ -413,7 +415,7 @@ const BeerFilters = ({
                   fontWeight: 600,
                 }}
               >
-                Limpiar filtros
+                {t("filters.clearBtn")}
               </button>
             </div>
           )}

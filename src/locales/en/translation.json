@@ -32,5 +32,99 @@
       "languageTitle": "Language",
       "languageNote":  "Preference syncs to your account."
     }
+  },
+  "dashboard": {
+    "title":        "Beer Catalog",
+    "loading":      "Loading beers...",
+    "statsBar":     "🏆 Level: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} beers ({{verified}} verified)",
+    "found_one":    "{{count}} beer found",
+    "found_other":  "{{count}} beers found"
+  },
+  "filters": {
+    "searchPlaceholder": "Search beers...",
+    "filtersBtn":        "Filters",
+    "clearBtn":          "Clear filters",
+    "styleSection":      "STYLE",
+    "countrySection":    "COUNTRY",
+    "alcoholSection":    "ALCOHOL CONTENT"
+  },
+  "beerform": {
+    "verified":           "Verified",
+    "timesLabel":         "Times tried",
+    "ratingLabel":        "Rating",
+    "noRating":           "— No rating —",
+    "commentLabel":       "Comment",
+    "commentPlaceholder": "What did you think?",
+    "photoLabel":         "Your photo URL",
+    "bonusComplete":      "+{{xp}} XP bonus for complete entry",
+    "saving":             "Saving...",
+    "saveBtn":            "Save · +{{xp}} XP",
+    "inNotebook":         "In your notebook"
+  },
+  "notebook": {
+    "title":              "My Notebook",
+    "loading":            "Loading your notebook...",
+    "empty":              "You haven't saved any beers yet.",
+    "confirmDelete":      "Are you sure you want to delete this beer?",
+    "noPhoto":            "No photo · unverified",
+    "commercializedLabel":"Commercialized",
+    "yes":                "Yes",
+    "no":                 "No",
+    "commentPlaceholder": "Comments or anecdotes...",
+    "bonusComplete":      "+{{xp}} XP bonus — complete entry",
+    "saveBtn":            "Save · {{xp}} XP",
+    "deleteBtn":          "Delete"
+  },
+  "location": {
+    "addBtn":       "Add location",
+    "getting":      "Getting location...",
+    "visibleFeed":  "Visible in feed and profile",
+    "privateOnly":  "Only in your notebook",
+    "removeBtn":    "Remove",
+    "errorDenied":  "Permission denied. You can continue without location.",
+    "errorTimeout": "Could not get location. Try again.",
+    "errorSupport": "Your browser does not support geolocation.",
+    "private":      "private"
+  },
+  "ranking": {
+    "title":               "BeerBook Ranking",
+    "loading":             "Loading ranking...",
+    "self":                "← you",
+    "verifiedLabel":       "verified",
+    "disabledWeekly":      "Not available in Verified Beers mode",
+    "notInRankingBeers":   "Not in yet — upload photos of your beers to enter.",
+    "notInRankingXP":      "Not in the ranking yet — log your first beer to enter.",
+    "onlyYou":             "Only you appear. Invite friends for more competition.",
+    "scope": {
+      "total":   "All time",
+      "weekly":  "This week",
+      "friends": "Friends"
+    },
+    "dim": {
+      "xp":    "Total XP",
+      "beers": "Verified Beers"
+    },
+    "subtitles": {
+      "xpTotal":     "Accumulated historical XP · photo entries only",
+      "xpWeekly":    "New verified beers in the last 7 days",
+      "xpFriends":   "You and your friends, sorted by total XP",
+      "beersTotal":  "Who logged the most verified beers (with photo)",
+      "beersFriends":"Who logged the most verified beers among your friends"
+    },
+    "empty": {
+      "xpTotal":     "The ranking is empty.",
+      "xpWeekly":    "Nobody added verified beers this week yet.",
+      "xpFriends":   "Add friends to see the friends ranking.",
+      "beersTotal":  "Nobody has verified beers yet.",
+      "beersFriends":"None of your friends have verified beers yet."
+    },
+    "consent": {
+      "title":       "Want to appear in the ranking?",
+      "body":        "Your XP always accumulates. You just decide if your position is visible to everyone in the global ranking.",
+      "settingsHint":"You can change this anytime in",
+      "settingsLink":"Settings → Privacy",
+      "btnPrivate":  "Stay private",
+      "btnPublic":   "Yes, show me"
+    }
   }
 }

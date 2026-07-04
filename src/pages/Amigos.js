@@ -68,12 +68,12 @@ const Amigos = () => {
     setTimeout(() => setActionMsg(""), 3000);
   };
 
-  if (loading) return <p style={{ padding: 24 }}>{t("friends.loading")}</p>;
+  if (loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("friends.loading")}</p>;
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
       <h2 style={{ margin: "0 0 4px" }}>👥 {t("friends.title")}</h2>
-      <p style={{ color: "#888", fontSize: 13, margin: "0 0 24px" }}>
+      <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 24px" }}>
         {t("friends.count", { count: friends.length })}
       </p>
 
@@ -89,7 +89,7 @@ const Amigos = () => {
           {receivedRequests.map((req) => (
             <div key={req.id} style={rowStyle}>
               <Avatar avatarUrl={req.avatar_url} nombre={req.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600 }}>{req.nombre}</span>
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{req.nombre}</span>
               <button onClick={() => handleAccept(req.id)} style={btnGreen}>{t("friends.accept")}</button>
               <button onClick={() => handleReject(req.id)} style={btnGray}>{t("friends.reject")}</button>
             </div>
@@ -114,7 +114,7 @@ const Amigos = () => {
         </div>
 
         {searchResults.length === 0 && searchTerm && !searching && (
-          <p style={{ color: "#bbb", fontSize: 13 }}>{t("friends.noResults", { term: searchTerm })}</p>
+          <p style={{ color: "#5a4535", fontSize: 13 }}>{t("friends.noResults", { term: searchTerm })}</p>
         )}
 
         {searchResults.map((user) => {
@@ -122,7 +122,7 @@ const Amigos = () => {
           return (
             <div key={user.id} style={rowStyle}>
               <Avatar avatarUrl={user.avatar_url} nombre={user.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600 }}>{user.nombre}</span>
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{user.nombre}</span>
               {status === "friend"   && <span style={chipGreen}>✓ {t("friends.statusFriends")}</span>}
               {status === "sent"     && <span style={chipGray}>{t("friends.statusSent")}</span>}
               {status === "received" && <button onClick={() => handleAccept(user.id)} style={btnGreen}>{t("friends.accept")}</button>}
@@ -136,12 +136,12 @@ const Amigos = () => {
       <section style={sectionStyle}>
         <h3 style={sectionTitle}>{t("friends.myFriends")}</h3>
         {friends.length === 0 ? (
-          <p style={{ color: "#bbb", fontSize: 13 }}>{t("friends.empty")}</p>
+          <p style={{ color: "#5a4535", fontSize: 13 }}>{t("friends.empty")}</p>
         ) : (
           friends.map((f) => (
             <div key={f.id} style={rowStyle}>
               <Avatar avatarUrl={f.avatar_url} nombre={f.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600 }}>{f.nombre}</span>
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{f.nombre}</span>
               <button onClick={() => handleRemove(f.id)} style={btnDanger}>{t("friends.removeBtn")}</button>
             </div>
           ))
@@ -155,7 +155,7 @@ const Amigos = () => {
           {sentRequests.map((r) => (
             <div key={r.id} style={rowStyle}>
               <Avatar avatarUrl={r.avatar_url} nombre={r.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600 }}>{r.nombre}</span>
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{r.nombre}</span>
               <span style={chipGray}>{t("friends.pending")}</span>
             </div>
           ))}
@@ -165,17 +165,17 @@ const Amigos = () => {
   );
 };
 
-const sectionStyle = { background: "#fff", border: "1px solid #eee", borderRadius: 12, padding: "16px 20px", marginBottom: 20 };
-const sectionTitle = { margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: "#333", display: "flex", alignItems: "center", gap: 8 };
-const rowStyle     = { display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderBottom: "1px solid #f5f5f5" };
-const inputStyle   = { flex: 1, padding: "8px 12px", border: "1px solid #ddd", borderRadius: 8, fontSize: 14 };
-const flashStyle   = { background: "#d5f5e3", border: "1px solid #2ecc71", borderRadius: 8, padding: "10px 16px", marginBottom: 16, fontSize: 14, color: "#1e8449" };
-const badgeStyle   = { background: "#e74c3c", color: "#fff", borderRadius: "50%", fontSize: 11, fontWeight: 700, width: 20, height: 20, display: "inline-flex", alignItems: "center", justifyContent: "center" };
-const chipGreen    = { fontSize: 12, color: "#1e8449", fontWeight: 600, background: "#d5f5e3", padding: "3px 10px", borderRadius: 20 };
-const chipGray     = { fontSize: 12, color: "#888", background: "#f5f5f5", padding: "3px 10px", borderRadius: 20 };
-const btnGold      = { padding: "6px 14px", background: "#d4af37", color: "#111", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
-const btnGreen     = { padding: "6px 14px", background: "#1e8449", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
-const btnGray      = { padding: "6px 14px", background: "#f0f0f0", color: "#555", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
-const btnDanger    = { padding: "6px 14px", background: "#fde8e8", color: "#c0392b", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
+const sectionStyle = { background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: "16px 20px", marginBottom: 20 };
+const sectionTitle = { margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: "#f0e4cc", display: "flex", alignItems: "center", gap: 8, fontFamily: "'Playfair Display', serif" };
+const rowStyle     = { display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderBottom: "1px solid #2e2215" };
+const inputStyle   = { flex: 1, padding: "8px 12px", border: "1px solid #2e2215", borderRadius: 8, fontSize: 14, background: "#2a1e0f", color: "#f0e4cc" };
+const flashStyle   = { background: "#0f2a18", border: "1px solid #2a6b3a", borderRadius: 8, padding: "10px 16px", marginBottom: 16, fontSize: 14, color: "#2a6b3a" };
+const badgeStyle   = { background: "#8b2020", color: "#f0e4cc", borderRadius: "50%", fontSize: 11, fontWeight: 700, width: 20, height: 20, display: "inline-flex", alignItems: "center", justifyContent: "center" };
+const chipGreen    = { fontSize: 12, color: "#2a6b3a", fontWeight: 600, background: "#0f2a18", padding: "3px 10px", borderRadius: 20 };
+const chipGray     = { fontSize: 12, color: "#9a7d62", background: "#2a1e0f", padding: "3px 10px", borderRadius: 20 };
+const btnGold      = { padding: "6px 14px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
+const btnGreen     = { padding: "6px 14px", background: "#2a6b3a", color: "#f0e4cc", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
+const btnGray      = { padding: "6px 14px", background: "#2a1e0f", color: "#9a7d62", border: "1px solid #2e2215", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
+const btnDanger    = { padding: "6px 14px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer" };
 
 export default Amigos;

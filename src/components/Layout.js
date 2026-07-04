@@ -31,22 +31,30 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
         style={{
           width: "260px",
           backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('/wood.jpg')",
+            "linear-gradient(rgba(13,10,6,0.82), rgba(13,10,6,0.82)), url('/wood.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          color: "#f5f5f5",
+          color: "#f0e4cc",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "24px 16px",
+          borderRight: "1px solid #2e2215",
         }}
       >
         <div>
-          <h1 style={{ fontSize: "22px", marginBottom: "16px", textAlign: "center", letterSpacing: "1px" }}>
+          <h1 style={{
+            fontSize: "22px",
+            marginBottom: "16px",
+            textAlign: "center",
+            letterSpacing: "1px",
+            fontFamily: "'Playfair Display', serif",
+            color: "#d4af37",
+          }}>
             🍺 BeerBook
           </h1>
 
-          {/* Avatar + username — clickable to open selector */}
+          {/* Avatar + username */}
           <div
             onClick={() => setShowAvatarSelector(true)}
             title={t("sidebar.changeAvatar")}
@@ -67,7 +75,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
                 ✏️
               </span>
             </div>
-            <p style={{ textAlign: "center", fontSize: "13px", opacity: 0.85, margin: "8px 0 0" }}>
+            <p style={{ textAlign: "center", fontSize: "13px", opacity: 0.75, margin: "8px 0 0", color: "#f0e4cc" }}>
               {username}
             </p>
           </div>
@@ -94,7 +102,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
                     style={{
                       fontSize: 18,
                       filter: !b.currentTier ? "grayscale(1)" : "none",
-                      opacity: b.currentTier ? 1 : 0.35,
+                      opacity: b.currentTier ? 1 : 0.25,
                     }}
                   >
                     {b.icon}
@@ -106,7 +114,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
                       borderRadius: "50%",
                       background: b.currentTier
                         ? TIER_META[b.currentTier].color
-                        : "rgba(255,255,255,0.2)",
+                        : "rgba(255,255,255,0.12)",
                     }}
                   />
                 </div>
@@ -114,7 +122,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             </div>
           )}
 
-          <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <SidebarLink to="/" label={t("nav.catalog")} />
             <SidebarLink to="/cuaderno" label={t("nav.notebook")} />
             <SidebarLink to="/feed" label={`📡 ${t("nav.feed")}`} />
@@ -125,17 +133,17 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           </nav>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <SidebarLink to="/configuracion" label={`⚙️ ${t("nav.settings")}`} />
           <SidebarButton label={`🚪 ${t("nav.logout")}`} onClick={handleLogout} />
         </div>
       </aside>
 
-      {/* CONTENIDO */}
+      {/* MAIN CONTENT */}
       <main
         key={location.pathname}
         className="page-enter"
-        style={{ flex: 1, overflowY: "auto", padding: "28px", background: "#faf8f4" }}
+        style={{ flex: 1, overflowY: "auto", padding: "28px", background: "#0d0a06" }}
       >
         {children}
       </main>
@@ -161,20 +169,21 @@ const SidebarLink = ({ to, label }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={({ isActive }) => ({
-        padding: "14px 16px",
+        padding: "12px 16px",
         borderRadius: "10px",
         textDecoration: "none",
-        color:      isActive ? "#1e8449" : "#f5f5f5",
+        color:      isActive ? "#0d0a06" : "#f0e4cc",
         background: isActive
-          ? "#d5f5e3"
+          ? "#d4af37"
           : hovered
-          ? "rgba(255,255,255,0.14)"
-          : "rgba(255,255,255,0.08)",
-        fontSize: "16px",
-        fontWeight: "600",
+          ? "rgba(212,175,55,0.12)"
+          : "rgba(255,255,255,0.04)",
+        fontSize: "15px",
+        fontWeight: isActive ? "700" : "500",
         transition: "background 0.18s ease, transform 0.12s ease",
         transform: hovered && !isActive ? "translateX(2px)" : "none",
         display: "block",
+        borderLeft: isActive ? "none" : "none",
       })}
     >
       {label}
@@ -188,10 +197,10 @@ const SidebarButton = ({ label, onClick }) => (
     style={{
       padding: "12px 16px",
       borderRadius: "10px",
-      background: "rgba(255,255,255,0.08)",
-      color: "#f5f5f5",
-      fontSize: "15px",
-      fontWeight: "600",
+      background: "rgba(255,255,255,0.04)",
+      color: "#9a7d62",
+      fontSize: "14px",
+      fontWeight: "500",
       cursor: "pointer",
       textAlign: "center",
     }}

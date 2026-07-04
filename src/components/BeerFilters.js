@@ -21,8 +21,8 @@ const RANGE_CSS = `
     height: 20px;
     border-radius: 50%;
     background: #d4af37;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 5px rgba(0,0,0,.25);
+    border: 2px solid #1c1409;
+    box-shadow: 0 1px 5px rgba(0,0,0,.5);
     cursor: pointer;
     pointer-events: all;
   }
@@ -31,8 +31,8 @@ const RANGE_CSS = `
     height: 20px;
     border-radius: 50%;
     background: #d4af37;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 5px rgba(0,0,0,.25);
+    border: 2px solid #1c1409;
+    box-shadow: 0 1px 5px rgba(0,0,0,.5);
     cursor: pointer;
     pointer-events: all;
   }
@@ -46,12 +46,12 @@ const Chip = ({ label, active, onClick }) => (
     style={{
       padding: "6px 14px",
       borderRadius: 999,
-      border: `1.5px solid ${active ? "#d4af37" : "#e2e2e2"}`,
+      border: `1.5px solid ${active ? "#d4af37" : "#2e2215"}`,
       cursor: "pointer",
       fontWeight: active ? 700 : 500,
       fontSize: 13,
-      background: active ? "#fffbee" : "#f8f8f8",
-      color: active ? "#8b6b2e" : "#555",
+      background: active ? "rgba(212,175,55,0.15)" : "#2a1e0f",
+      color: active ? "#d4af37" : "#9a7d62",
       transition: "all 0.15s",
       whiteSpace: "nowrap",
     }}
@@ -69,7 +69,7 @@ const Badge = ({ label, onRemove }) => (
       padding: "3px 6px 3px 10px",
       borderRadius: 999,
       background: "#d4af37",
-      color: "#111",
+      color: "#0d0a06",
       fontSize: 12,
       fontWeight: 700,
     }}
@@ -81,7 +81,7 @@ const Badge = ({ label, onRemove }) => (
         background: "rgba(0,0,0,0.18)",
         border: "none",
         cursor: "pointer",
-        color: "#111",
+        color: "#0d0a06",
         borderRadius: "50%",
         width: 16,
         height: 16,
@@ -109,7 +109,6 @@ const RangeSlider = ({ low, high, onChange }) => {
   return (
     <div>
       <div style={{ position: "relative", height: 24 }}>
-        {/* Custom track */}
         <div
           style={{
             position: "absolute",
@@ -117,7 +116,7 @@ const RangeSlider = ({ low, high, onChange }) => {
             left: 0,
             right: 0,
             height: 4,
-            background: "#ebebeb",
+            background: "#2e2215",
             borderRadius: 2,
           }}
         >
@@ -133,7 +132,6 @@ const RangeSlider = ({ low, high, onChange }) => {
           />
         </div>
 
-        {/* Low thumb */}
         <input
           type="range"
           min={MIN}
@@ -147,7 +145,6 @@ const RangeSlider = ({ low, high, onChange }) => {
           style={{ zIndex: low > high - 2 ? 3 : 1 }}
         />
 
-        {/* High thumb */}
         <input
           type="range"
           min={MIN}
@@ -167,7 +164,7 @@ const RangeSlider = ({ low, high, onChange }) => {
           display: "flex",
           justifyContent: "space-between",
           fontSize: 12,
-          color: "#888",
+          color: "#9a7d62",
           marginTop: 4,
           fontWeight: 600,
         }}
@@ -183,7 +180,7 @@ const sectionLabel = {
   margin: "0 0 10px",
   fontSize: 11,
   fontWeight: 700,
-  color: "#b0b0b0",
+  color: "#5a4535",
   letterSpacing: "0.8px",
 };
 
@@ -217,8 +214,8 @@ const BeerFilters = ({
   return (
     <div
       style={{
-        background: "#fff",
-        border: "1px solid #eaeaea",
+        background: "#1c1409",
+        border: "1px solid #2e2215",
         borderRadius: 14,
         marginBottom: 20,
       }}
@@ -242,7 +239,7 @@ const BeerFilters = ({
               top: "50%",
               transform: "translateY(-50%)",
               fontSize: 15,
-              color: "#c8c8c8",
+              color: "#5a4535",
               pointerEvents: "none",
             }}
           >
@@ -257,12 +254,12 @@ const BeerFilters = ({
               width: "100%",
               boxSizing: "border-box",
               padding: "10px 12px 10px 36px",
-              border: "1.5px solid #ebebeb",
+              border: "1.5px solid #2e2215",
               borderRadius: 10,
               fontSize: 14,
               outline: "none",
-              background: "#fafafa",
-              color: "#111",
+              background: "#2a1e0f",
+              color: "#f0e4cc",
             }}
           />
         </div>
@@ -276,13 +273,9 @@ const BeerFilters = ({
             padding: "10px 14px",
             borderRadius: 10,
             cursor: "pointer",
-            border: `1.5px solid ${open || activeCount > 0 ? "#d4af37" : "#ebebeb"}`,
-            background: open
-              ? "#d4af37"
-              : activeCount > 0
-              ? "#fffbee"
-              : "#fafafa",
-            color: open ? "#111" : "#555",
+            border: `1.5px solid ${open || activeCount > 0 ? "#d4af37" : "#2e2215"}`,
+            background: open ? "#d4af37" : activeCount > 0 ? "rgba(212,175,55,0.12)" : "#2a1e0f",
+            color: open ? "#0d0a06" : "#9a7d62",
             fontWeight: 600,
             fontSize: 13,
             whiteSpace: "nowrap",
@@ -293,7 +286,7 @@ const BeerFilters = ({
             <span
               style={{
                 background: open ? "rgba(0,0,0,0.18)" : "#d4af37",
-                color: "#111",
+                color: "#0d0a06",
                 borderRadius: "50%",
                 width: 18,
                 height: 18,
@@ -342,11 +335,10 @@ const BeerFilters = ({
       {open && (
         <div
           style={{
-            borderTop: "1px solid #f0f0f0",
+            borderTop: "1px solid #2e2215",
             padding: "16px 14px",
           }}
         >
-          {/* Style */}
           {styles.length > 0 && (
             <div style={{ marginBottom: 18 }}>
               <p style={sectionLabel}>{t("filters.styleSection")}</p>
@@ -365,7 +357,6 @@ const BeerFilters = ({
             </div>
           )}
 
-          {/* Country */}
           {countries.length > 0 && (
             <div style={{ marginBottom: 18 }}>
               <p style={sectionLabel}>{t("filters.countrySection")}</p>
@@ -384,7 +375,6 @@ const BeerFilters = ({
             </div>
           )}
 
-          {/* Alcohol range slider */}
           <div style={{ marginBottom: 8 }}>
             <p style={sectionLabel}>{t("filters.alcoholSection")}</p>
             <RangeSlider
@@ -394,7 +384,6 @@ const BeerFilters = ({
             />
           </div>
 
-          {/* Clear all */}
           {(styleFilter || countryFilter || alcActive) && (
             <div
               style={{
@@ -407,11 +396,11 @@ const BeerFilters = ({
                 onClick={clearAll}
                 style={{
                   background: "none",
-                  border: "1px solid #e0e0e0",
+                  border: "1px solid #2e2215",
                   borderRadius: 8,
                   padding: "6px 14px",
                   fontSize: 13,
-                  color: "#aaa",
+                  color: "#5a4535",
                   cursor: "pointer",
                   fontWeight: 600,
                 }}

@@ -31,7 +31,7 @@ const Logros = () => {
     load();
   }, []);
 
-  if (loading || badgesLoading) return <p style={{ padding: 24 }}>{t("logros.loading")}</p>;
+  if (loading || badgesLoading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("logros.loading")}</p>;
 
   const totalAchXP = Object.values(unlockedData).reduce((s, a) => s + (a.xp_awarded || 0), 0);
   const unlockedBadgeCount = badges.filter((b) => b.currentTier).length;
@@ -43,7 +43,7 @@ const Logros = () => {
       <div style={{ marginBottom: 36 }}>
         <div style={{ marginBottom: 20 }}>
           <h2 style={{ margin: "0 0 4px" }}>🏷️ {t("logros.badgesTitle")}</h2>
-          <p style={{ color: "#666", margin: 0, fontSize: 14 }}>
+          <p style={{ color: "#9a7d62", margin: 0, fontSize: 14 }}>
             {t("logros.badgesSummary", { unlocked: unlockedBadgeCount, total: badges.length })}
             {totalBadgeXP > 0 && ` ${t("logros.xpEarned", { xp: totalBadgeXP })}`}
           </p>
@@ -66,7 +66,7 @@ const Logros = () => {
       <div>
         <div style={{ marginBottom: 20 }}>
           <h2 style={{ margin: "0 0 4px" }}>🏅 {t("logros.achievementsTitle")}</h2>
-          <p style={{ color: "#666", margin: 0, fontSize: 14 }}>
+          <p style={{ color: "#9a7d62", margin: 0, fontSize: 14 }}>
             {t("logros.achievementsSummary", { unlocked: unlocked.size, total: ACHIEVEMENTS.length })}
             {totalAchXP > 0 && ` ${t("logros.xpEarned", { xp: totalAchXP })}`}
           </p>
@@ -94,8 +94,8 @@ const Logros = () => {
                 style={{
                   borderRadius: 14,
                   padding: "18px 16px",
-                  background: isUnlocked ? "#fff" : "#f5f5f5",
-                  border: isUnlocked ? "2px solid #d4af37" : "2px solid #e0e0e0",
+                  background: "#1c1409",
+                  border: isUnlocked ? "2px solid #d4af37" : "2px solid #2e2215",
                   opacity: isUnlocked ? 1 : 0.6,
                   position: "relative",
                 }}
@@ -109,10 +109,10 @@ const Logros = () => {
                 >
                   {ach.emoji}
                 </div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 4 }}>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc", marginBottom: 4 }}>
                   {t(`achievement.${ach.slug}.name`)}
                 </div>
-                <div style={{ fontSize: 12, color: "#777", lineHeight: 1.4, marginBottom: 8 }}>
+                <div style={{ fontSize: 12, color: "#9a7d62", lineHeight: 1.4, marginBottom: 8 }}>
                   {t(`achievement.${ach.slug}.desc`)}
                 </div>
                 <div
@@ -120,9 +120,9 @@ const Logros = () => {
                     display: "inline-block",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: isUnlocked ? "#b8941f" : "#aaa",
-                    background: isUnlocked ? "#fffbee" : "#f0f0f0",
-                    border: `1px solid ${isUnlocked ? "#f0d060" : "#ddd"}`,
+                    color: isUnlocked ? "#d4af37" : "#5a4535",
+                    background: isUnlocked ? "rgba(212,175,55,0.12)" : "#2a1e0f",
+                    border: `1px solid ${isUnlocked ? "rgba(212,175,55,0.35)" : "#2e2215"}`,
                     borderRadius: 6,
                     padding: "2px 8px",
                   }}
@@ -130,7 +130,7 @@ const Logros = () => {
                   +{ach.xpBonus} XP
                 </div>
                 {isUnlocked && date && (
-                  <div style={{ fontSize: 10, color: "#aaa", marginTop: 6 }}>✓ {date}</div>
+                  <div style={{ fontSize: 10, color: "#5a4535", marginTop: 6 }}>✓ {date}</div>
                 )}
                 {!isUnlocked && (
                   <div

@@ -1,0 +1,17 @@
+export const T = {
+  bg:          '#0d0a06',
+  surface:     '#1c1409',
+  surfaceHigh: '#2a1e0f',
+  border:      '#2e2215',
+  gold:        '#d4af37',
+  goldHover:   '#e8c84a',
+  goldDim:     '#8b6b2e',
+  copper:      '#c07a3f',
+  text:        '#f0e4cc',
+  textSub:     '#9a7d62',
+  textMuted:   '#5a4535',
+  success:     '#2a6b3a',
+  successBg:   '#0f2a18',
+  error:       '#8b2020',
+  errorBg:     '#2a0a0a',
+};

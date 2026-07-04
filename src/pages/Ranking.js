@@ -19,28 +19,27 @@ const DIM_OPTIONS = [
   { key: "beers", emoji: "🍺", tKey: "ranking.dim.beers" },
 ];
 
-// ── Row components ────────────────────────────────────────────────────────────
 const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
   const pos = Number(entry.rank_pos);
   const { levelName } = getLevelInfo(Number(entry.total_xp));
   return (
     <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
-      <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#888" }}>
+      <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
       <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 15, color: "#111" }}>
+        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc" }}>
           {entry.nombre || "Usuario"}
-          {isSelf && <span style={{ fontSize: 11, color: "#d4af37", marginLeft: 8 }}>{selfLabel}</span>}
+          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e", marginLeft: 8 }}>{selfLabel}</span>}
         </div>
-        <div style={{ fontSize: 12, color: "#999" }}>{levelName}</div>
+        <div style={{ fontSize: 12, color: isSelf ? "#3a2a10" : "#9a7d62" }}>{levelName}</div>
       </div>
       <div style={{ textAlign: "right" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#b8941f" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: isSelf ? "#8b6b2e" : "#d4af37" }}>
           ⭐ {Number(entry.total_xp).toLocaleString()} XP
         </div>
-        <div style={{ fontSize: 11, color: "#aaa" }}>🍺 {entry.total_beers} {verifiedLabel}</div>
+        <div style={{ fontSize: 11, color: isSelf ? "#5a3a10" : "#5a4535" }}>🍺 {entry.total_beers} {verifiedLabel}</div>
       </div>
     </div>
   );
@@ -50,25 +49,24 @@ const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) =
   const pos = Number(entry.rank_pos);
   return (
     <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
-      <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#888" }}>
+      <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
       <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 15, color: "#111" }}>
+        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc" }}>
           {entry.nombre || "Usuario"}
-          {isSelf && <span style={{ fontSize: 11, color: "#d4af37", marginLeft: 8 }}>{selfLabel}</span>}
+          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e", marginLeft: 8 }}>{selfLabel}</span>}
         </div>
       </div>
       <div style={{ textAlign: "right" }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#1e8449" }}>🍺 {entry.total_beers}</div>
-        <div style={{ fontSize: 11, color: "#aaa" }}>{verifiedLabel}</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#2a6b3a" }}>🍺 {entry.total_beers}</div>
+        <div style={{ fontSize: 11, color: isSelf ? "#5a3a10" : "#5a4535" }}>{verifiedLabel}</div>
       </div>
     </div>
   );
 };
 
-// ── Main component ────────────────────────────────────────────────────────────
 const Ranking = () => {
   const { t } = useTranslation();
   const {
@@ -83,7 +81,6 @@ const Ranking = () => {
   const [showConsent, setShowConsent] = useState(false);
   const [consentSession, setConsentSession] = useState(null);
 
-  // Check if user needs to be asked about ranking consent
   useEffect(() => {
     const checkConsent = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -145,32 +142,32 @@ const Ranking = () => {
   const verifiedLabel = t("ranking.verifiedLabel");
   const RowComp       = dim === "beers" ? RankingRowBeers : RankingRowXP;
 
-  if (loading) return <p style={{ padding: 24 }}>{t("ranking.loading")}</p>;
+  if (loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("ranking.loading")}</p>;
 
   return (
     <>
-      {/* ── Consent modal ───────────────────────────────────────────── */}
+      {/* Consent modal */}
       {showConsent && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: 20 }}>
-          <div style={{ background: "#fff", borderRadius: 18, padding: 36, maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: 20 }}>
+          <div style={{ background: "#1c1409", border: "1px solid #2e2215", borderRadius: 18, padding: 36, maxWidth: 420, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🏆</div>
-            <h3 style={{ margin: "0 0 10px", fontSize: 20 }}>{t("ranking.consent.title")}</h3>
-            <p style={{ color: "#666", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
+            <h3 style={{ margin: "0 0 10px", fontSize: 20, color: "#f0e4cc" }}>{t("ranking.consent.title")}</h3>
+            <p style={{ color: "#9a7d62", fontSize: 14, lineHeight: 1.6, margin: "0 0 28px" }}>
               {t("ranking.consent.body")}
               <br /><br />
               {t("ranking.consent.settingsHint")}{" "}
-              <strong>{t("ranking.consent.settingsLink")}</strong>.
+              <strong style={{ color: "#d4af37" }}>{t("ranking.consent.settingsLink")}</strong>.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <button
                 onClick={() => handleConsent(false)}
-                style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid #e0e0e0", background: "#fafafa", color: "#555", fontWeight: 600, fontSize: 14, cursor: "pointer" }}
+                style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid #2e2215", background: "#2a1e0f", color: "#9a7d62", fontWeight: 600, fontSize: 14, cursor: "pointer" }}
               >
                 {t("ranking.consent.btnPrivate")}
               </button>
               <button
                 onClick={() => handleConsent(true)}
-                style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "#d4af37", color: "#111", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
+                style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
               >
                 {t("ranking.consent.btnPublic")} 🏅
               </button>
@@ -179,10 +176,10 @@ const Ranking = () => {
         </div>
       )}
 
-      {/* ── Main content ────────────────────────────────────────────── */}
+      {/* Main content */}
       <div style={{ maxWidth: 640, margin: "0 auto" }}>
         <h2 style={{ margin: "0 0 4px" }}>🏆 {t("ranking.title")}</h2>
-        <p style={{ color: "#888", fontSize: 13, margin: "0 0 20px" }}>{t(subtitleKey)}</p>
+        <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 20px" }}>{t(subtitleKey)}</p>
 
         {/* Dimension switcher */}
         <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
@@ -192,10 +189,10 @@ const Ranking = () => {
               onClick={() => handleDimChange(key)}
               style={{
                 padding: "6px 14px", borderRadius: 20,
-                border: dim === key ? "2px solid #b8941f" : "2px solid #e0e0e0",
+                border: dim === key ? "2px solid #d4af37" : "2px solid #2e2215",
                 fontWeight: 700, fontSize: 13, cursor: "pointer",
-                background: dim === key ? "#fffbee" : "#fafafa",
-                color:      dim === key ? "#b8941f" : "#888",
+                background: dim === key ? "rgba(212,175,55,0.15)" : "#2a1e0f",
+                color:      dim === key ? "#d4af37" : "#9a7d62",
                 transition: "all 0.15s",
               }}
             >
@@ -219,9 +216,9 @@ const Ranking = () => {
                   padding: "8px 16px", borderRadius: 8, border: "none",
                   fontWeight: 600, fontSize: 13,
                   cursor: disabled ? "not-allowed" : "pointer",
-                  background: disabled ? "#f0f0f0" : active ? "#d4af37" : "#f0f0f0",
-                  color:      disabled ? "#ccc"    : active ? "#111"    : "#666",
-                  opacity: disabled ? 0.5 : 1,
+                  background: disabled ? "#2a1e0f" : active ? "#d4af37" : "#2a1e0f",
+                  color:      disabled ? "#5a4535" : active ? "#0d0a06" : "#9a7d62",
+                  opacity: disabled ? 0.4 : 1,
                   transition: "all 0.15s",
                 }}
               >
@@ -233,7 +230,7 @@ const Ranking = () => {
 
         {/* List */}
         {list.length === 0 ? (
-          <p style={{ color: "#999", textAlign: "center", padding: 40 }}>{t(emptyKey)}</p>
+          <p style={{ color: "#5a4535", textAlign: "center", padding: 40 }}>{t(emptyKey)}</p>
         ) : (
           <>
             {list.map((entry) => (
@@ -249,7 +246,7 @@ const Ranking = () => {
 
             {scope === "total" && !selfInList && selfEntry && (
               <>
-                <div style={{ textAlign: "center", color: "#ccc", margin: "8px 0", fontSize: 13 }}>· · ·</div>
+                <div style={{ textAlign: "center", color: "#5a4535", margin: "8px 0", fontSize: 13 }}>· · ·</div>
                 <RowComp
                   entry={selfEntry}
                   isSelf
@@ -261,7 +258,7 @@ const Ranking = () => {
             )}
 
             {scope === "total" && !selfInList && !selfEntry && (
-              <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
+              <p style={{ textAlign: "center", color: "#5a4535", fontSize: 13, marginTop: 16 }}>
                 {dim === "beers"
                   ? t("ranking.notInRankingBeers")
                   : t("ranking.notInRankingXP")}
@@ -269,7 +266,7 @@ const Ranking = () => {
             )}
 
             {scope === "amigos" && list.length === 1 && (
-              <p style={{ textAlign: "center", color: "#bbb", fontSize: 13, marginTop: 16 }}>
+              <p style={{ textAlign: "center", color: "#5a4535", fontSize: 13, marginTop: 16 }}>
                 {t("ranking.onlyYou")}
               </p>
             )}
@@ -287,12 +284,12 @@ const rowStyle = (isSelf, pos, clickable) => ({
   padding: "12px 16px",
   marginBottom: 8,
   borderRadius: 12,
-  background: isSelf ? "#fffbee" : "#fff",
+  background: isSelf ? "#d4af37" : "#1c1409",
   border: isSelf
-    ? "2px solid #d4af37"
+    ? "none"
     : pos <= 3
-    ? `2px solid ${["#ffd700", "#c0c0c0", "#cd7f32"][pos - 1]}`
-    : "1px solid #eee",
+    ? `2px solid ${["#d4af37", "#a0a0a0", "#cd7f32"][pos - 1]}`
+    : "1px solid #2e2215",
   fontWeight: isSelf ? 700 : 400,
   cursor: clickable ? "pointer" : "default",
   transition: "box-shadow 0.15s",

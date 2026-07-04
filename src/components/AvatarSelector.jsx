@@ -119,7 +119,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
 
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#111" }}>{t("avatar.ui.title")}</h2>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f0e4cc" }}>{t("avatar.ui.title")}</h2>
           <button onClick={onClose} style={closeBtnStyle}>✕</button>
         </div>
 
@@ -154,7 +154,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
             </button>
           ) : (
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <span style={{ fontSize: 13, color: "#555", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 13, color: "#9a7d62", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {file.name}
               </span>
               <button
@@ -191,7 +191,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
                   style={{
                     ...presetBtnStyle,
                     border:     isSelected ? "2px solid #d4af37" : "2px solid transparent",
-                    background: isSelected ? "#fffbee"           : "#f4f4f4",
+                    background: isSelected ? "rgba(212,175,55,0.15)" : "#2a1e0f",
                     opacity:    uploading ? 0.6 : 1,
                   }}
                 >
@@ -200,10 +200,10 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
                     alt={presetName}
                     style={{ width: 52, height: 52, borderRadius: "50%" }}
                   />
-                  <span style={{ fontSize: 9, color: "#555", marginTop: 4, textAlign: "center", lineHeight: 1.2, fontWeight: 600 }}>
+                  <span style={{ fontSize: 9, color: "#f0e4cc", marginTop: 4, textAlign: "center", lineHeight: 1.2, fontWeight: 600 }}>
                     {presetName}
                   </span>
-                  <span style={{ fontSize: 8, color: "#999", textAlign: "center", lineHeight: 1.2, marginTop: 1 }}>
+                  <span style={{ fontSize: 8, color: "#9a7d62", textAlign: "center", lineHeight: 1.2, marginTop: 1 }}>
                     {presetDesc}
                   </span>
                 </button>
@@ -218,40 +218,40 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
 };
 
 const overlayStyle = {
-  position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
+  position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)",
   display: "flex", alignItems: "center", justifyContent: "center",
   zIndex: 9999, padding: 20,
 };
 const modalStyle = {
-  background: "#fff", borderRadius: 16, padding: 24,
+  background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16, padding: 24,
   width: "100%", maxWidth: 460, maxHeight: "90vh", overflowY: "auto",
-  boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+  boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
 };
 const closeBtnStyle = {
   background: "none", border: "none", fontSize: 20, cursor: "pointer",
-  color: "#888", lineHeight: 1, padding: "2px 6px",
+  color: "#5a4535", lineHeight: 1, padding: "2px 6px",
 };
 const sectionStyle = {
-  background: "#fafafa", border: "1px solid #eee", borderRadius: 10,
+  background: "#2a1e0f", border: "1px solid #2e2215", borderRadius: 10,
   padding: "14px 16px", marginBottom: 16,
 };
 const sectionTitleStyle = {
-  margin: "0 0 12px", fontSize: 12, fontWeight: 700, color: "#555",
+  margin: "0 0 12px", fontSize: 12, fontWeight: 700, color: "#5a4535",
   textTransform: "uppercase", letterSpacing: "0.5px",
 };
 const uploadBtnStyle = {
-  width: "100%", padding: 10, background: "#f0f0f0",
-  border: "1.5px dashed #ccc", borderRadius: 8,
-  fontSize: 13, color: "#555", cursor: "pointer", fontWeight: 600,
+  width: "100%", padding: 10, background: "#1c1409",
+  border: "1.5px dashed #2e2215", borderRadius: 8,
+  fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600,
 };
 const saveBtnStyle = {
-  padding: "8px 14px", background: "#d4af37", color: "#111",
+  padding: "8px 14px", background: "#d4af37", color: "#0d0a06",
   border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13,
   cursor: "pointer", whiteSpace: "nowrap",
 };
 const clearBtnStyle = {
-  padding: "4px 8px", background: "#fee", border: "none",
-  borderRadius: 6, color: "#c0392b", cursor: "pointer", fontSize: 13, fontWeight: 600,
+  padding: "4px 8px", background: "#2a0a0a", border: "1px solid #8b2020",
+  borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 13, fontWeight: 600,
 };
 const gridStyle = {
   display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8,
@@ -262,8 +262,8 @@ const presetBtnStyle = {
   transition: "all 0.15s",
 };
 const errorStyle = {
-  background: "#fff5f5", border: "1px solid #fecaca", borderRadius: 8,
-  padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#c0392b",
+  background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 8,
+  padding: "10px 14px", marginBottom: 14, fontSize: 13, color: "#c07a3f",
 };
 
 export default AvatarSelector;

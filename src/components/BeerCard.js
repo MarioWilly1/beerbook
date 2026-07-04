@@ -42,7 +42,6 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
     setSaving(true);
     const xp = computeEntryXP({ rating, comment, photo: photoUrl });
 
-    // Detect level-up before writing
     const { data: xpRows } = await supabase
       .from("user_beers").select('"XP"').eq("user_id", session.user.id);
     const prevTotal = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
@@ -111,7 +110,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
         {photoUrl?.trim() && (
           <span style={{
             position: "absolute", bottom: 6, right: 6,
-            background: "rgba(0,0,0,0.6)", color: "#fff",
+            background: "rgba(0,0,0,0.7)", color: "#d4af37",
             fontSize: 10, fontWeight: 700,
             padding: "2px 6px", borderRadius: 5,
           }}>
@@ -122,7 +121,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
       </div>
 
       <div style={{ padding: "10px 4px 0" }}>
-        <h3 style={{ margin: "0 0 2px", fontSize: "15px" }}>{beer.nombre}</h3>
+        <h3 style={{ margin: "0 0 2px", fontSize: "15px", color: "#f0e4cc" }}>{beer.nombre}</h3>
         <p style={metaStyle}>{beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%</p>
 
         <div style={fieldStyle}>
@@ -192,7 +191,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
         </button>
 
         {isInMyBeers && (
-          <p style={{ marginTop: "6px", fontSize: "12px", color: "#888", textAlign: "center" }}>
+          <p style={{ marginTop: "6px", fontSize: "12px", color: "#9a7d62", textAlign: "center" }}>
             ✅ {t("beerform.inNotebook")}
           </p>
         )}
@@ -207,12 +206,12 @@ const XpBadge = ({ xp }) => (
   </span>
 );
 
-const cardStyle   = { border: "1px solid #e8e0d0", borderRadius: "12px", padding: "12px", background: "#fff", display: "flex", flexDirection: "column" };
-const metaStyle   = { margin: "0 0 10px", fontSize: "12px", color: "#888" };
+const cardStyle   = { border: "1px solid #2e2215", borderRadius: "12px", padding: "12px", background: "#1c1409", display: "flex", flexDirection: "column" };
+const metaStyle   = { margin: "0 0 10px", fontSize: "12px", color: "#9a7d62" };
 const fieldStyle  = { marginBottom: "8px" };
-const labelStyle  = { display: "block", fontSize: "11px", fontWeight: "600", color: "#555", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.4px" };
-const inputStyle  = { width: "100%", padding: "6px 8px", border: "1px solid #ddd", borderRadius: "6px", fontSize: "13px", boxSizing: "border-box" };
-const bonusBannerStyle = { background: "#fffbee", border: "1px solid #f0d060", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", color: "#856404", fontWeight: "600", marginBottom: "8px" };
-const saveBtn     = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#111", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
+const labelStyle  = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.4px" };
+const inputStyle  = { width: "100%", padding: "6px 8px", border: "1px solid #2e2215", borderRadius: "6px", fontSize: "13px", boxSizing: "border-box", background: "#2a1e0f", color: "#f0e4cc" };
+const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
+const saveBtn     = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
 
 export default BeerCard;

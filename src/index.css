@@ -1,3 +1,36 @@
+/* ── Global dark base ──────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: #0d0a06;
+  color: #f0e4cc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #f0e4cc;
+}
+
+::selection {
+  background: rgba(212, 175, 55, 0.28);
+  color: #f0e4cc;
+}
+
+input, textarea, select {
+  background: #2a1e0f;
+  color: #f0e4cc;
+  border-color: #2e2215;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #5a4535;
+}
+
 /* ── Page transitions ─────────────────────────────────────────────────────── */
 @keyframes page-fade-in {
   from { opacity: 0; transform: translateY(5px); }
@@ -22,7 +55,7 @@ button:active:not(:disabled) {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #1c1409;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(212, 175, 55, 0.3);

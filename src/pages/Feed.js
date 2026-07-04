@@ -35,13 +35,13 @@ const FeedEntry = ({ entry }) => {
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
           <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
           <div style={{ flex: 1 }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>{entry.nombre}</span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc" }}>{entry.nombre}</span>
             {" "}
-            <span style={{ fontSize: 14, color: "#555" }}>{emoji} {label}</span>
+            <span style={{ fontSize: 14, color: "#9a7d62" }}>{emoji} {label}</span>
             {" "}
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#8b6b2e" }}>{entry.beer_nombre}</span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#d4af37" }}>{entry.beer_nombre}</span>
           </div>
-          <span style={{ fontSize: 12, color: "#bbb", flexShrink: 0 }}>{timeAgo(entry.created_at, t)}</span>
+          <span style={{ fontSize: 12, color: "#5a4535", flexShrink: 0 }}>{timeAgo(entry.created_at, t)}</span>
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
@@ -60,7 +60,7 @@ const FeedEntry = ({ entry }) => {
               </div>
             )}
             {entry.comment?.trim() && (
-              <p style={{ margin: "0 0 6px", fontSize: 13, color: "#555", fontStyle: "italic" }}>
+              <p style={{ margin: "0 0 6px", fontSize: 13, color: "#9a7d62", fontStyle: "italic" }}>
                 "{entry.comment.trim()}"
               </p>
             )}
@@ -90,21 +90,21 @@ const Feed = () => {
   const { t } = useTranslation();
   const { feed, loading } = useFeed();
 
-  if (loading) return <p style={{ padding: 24 }}>{t("feed.loading")}</p>;
+  if (loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("feed.loading")}</p>;
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
       <h2 style={{ margin: "0 0 4px" }}>📡 {t("feed.title")}</h2>
-      <p style={{ color: "#888", fontSize: 13, margin: "0 0 24px" }}>
+      <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 24px" }}>
         {t("feed.subtitle")}
       </p>
 
       {feed.length === 0 ? (
         <div style={emptyStyle}>
           <p style={{ fontSize: 40, margin: "0 0 12px" }}>🍺</p>
-          <p style={{ margin: 0, fontWeight: 600, color: "#555" }}>{t("feed.empty.title")}</p>
-          <p style={{ margin: "6px 0 0", fontSize: 13, color: "#999" }}>
-            {t("feed.empty.bodyPre")}<strong>{t("feed.empty.bodyLink")}</strong>{t("feed.empty.bodyPost")}
+          <p style={{ margin: 0, fontWeight: 600, color: "#f0e4cc" }}>{t("feed.empty.title")}</p>
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "#9a7d62" }}>
+            {t("feed.empty.bodyPre")}<strong style={{ color: "#d4af37" }}>{t("feed.empty.bodyLink")}</strong>{t("feed.empty.bodyPost")}
           </p>
         </div>
       ) : (
@@ -116,7 +116,7 @@ const Feed = () => {
   );
 };
 
-const cardStyle  = { background: "#fff", border: "1px solid #eee", borderRadius: 12, padding: 16, marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" };
-const emptyStyle = { textAlign: "center", padding: "60px 20px", background: "#fff", border: "1px solid #eee", borderRadius: 12 };
+const cardStyle  = { background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: 16, marginBottom: 16 };
+const emptyStyle = { textAlign: "center", padding: "60px 20px", background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12 };
 
 export default Feed;

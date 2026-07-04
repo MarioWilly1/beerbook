@@ -39,9 +39,6 @@ const Dashboard = () => {
     }
   }, [refresh, refetch, refetchStats]);
 
-  // Derive unique root countries from actual DB data.
-  // If a shorter pais is a substring of another ("España" in "España (A Coruña)" or "Madrid (España)"),
-  // the shorter one becomes the canonical chip value used for filtering.
   const countries = useMemo(() => {
     if (!beers.length) return [];
     const paises = [...new Set(beers.map((b) => b.pais).filter(Boolean))];
@@ -53,7 +50,6 @@ const Dashboard = () => {
     return [...roots].sort();
   }, [beers]);
 
-  // Only show style keywords that actually appear in the loaded beers.
   const styles = useMemo(
     () =>
       STYLE_KEYWORDS.filter((kw) =>
@@ -62,8 +58,8 @@ const Dashboard = () => {
     [beers]
   );
 
-  if (loading) return <p>{t("dashboard.loading")}</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p style={{ color: "#9a7d62" }}>{t("dashboard.loading")}</p>;
+  if (error) return <p style={{ color: "#8b2020" }}>Error: {error}</p>;
 
   const [minAlc, maxAlc] = alcoholFilter;
 
@@ -79,16 +75,17 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1>🍺 {t("dashboard.title")}</h1>
+      <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>
 
       <div
         style={{
-          padding: "10px",
+          padding: "10px 14px",
           marginBottom: "15px",
-          background: "#111",
-          color: "#fff",
+          background: "#1c1409",
+          border: "1px solid #2e2215",
           borderRadius: "10px",
           fontSize: "14px",
+          color: "#9a7d62",
         }}
       >
         {t("dashboard.statsBar", { level: stats.level, xp: stats.xp, beers: stats.beers, verified: stats.verifiedBeers })}
@@ -107,7 +104,7 @@ const Dashboard = () => {
         countries={countries}
       />
 
-      <p style={{ color: "#999", fontSize: 13, margin: "0 0 14px" }}>
+      <p style={{ color: "#5a4535", fontSize: 13, margin: "0 0 14px" }}>
         {t("dashboard.found", { count: filteredBeers.length })}
       </p>
 

@@ -40,9 +40,9 @@ const MiCuaderno = () => {
     );
   }, [beers]);
 
-  if (loading) return <p>{t("notebook.loading")}</p>;
+  if (loading) return <p style={{ color: "#9a7d62" }}>{t("notebook.loading")}</p>;
   if (editableBeers.length === 0)
-    return <p>{t("notebook.empty")}</p>;
+    return <p style={{ color: "#9a7d62" }}>{t("notebook.empty")}</p>;
 
   const handleChange = (id, field, value) => {
     setEditableBeers((prev) =>
@@ -65,7 +65,6 @@ const MiCuaderno = () => {
       beer.comment.trim().length > 0 &&
       beer.user_photo_url.trim().length > 0;
 
-    // Detect level-up before writing
     const { data: xpRows } = await supabase
       .from("user_beers").select('"XP"').eq("user_id", session.user.id);
     const prevTotal = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
@@ -168,8 +167,8 @@ const MiCuaderno = () => {
               padding: "16px",
               marginBottom: "16px",
               borderRadius: "10px",
-              backgroundColor: `rgba(212,175,55,${intensity * 0.3 + 0.05})`,
-              border: "1px solid rgba(212,175,55,0.3)",
+              backgroundColor: `rgba(212,175,55,${intensity * 0.12 + 0.04})`,
+              border: "1px solid rgba(212,175,55,0.2)",
             }}
           >
             <div
@@ -180,19 +179,19 @@ const MiCuaderno = () => {
             </div>
 
             <div style={{ flex: 1 }}>
-              <h3 style={{ margin: "0 0 4px" }}>{beer.nombre}</h3>
+              <h3 style={{ margin: "0 0 4px", color: "#f0e4cc" }}>{beer.nombre}</h3>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                 {beer.user_photo_url?.trim() ? (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e8449", background: "#d5f5e3", borderRadius: 5, padding: "2px 7px" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#2a6b3a", background: "#0f2a18", borderRadius: 5, padding: "2px 7px" }}>
                     📸 {t("beerform.verified")}
                   </span>
                 ) : (
-                  <span style={{ fontSize: 11, color: "#999", background: "#f0f0f0", borderRadius: 5, padding: "2px 7px" }}>
+                  <span style={{ fontSize: 11, color: "#5a4535", background: "#2a1e0f", borderRadius: 5, padding: "2px 7px" }}>
                     {t("notebook.noPhoto")}
                   </span>
                 )}
                 {beer.location?.name && (
-                  <span style={{ fontSize: 11, color: "#8b6b2e", background: "#fffbee", border: "1px solid #f0d060", borderRadius: 5, padding: "2px 7px" }}>
+                  <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
                     📍 {beer.location.name}
                     {!beer.location.isPublic && ` · ${t("location.private")}`}
                   </span>
@@ -204,7 +203,7 @@ const MiCuaderno = () => {
                 <input
                   type="number" min="0" value={beer.times}
                   onChange={(e) => handleChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
-                  style={{ width: "70px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #ddd" }}
+                  style={{ width: "70px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
                 />
               </div>
 
@@ -215,7 +214,7 @@ const MiCuaderno = () => {
                 <select
                   value={beer.Rating ?? ""}
                   onChange={(e) => handleChange(beer.id, "Rating", e.target.value)}
-                  style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #ddd" }}
+                  style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
                 >
                   {RATING_OPTIONS.map((v) => (
                     <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
@@ -228,7 +227,7 @@ const MiCuaderno = () => {
                 <select
                   value={beer.commercialized ? "yes" : "no"}
                   onChange={(e) => handleChange(beer.id, "commercialized", e.target.value === "yes")}
-                  style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #ddd" }}
+                  style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
                 >
                   <option value="yes">{t("notebook.yes")}</option>
                   <option value="no">{t("notebook.no")}</option>
@@ -241,7 +240,7 @@ const MiCuaderno = () => {
                   value={beer.comment}
                   onChange={(e) => handleChange(beer.id, "comment", e.target.value)}
                   rows={3} placeholder={t("notebook.commentPlaceholder")}
-                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #ddd", resize: "vertical", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", resize: "vertical", boxSizing: "border-box" }}
                 />
               </div>
 
@@ -251,7 +250,7 @@ const MiCuaderno = () => {
                   type="text" placeholder="https://..."
                   value={beer.user_photo_url}
                   onChange={(e) => handleChange(beer.id, "user_photo_url", e.target.value)}
-                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #ddd", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}
                 />
                 {beer.user_photo_url && (
                   <img
@@ -296,9 +295,9 @@ const XpBadge = ({ xp }) => (
 );
 
 const rowStyle        = { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" };
-const labelStyle      = { fontSize: "12px", fontWeight: "600", color: "#555", minWidth: "120px", textTransform: "uppercase", letterSpacing: "0.4px" };
-const bonusBannerStyle = { background: "#fffbee", border: "1px solid #f0d060", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", color: "#856404", fontWeight: "600", marginBottom: "8px" };
-const saveBtnStyle    = { padding: "8px 14px", background: "#8b6b2e", color: "#fff", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
-const deleteBtnStyle  = { padding: "8px 14px", background: "#5a1e1e", color: "#fff", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
+const labelStyle      = { fontSize: "12px", fontWeight: "600", color: "#9a7d62", minWidth: "120px", textTransform: "uppercase", letterSpacing: "0.4px" };
+const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
+const saveBtnStyle    = { padding: "8px 14px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
+const deleteBtnStyle  = { padding: "8px 14px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
 
 export default MiCuaderno;

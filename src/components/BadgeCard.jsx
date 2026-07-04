@@ -10,17 +10,16 @@ const BadgeCard = ({ badge }) => {
   const tierMeta = currentTier ? TIER_META[currentTier] : null;
   const nextMeta = nextTier    ? TIER_META[nextTier]    : null;
 
-  const bg          = tierMeta?.bg    || "#f8f8f8";
-  const borderColor = tierMeta?.color || "#e0e0e0";
+  const borderColor = tierMeta?.color || "#2e2215";
 
   return (
     <div
       style={{
         borderRadius: 14,
         padding: "18px 16px",
-        background: bg,
-        border: `2px solid ${borderColor}`,
-        opacity: currentTier ? 1 : 0.6,
+        background: "#1c1409",
+        border: `2px solid ${currentTier ? borderColor : "#2e2215"}`,
+        opacity: currentTier ? 1 : 0.7,
         display: "flex",
         flexDirection: "column",
         minHeight: 190,
@@ -39,10 +38,10 @@ const BadgeCard = ({ badge }) => {
       </div>
 
       {/* Name + description */}
-      <div style={{ fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 2 }}>
+      <div style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc", marginBottom: 2 }}>
         {t(`badge.${slug}.name`)}
       </div>
-      <div style={{ fontSize: 11, color: "#888", lineHeight: 1.4, marginBottom: 12 }}>
+      <div style={{ fontSize: 11, color: "#9a7d62", lineHeight: 1.4, marginBottom: 12 }}>
         {t(`badge.${slug}.desc`)}
       </div>
 
@@ -56,7 +55,7 @@ const BadgeCard = ({ badge }) => {
               flex: 1,
               height: 6,
               borderRadius: 3,
-              background: unlockedTiers.has(tier) ? TIER_META[tier].color : "#e0e0e0",
+              background: unlockedTiers.has(tier) ? TIER_META[tier].color : "#2e2215",
               transition: "background 0.3s",
             }}
           />
@@ -74,7 +73,7 @@ const BadgeCard = ({ badge }) => {
             fontSize: 11,
             fontWeight: 700,
             color: tierMeta.color,
-            background: "rgba(255,255,255,0.75)",
+            background: "rgba(255,255,255,0.06)",
             border: `1px solid ${borderColor}`,
             borderRadius: 6,
             padding: "2px 8px",
@@ -84,13 +83,13 @@ const BadgeCard = ({ badge }) => {
           {TIER_ICON[currentTier]} {t(`badge.tier.${currentTier}`)} · +{TIER_META[currentTier].xp} XP
         </div>
       ) : (
-        <div style={{ fontSize: 11, color: "#bbb", fontWeight: 600, marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "#5a4535", fontWeight: 600, marginBottom: 8 }}>
           🔒 {t("badge.locked")}
         </div>
       )}
 
       {/* Progress hint */}
-      <div style={{ fontSize: 11, color: "#999", marginTop: "auto" }}>
+      <div style={{ fontSize: 11, color: "#9a7d62", marginTop: "auto" }}>
         {nextTier ? (
           t("badge.progress.next", {
             value,

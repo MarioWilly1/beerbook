@@ -64,3 +64,15 @@ button:active:not(:disabled) {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(212, 175, 55, 0.55);
 }
+
+/* ── StoryBar: ocultar scrollbar horizontal ────────────────────────────────── */
+.story-bar::-webkit-scrollbar { display: none; }
+
+/* ── Keyframes compartidos ──────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}

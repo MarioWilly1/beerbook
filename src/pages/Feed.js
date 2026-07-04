@@ -5,6 +5,7 @@ import { useFeedReactions } from "../hooks/useFeedReactions";
 import Avatar from "../components/Avatar";
 import Lightbox from "../components/Lightbox";
 import ReactionBar from "../components/ReactionBar";
+import StoryBar from "../components/StoryBar";
 
 const ACTION_EMOJI = {
   register: "🍺",
@@ -110,6 +111,9 @@ const Feed = () => {
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
+      {/* Barra de historias efímeras */}
+      <StoryBar />
+
       <h2 style={{ margin: "0 0 4px" }}>📡 {t("feed.title")}</h2>
       <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 24px" }}>
         {t("feed.subtitle")}

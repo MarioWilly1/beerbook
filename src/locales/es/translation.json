@@ -299,5 +299,25 @@
       "maxLevel": "Nivel máximo alcanzado",
       "start":    "{{value}}/{{threshold}} para {{tier}}"
     }
+  },
+  "stories": {
+    "myStory": "Tu historia",
+    "emptyBar": "Tus amigos no publicaron historias hoy",
+    "ownLabel": "(tú)",
+    "viewers": "vistas",
+    "viewedBy": "Visto por",
+    "noViewersYet": "Nadie la vio todavía",
+    "photoUnavailable": "Foto no disponible",
+    "creator": {
+      "title": "Nueva historia",
+      "tabPhoto": "Foto",
+      "tabText": "Texto",
+      "choosePhoto": "Toca para elegir una foto",
+      "textPlaceholder": "Escribí algo...",
+      "bgColor": "Color de fondo",
+      "publish": "Publicar historia",
+      "publishing": "Publicando...",
+      "errorSize": "La imagen no puede superar los 15 MB"
+    }
   }
 }

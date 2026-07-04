@@ -299,5 +299,25 @@
       "maxLevel": "Maximalstufe erreicht",
       "start":    "{{value}}/{{threshold}} für {{tier}}"
     }
+  },
+  "stories": {
+    "myStory": "Deine Story",
+    "emptyBar": "Deine Freunde haben heute keine Stories gepostet",
+    "ownLabel": "(du)",
+    "viewers": "Aufrufe",
+    "viewedBy": "Gesehen von",
+    "noViewersYet": "Noch niemand hat es gesehen",
+    "photoUnavailable": "Foto nicht verfügbar",
+    "creator": {
+      "title": "Neue Story",
+      "tabPhoto": "Foto",
+      "tabText": "Text",
+      "choosePhoto": "Tippe, um ein Foto auszuwählen",
+      "textPlaceholder": "Schreib etwas...",
+      "bgColor": "Hintergrundfarbe",
+      "publish": "Story veröffentlichen",
+      "publishing": "Wird veröffentlicht...",
+      "errorSize": "Das Bild darf 15 MB nicht überschreiten"
+    }
   }
 }

@@ -299,5 +299,25 @@
       "maxLevel": "Max level reached",
       "start":    "{{value}}/{{threshold}} for {{tier}}"
     }
+  },
+  "stories": {
+    "myStory": "Your story",
+    "emptyBar": "Your friends haven't posted stories today",
+    "ownLabel": "(you)",
+    "viewers": "views",
+    "viewedBy": "Viewed by",
+    "noViewersYet": "No one has viewed it yet",
+    "photoUnavailable": "Photo unavailable",
+    "creator": {
+      "title": "New story",
+      "tabPhoto": "Photo",
+      "tabText": "Text",
+      "choosePhoto": "Tap to choose a photo",
+      "textPlaceholder": "Write something...",
+      "bgColor": "Background color",
+      "publish": "Publish story",
+      "publishing": "Publishing...",
+      "errorSize": "Image cannot exceed 15 MB"
+    }
   }
 }

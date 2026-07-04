@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import { useMyBeers } from "../hooks/useMyBeers";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
-import { computeEntryXP, XP_VALUES } from "../utils/xp";
+import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { checkAndAwardBadges } from "../utils/badges";
 import { logActivity } from "../utils/activity";
 import Lightbox from "../components/Lightbox";
 import LocationPicker from "../components/LocationPicker";
+import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
+import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
+import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -25,6 +28,7 @@ const MiCuaderno = () => {
         times: beer.times || 0,
         comment: beer.comment || "",
         Rating: beer.Rating ?? "",
+        XP: beer.XP || 0,
         commercialized: beer.commercialized ?? true,
         user_photo_url: beer.user_photo_url || "",
         location: beer.location_lat
@@ -58,6 +62,14 @@ const MiCuaderno = () => {
       beer.Rating !== "" && Number(beer.Rating) > 0 &&
       beer.comment.trim().length > 0 &&
       beer.user_photo_url.trim().length > 0;
+
+    // Detect level-up before writing
+    const { data: xpRows } = await supabase
+      .from("user_beers").select('"XP"').eq("user_id", session.user.id);
+    const prevTotal = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
+    const newTotal  = prevTotal - (beer.XP || 0) + xp;
+    const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
+    const newLevelName = getLevelInfo(newTotal).levelName;
 
     const { error } = await supabase
       .from("user_beers")
@@ -96,17 +108,22 @@ const MiCuaderno = () => {
 
     refetchStats();
 
-    let msg = `💾 Guardado · ${xp} XP`;
-    if (isComplete) msg += " 🎯 ¡Entrada completa!";
+    soundClink();
+    toastSave(xp, isComplete);
+
+    if (didLevelUp) {
+      celebrateLevel();
+      soundLevelUp();
+      toastLevelUp(newLevelName);
+    }
     if (newAchievements.length > 0) {
-      msg += "\n\n🏅 ¡Logro desbloqueado!";
-      newAchievements.forEach((a) => { msg += `\n${a.emoji} ${a.nombre} (+${a.xpBonus} XP)`; });
+      celebrateAchievement();
+      soundAchievement();
+      toastAchievements(newAchievements);
     }
     if (newBadges.length > 0) {
-      msg += "\n\n🏷️ ¡Insignia desbloqueada!";
-      newBadges.forEach((b) => { msg += `\n${b.icon} ${b.nombre} ${b.tierLabel} (+${b.xp} XP)`; });
+      toastBadges(newBadges);
     }
-    alert(msg);
   };
 
   const handleDelete = async (beerId) => {

@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { supabase } from "../services/supabase";
-import { computeEntryXP, XP_VALUES } from "../utils/xp";
+import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { logActivity } from "../utils/activity";
 import { checkAndAwardBadges } from "../utils/badges";
 import Lightbox from "./Lightbox";
 import LocationPicker from "./LocationPicker";
+import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
+import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
+import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -35,6 +38,14 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
 
     setSaving(true);
     const xp = computeEntryXP({ rating, comment, photo: photoUrl });
+
+    // Detect level-up before writing
+    const { data: xpRows } = await supabase
+      .from("user_beers").select('"XP"').eq("user_id", session.user.id);
+    const prevTotal = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
+    const newTotal  = prevTotal - (myBeerData?.XP || 0) + xp;
+    const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
+    const newLevelName = getLevelInfo(newTotal).levelName;
 
     const { error } = await supabase.from("user_beers").upsert({
       user_id: session.user.id,
@@ -67,17 +78,22 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
     setSaving(false);
     onSaved && onSaved();
 
-    let msg = `🍺 Guardado · +${xp} XP`;
-    if (isComplete) msg += " 🎯 ¡Entrada completa!";
+    soundClink();
+    toastSave(xp, isComplete);
+
+    if (didLevelUp) {
+      celebrateLevel();
+      soundLevelUp();
+      toastLevelUp(newLevelName);
+    }
     if (newAchievements.length > 0) {
-      msg += "\n\n🏅 ¡Logro desbloqueado!";
-      newAchievements.forEach((a) => { msg += `\n${a.emoji} ${a.nombre} (+${a.xpBonus} XP)`; });
+      celebrateAchievement();
+      soundAchievement();
+      toastAchievements(newAchievements);
     }
     if (newBadges.length > 0) {
-      msg += "\n\n🏷️ ¡Insignia desbloqueada!";
-      newBadges.forEach((b) => { msg += `\n${b.icon} ${b.nombre} ${b.tierLabel} (+${b.xp} XP)`; });
+      toastBadges(newBadges);
     }
-    alert(msg);
   };
 
   return (

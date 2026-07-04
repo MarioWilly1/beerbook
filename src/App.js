@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import { useAuth } from "./hooks/useAuth";
 import { useProfile } from "./hooks/useProfile";
 import Layout from "./components/Layout";
@@ -66,6 +67,23 @@ function App() {
 
   // Fully authenticated → main app
   return (
+    <>
+    <Toaster
+      position="bottom-right"
+      toastOptions={{
+        style: {
+          background: "#1a1208",
+          color: "#f0ead6",
+          borderRadius: "10px",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
+          fontSize: "13px",
+          fontWeight: "500",
+          padding: "12px 16px",
+          border: "1px solid rgba(212,175,55,0.2)",
+          maxWidth: "370px",
+        },
+      }}
+    />
     <Layout session={session} profile={profile} onAvatarChange={(url) => setProfile((p) => ({ ...p, avatar_url: url }))}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
@@ -80,6 +98,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
+    </>
   );
 }
 

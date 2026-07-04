@@ -6,8 +6,9 @@ import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
 
 const TABS = [
-  { key: "perfil",     label: "👤 Perfil"    },
-  { key: "privacidad", label: "🔒 Privacidad" },
+  { key: "perfil",       label: "👤 Perfil"       },
+  { key: "privacidad",   label: "🔒 Privacidad"   },
+  { key: "preferencias", label: "🎛 Preferencias" },
 ];
 
 // ── Toggle component ──────────────────────────────────────────────────────────
@@ -48,6 +49,9 @@ const Configuracion = ({ onProfileChange }) => {
   const [featuredBadges, setFeaturedBadges] = useState([]);
   const [perfilPublico, setPerfilPublico]   = useState(true);
   const [aparecer, setAparecer]             = useState(true);
+  const [soundsOn, setSoundsOn]             = useState(
+    localStorage.getItem("sounds_enabled") === "true"
+  );
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
@@ -104,6 +108,11 @@ const Configuracion = ({ onProfileChange }) => {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleSoundsToggle = (v) => {
+    setSoundsOn(v);
+    localStorage.setItem("sounds_enabled", v ? "true" : "false");
   };
 
   const handlePrivacyToggle = async (field, value) => {
@@ -314,6 +323,25 @@ const Configuracion = ({ onProfileChange }) => {
           <p style={{ fontSize: 12, color: "#ccc", marginTop: 20, lineHeight: 1.5 }}>
             Los cambios de privacidad se aplican de inmediato.
           </p>
+        </div>
+      )}
+
+      {/* ── Tab: Preferencias ─────────────────────────────────────────── */}
+      {tab === "preferencias" && (
+        <div>
+          <p style={{ color: "#888", fontSize: 13, margin: "0 0 4px", lineHeight: 1.5 }}>
+            Preferencias de audio. Se guardan en este dispositivo.
+          </p>
+          <Toggle
+            value={soundsOn}
+            onChange={handleSoundsToggle}
+            label="Efectos de sonido"
+            description={
+              soundsOn
+                ? "Clink al guardar una cerveza · acorde al subir de nivel · tono al desbloquear logros."
+                : "Activá para escuchar efectos de sonido sutiles en acciones clave."
+            }
+          />
         </div>
       )}
 

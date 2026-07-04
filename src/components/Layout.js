@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
 import Avatar from "./Avatar";
@@ -9,6 +9,7 @@ import { TIER_META } from "../utils/badges";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const location = useLocation();
   const { badges } = useBadges();
 
   const username =
@@ -129,7 +130,11 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
       </aside>
 
       {/* CONTENIDO */}
-      <main style={{ flex: 1, overflowY: "auto", padding: "28px", background: "#faf8f4" }}>
+      <main
+        key={location.pathname}
+        className="page-enter"
+        style={{ flex: 1, overflowY: "auto", padding: "28px", background: "#faf8f4" }}
+      >
         {children}
       </main>
 
@@ -146,23 +151,34 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
   );
 };
 
-const SidebarLink = ({ to, label }) => (
-  <NavLink
-    to={to}
-    style={({ isActive }) => ({
-      padding: "14px 16px",
-      borderRadius: "10px",
-      textDecoration: "none",
-      color:      isActive ? "#1e8449" : "#f5f5f5",
-      background: isActive ? "#d5f5e3" : "rgba(255,255,255,0.08)",
-      fontSize: "16px",
-      fontWeight: "600",
-      transition: "all 0.2s",
-    })}
-  >
-    {label}
-  </NavLink>
-);
+const SidebarLink = ({ to, label }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <NavLink
+      to={to}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={({ isActive }) => ({
+        padding: "14px 16px",
+        borderRadius: "10px",
+        textDecoration: "none",
+        color:      isActive ? "#1e8449" : "#f5f5f5",
+        background: isActive
+          ? "#d5f5e3"
+          : hovered
+          ? "rgba(255,255,255,0.14)"
+          : "rgba(255,255,255,0.08)",
+        fontSize: "16px",
+        fontWeight: "600",
+        transition: "background 0.18s ease, transform 0.12s ease",
+        transform: hovered && !isActive ? "translateX(2px)" : "none",
+        display: "block",
+      })}
+    >
+      {label}
+    </NavLink>
+  );
+};
 
 const SidebarButton = ({ label, onClick }) => (
   <div

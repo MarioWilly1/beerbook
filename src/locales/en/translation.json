@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "catalog":      "Catalog",
+    "notebook":     "My Notebook",
+    "feed":         "Feed",
+    "friends":      "Friends",
+    "achievements": "Achievements",
+    "ranking":      "Ranking",
+    "about":        "About us",
+    "settings":     "Settings",
+    "logout":       "Log out"
+  },
+  "sidebar": {
+    "changeAvatar": "Change avatar →"
+  },
+  "toast": {
+    "saved":         "Saved · +{{xp}} XP",
+    "savedComplete": "Saved · +{{xp}} XP  ·  complete entry",
+    "levelUp":       "Level unlocked — {{levelName}}"
+  },
+  "settings": {
+    "tabs": {
+      "profile":     "Profile",
+      "privacy":     "Privacy",
+      "preferences": "Preferences"
+    },
+    "prefs": {
+      "audioTitle":    "Sound effects",
+      "audioOn":       "Glass clink when saving · chord on level up · tone on achievement unlock.",
+      "audioOff":      "Enable to hear subtle sound effects on key actions.",
+      "audioNote":     "Audio preferences are saved on this device.",
+      "languageTitle": "Language",
+      "languageNote":  "Preference syncs to your account."
+    }
+  }
+}

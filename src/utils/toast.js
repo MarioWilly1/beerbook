@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import i18n from "../i18n";
 
 // Dark warm brand style — Spotify/Apple inspired
 const base = {
@@ -20,9 +21,7 @@ const highlighted = {
 };
 
 export const toastSave = (xp, isComplete = false) => {
-  const msg = isComplete
-    ? `Guardado · +${xp} XP  ·  entrada completa`
-    : `Guardado · +${xp} XP`;
+  const msg = i18n.t(isComplete ? "toast.savedComplete" : "toast.saved", { xp });
   toast.success(msg, {
     style: base,
     iconTheme: { primary: "#d4af37", secondary: "#1a1208" },
@@ -53,7 +52,7 @@ export const toastBadges = (list) => {
 };
 
 export const toastLevelUp = (levelName) => {
-  toast(`Nivel desbloqueado — ${levelName}`, {
+  toast(i18n.t("toast.levelUp", { levelName }), {
     style: {
       ...base,
       background: "#1f1500",

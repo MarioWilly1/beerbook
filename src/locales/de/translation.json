@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "catalog":      "Katalog",
+    "notebook":     "Mein Notizbuch",
+    "feed":         "Feed",
+    "friends":      "Freunde",
+    "achievements": "Erfolge",
+    "ranking":      "Ranking",
+    "about":        "Über uns",
+    "settings":     "Einstellungen",
+    "logout":       "Abmelden"
+  },
+  "sidebar": {
+    "changeAvatar": "Avatar ändern →"
+  },
+  "toast": {
+    "saved":         "Gespeichert · +{{xp}} XP",
+    "savedComplete": "Gespeichert · +{{xp}} XP  ·  vollständiger Eintrag",
+    "levelUp":       "Stufe freigeschaltet — {{levelName}}"
+  },
+  "settings": {
+    "tabs": {
+      "profile":     "Profil",
+      "privacy":     "Datenschutz",
+      "preferences": "Einstellungen"
+    },
+    "prefs": {
+      "audioTitle":    "Soundeffekte",
+      "audioOn":       "Klirrton beim Speichern · Akkord beim Aufstieg · Ton beim Freischalten.",
+      "audioOff":      "Aktivieren, um subtile Soundeffekte bei wichtigen Aktionen zu hören.",
+      "audioNote":     "Audioeinstellungen werden auf diesem Gerät gespeichert.",
+      "languageTitle": "Sprache",
+      "languageNote":  "Die Einstellung wird mit deinem Konto synchronisiert."
+    }
+  }
+}

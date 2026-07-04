@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
@@ -6,9 +7,15 @@ import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
 
 const TABS = [
-  { key: "perfil",       label: "👤 Perfil"       },
-  { key: "privacidad",   label: "🔒 Privacidad"   },
-  { key: "preferencias", label: "🎛 Preferencias" },
+  { key: "perfil",       icon: "👤", tKey: "settings.tabs.profile"     },
+  { key: "privacidad",   icon: "🔒", tKey: "settings.tabs.privacy"     },
+  { key: "preferencias", icon: "🎛", tKey: "settings.tabs.preferences" },
+];
+
+const LANGUAGES = [
+  { code: "es", label: "Español",  flag: "🇦🇷" },
+  { code: "en", label: "English",  flag: "🇬🇧" },
+  { code: "de", label: "Deutsch",  flag: "🇩🇪" },
 ];
 
 // ── Toggle component ──────────────────────────────────────────────────────────
@@ -38,6 +45,7 @@ const Toggle = ({ value, onChange, label, description }) => (
 
 // ── Main component ────────────────────────────────────────────────────────────
 const Configuracion = ({ onProfileChange }) => {
+  const { t, i18n } = useTranslation();
   const [tab, setTab] = useState("perfil");
   const [session, setSession] = useState(null);
   const [localProfile, setLocalProfile] = useState(null);
@@ -115,6 +123,15 @@ const Configuracion = ({ onProfileChange }) => {
     localStorage.setItem("sounds_enabled", v ? "true" : "false");
   };
 
+  const handleLanguageChange = async (lang) => {
+    await i18n.changeLanguage(lang);
+    if (session) {
+      await supabase.from("profiles")
+        .update({ preferred_language: lang })
+        .eq("id", session.user.id);
+    }
+  };
+
   const handlePrivacyToggle = async (field, value) => {
     if (!session) return;
     await supabase.from("profiles").update({ [field]: value }).eq("id", session.user.id);
@@ -140,7 +157,7 @@ const Configuracion = ({ onProfileChange }) => {
 
       {/* ── Tabs ─────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #f0f0f0" }}>
-        {TABS.map(({ key, label }) => (
+        {TABS.map(({ key, icon, tKey }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -152,7 +169,7 @@ const Configuracion = ({ onProfileChange }) => {
               marginBottom: -2, transition: "all 0.15s",
             }}
           >
-            {label}
+            {icon} {t(tKey)}
           </button>
         ))}
       </div>
@@ -330,18 +347,48 @@ const Configuracion = ({ onProfileChange }) => {
       {tab === "preferencias" && (
         <div>
           <p style={{ color: "#888", fontSize: 13, margin: "0 0 4px", lineHeight: 1.5 }}>
-            Preferencias de audio. Se guardan en este dispositivo.
+            {t("settings.prefs.audioNote")}
           </p>
           <Toggle
             value={soundsOn}
             onChange={handleSoundsToggle}
-            label="Efectos de sonido"
-            description={
-              soundsOn
-                ? "Clink al guardar una cerveza · acorde al subir de nivel · tono al desbloquear logros."
-                : "Activá para escuchar efectos de sonido sutiles en acciones clave."
-            }
+            label={t("settings.prefs.audioTitle")}
+            description={t(soundsOn ? "settings.prefs.audioOn" : "settings.prefs.audioOff")}
           />
+
+          {/* ── Selector de idioma ── */}
+          <div style={{ paddingTop: 24 }}>
+            <div style={{ fontWeight: 600, color: "#111", marginBottom: 10 }}>
+              {t("settings.prefs.languageTitle")}
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {LANGUAGES.map(({ code, label, flag }) => {
+                const active = i18n.language?.startsWith(code);
+                return (
+                  <button
+                    key={code}
+                    onClick={() => handleLanguageChange(code)}
+                    style={{
+                      padding: "10px 18px",
+                      borderRadius: 10,
+                      border: `2px solid ${active ? "#d4af37" : "#e0e0e0"}`,
+                      background: active ? "#fffbee" : "#fafafa",
+                      fontWeight: active ? 700 : 400,
+                      color: active ? "#8b6b2e" : "#555",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {flag} {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p style={{ fontSize: 12, color: "#ccc", marginTop: 10 }}>
+              {t("settings.prefs.languageNote")}
+            </p>
+          </div>
         </div>
       )}
 

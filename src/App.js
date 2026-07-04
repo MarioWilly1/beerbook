@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import i18n from "./i18n";
 import { useAuth } from "./hooks/useAuth";
 import { useProfile } from "./hooks/useProfile";
 import Layout from "./components/Layout";
@@ -22,6 +23,13 @@ function App() {
   const { profile, loading: profileLoading, setProfile } = useProfile(session);
   const [showRegister, setShowRegister] = useState(false);
   const [registerEmail, setRegisterEmail] = useState("");
+
+  // Sync language from user profile (cross-device preference)
+  useEffect(() => {
+    if (profile?.preferred_language) {
+      i18n.changeLanguage(profile.preferred_language);
+    }
+  }, [profile?.preferred_language]);
 
   // Show a minimal spinner while auth state is being resolved
   if (authLoading || (session && profileLoading)) {

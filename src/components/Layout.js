@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
 import Avatar from "./Avatar";
@@ -10,6 +11,7 @@ import { TIER_META } from "../utils/badges";
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation();
   const { badges } = useBadges();
 
   const username =
@@ -113,19 +115,19 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           )}
 
           <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <SidebarLink to="/" label="Catálogo" />
-            <SidebarLink to="/cuaderno" label="Mi Cuaderno" />
-            <SidebarLink to="/feed" label="📡 Feed" />
-            <SidebarLink to="/amigos" label="👥 Amigos" />
-            <SidebarLink to="/logros" label="Logros" />
-            <SidebarLink to="/ranking" label="Ranking" />
-            <SidebarLink to="/sobre-nosotros" label="Sobre nosotros" />
+            <SidebarLink to="/" label={t("nav.catalog")} />
+            <SidebarLink to="/cuaderno" label={t("nav.notebook")} />
+            <SidebarLink to="/feed" label={`📡 ${t("nav.feed")}`} />
+            <SidebarLink to="/amigos" label={`👥 ${t("nav.friends")}`} />
+            <SidebarLink to="/logros" label={t("nav.achievements")} />
+            <SidebarLink to="/ranking" label={t("nav.ranking")} />
+            <SidebarLink to="/sobre-nosotros" label={t("nav.about")} />
           </nav>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <SidebarLink to="/configuracion" label="⚙️ Configuración" />
-          <SidebarButton label="🚪 Cerrar sesión" onClick={handleLogout} />
+          <SidebarLink to="/configuracion" label={`⚙️ ${t("nav.settings")}`} />
+          <SidebarButton label={`🚪 ${t("nav.logout")}`} onClick={handleLogout} />
         </div>
       </aside>
 

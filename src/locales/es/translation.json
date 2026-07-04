@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "catalog":      "Catálogo",
+    "notebook":     "Mi Cuaderno",
+    "feed":         "Feed",
+    "friends":      "Amigos",
+    "achievements": "Logros",
+    "ranking":      "Ranking",
+    "about":        "Sobre nosotros",
+    "settings":     "Configuración",
+    "logout":       "Cerrar sesión"
+  },
+  "sidebar": {
+    "changeAvatar": "Cambiar avatar →"
+  },
+  "toast": {
+    "saved":         "Guardado · +{{xp}} XP",
+    "savedComplete": "Guardado · +{{xp}} XP  ·  entrada completa",
+    "levelUp":       "Nivel desbloqueado — {{levelName}}"
+  },
+  "settings": {
+    "tabs": {
+      "profile":     "Perfil",
+      "privacy":     "Privacidad",
+      "preferences": "Preferencias"
+    },
+    "prefs": {
+      "audioTitle":    "Efectos de sonido",
+      "audioOn":       "Clink al guardar una cerveza · acorde al subir de nivel · tono al desbloquear logros.",
+      "audioOff":      "Activá para escuchar efectos de sonido sutiles en acciones clave.",
+      "audioNote":     "Preferencias de audio. Se guardan en este dispositivo.",
+      "languageTitle": "Idioma",
+      "languageNote":  "La preferencia se sincroniza con tu cuenta."
+    }
+  }
+}

@@ -177,7 +177,8 @@
     "statsBar":     "🏆 Stufe: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} Biere ({{verified}} verifiziert)",
     "found_one":    "{{count}} Bier gefunden",
     "found_other":  "{{count}} Biere gefunden",
-    "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →"
+    "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →",
+    "mapBtn":       "Herkunftskarte anzeigen"
   },
   "suggest": {
     "title":             "Bier vorschlagen",
@@ -411,14 +412,17 @@
     }
   },
   "map": {
-    "hint":          "Klicke auf ein goldenes Land, um seine Biere zu sehen",
-    "resetZoom":     "Ansicht zurücksetzen",
-    "beerCount_one": "{{count}} Bier im Katalog",
-    "beerCount_other":"{{count}} Biere im Katalog",
-    "noBeers":       "Keine Biere aus diesem Land.",
-    "triedByTitle":  "Wer hat es probiert?",
-    "triedByLoading":"Wird geladen...",
-    "triedByEmpty":  "Noch niemand mit öffentlichem Profil hat es probiert."
+    "hint":           "Klicke auf ein goldenes Land, um seine Biere zu sehen",
+    "resetZoom":      "Ansicht zurücksetzen",
+    "beerCount_one":  "{{count}} Bier mit Herkunft",
+    "beerCount_other":"{{count}} Biere mit Herkunft",
+    "locations":      "Standorte",
+    "noCoords":       "Noch keine Herkunftskoordinaten geladen.",
+    "beersHere":      "Biere aus diesem Ursprung",
+    "noBeers":        "Keine Biere an diesem Punkt.",
+    "triedByTitle":   "Wer hat es probiert?",
+    "triedByLoading": "Wird geladen...",
+    "triedByEmpty":   "Noch niemand mit öffentlichem Profil hat es probiert."
   },
   "chat": {
     "title":                 "Nachrichten",

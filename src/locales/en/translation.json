@@ -177,7 +177,8 @@
     "statsBar":     "🏆 Level: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} beers ({{verified}} verified)",
     "found_one":    "{{count}} beer found",
     "found_other":  "{{count}} beers found",
-    "suggestBeer":  "Can't find your beer? Suggest it →"
+    "suggestBeer":  "Can't find your beer? Suggest it →",
+    "mapBtn":       "View origin map"
   },
   "suggest": {
     "title":             "Suggest a beer",
@@ -411,14 +412,17 @@
     }
   },
   "map": {
-    "hint":          "Click a golden country to see its beers",
-    "resetZoom":     "Reset view",
-    "beerCount_one": "{{count}} beer in the catalog",
-    "beerCount_other":"{{count}} beers in the catalog",
-    "noBeers":       "No beers from this country.",
-    "triedByTitle":  "Who tried it?",
-    "triedByLoading":"Loading...",
-    "triedByEmpty":  "No one with a public profile has tried it yet."
+    "hint":           "Click a golden country to see its beers",
+    "resetZoom":      "Reset view",
+    "beerCount_one":  "{{count}} beer with origin",
+    "beerCount_other":"{{count}} beers with origin",
+    "locations":      "locations",
+    "noCoords":       "No origin coordinates loaded yet.",
+    "beersHere":      "Beers from this origin",
+    "noBeers":        "No beers at this point.",
+    "triedByTitle":   "Who tried it?",
+    "triedByLoading": "Loading...",
+    "triedByEmpty":   "No one with a public profile has tried it yet."
   },
   "chat": {
     "title":                 "Messages",

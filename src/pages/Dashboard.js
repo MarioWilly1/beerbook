@@ -6,6 +6,7 @@ import BeerCard from "../components/BeerCard";
 import BeerFilters from "../components/BeerFilters";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
+import OriginMapPanel from "../components/OriginMapPanel";
 
 const STYLE_KEYWORDS = ["IPA", "Lager", "Stout", "Ale", "Porter", "Saison", "Sour", "Dubbel", "Tripel"];
 
@@ -133,6 +134,7 @@ const Dashboard = () => {
 
   const [refresh, setRefresh] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState(null);
   const [countryFilter, setCountryFilter] = useState(null);
@@ -198,7 +200,22 @@ const Dashboard = () => {
         {t("dashboard.statsBar", { level: stats.level, xp: stats.xp, beers: stats.beers, verified: stats.verifiedBeers })}
       </div>
 
-      <div style={{ textAlign: "right", marginBottom: 12 }}>
+      {/* Map toggle + suggest row */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
+        <button
+          onClick={() => setShowMap((o) => !o)}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "7px 14px", borderRadius: 8,
+            border: `1px solid ${showMap ? "#d4af37" : "#2e2215"}`,
+            background: showMap ? "rgba(212,175,55,0.1)" : "#1c1409",
+            color: showMap ? "#d4af37" : "#9a7d62",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          🗺️ {t("dashboard.mapBtn")} {showMap ? "▲" : "▼"}
+        </button>
         <button
           onClick={() => setShowSuggest(true)}
           style={{
@@ -211,6 +228,7 @@ const Dashboard = () => {
         </button>
       </div>
 
+      {showMap && <OriginMapPanel beers={beers} />}
       {showSuggest && <SuggestBeerModal onClose={() => setShowSuggest(false)} t={t} />}
 
       <BeerFilters

@@ -177,7 +177,8 @@
     "statsBar":     "🏆 Nivel: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} cervezas ({{verified}} verificadas)",
     "found_one":    "{{count}} cerveza encontrada",
     "found_other":  "{{count}} cervezas encontradas",
-    "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →"
+    "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →",
+    "mapBtn":       "Ver mapa de origen"
   },
   "suggest": {
     "title":         "Sugerir cerveza",
@@ -411,14 +412,17 @@
     }
   },
   "map": {
-    "hint":          "Haz clic en un país dorado para ver sus cervezas",
-    "resetZoom":     "Restablecer vista",
-    "beerCount_one": "{{count}} cerveza en el catálogo",
-    "beerCount_other":"{{count}} cervezas en el catálogo",
-    "noBeers":       "Sin cervezas en este país.",
-    "triedByTitle":  "¿Quién la probó?",
-    "triedByLoading":"Cargando...",
-    "triedByEmpty":  "Nadie con perfil público la ha probado aún."
+    "hint":           "Haz clic en un país dorado para ver sus cervezas",
+    "resetZoom":      "Restablecer vista",
+    "beerCount_one":  "{{count}} cerveza con origen",
+    "beerCount_other":"{{count}} cervezas con origen",
+    "locations":      "ubicaciones",
+    "noCoords":       "Aún no hay coordenadas de origen cargadas.",
+    "beersHere":      "Cervezas de este origen",
+    "noBeers":        "Sin cervezas en este punto.",
+    "triedByTitle":   "¿Quién la probó?",
+    "triedByLoading": "Cargando...",
+    "triedByEmpty":   "Nadie con perfil público la ha probado aún."
   },
   "chat": {
     "title":                 "Mensajes",

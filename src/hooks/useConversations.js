@@ -7,7 +7,11 @@ export const useConversations = () => {
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.rpc("get_my_conversations");
-    if (!error) setConversations(data || []);
+    if (error) {
+      console.error("[useConversations] get_my_conversations:", error);
+    } else {
+      setConversations(data || []);
+    }
     setLoading(false);
   }, []);
 

@@ -93,13 +93,36 @@ export const useChat = (conversationId) => {
   const sendMessage = useCallback(async (content) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session || !content.trim()) return false;
-    const { error } = await supabase.from("messages").insert({
+
+    const { data: inserted, error } = await supabase
+      .from("messages")
+      .insert({
+        conversation_id: conversationId,
+        sender_id: session.user.id,
+        type: "text",
+        content: content.trim(),
+      })
+      .select("id, created_at")
+      .single();
+
+    if (error || !inserted) return false;
+
+    // Agrego inmediatamente con el ID real — el evento Realtime hará dedup por ID
+    const local = {
+      id: inserted.id,
       conversation_id: conversationId,
       sender_id: session.user.id,
       type: "text",
       content: content.trim(),
+      created_at: inserted.created_at,
+      sender: profilesRef.current[session.user.id] || null,
+    };
+    setMessages((prev) => {
+      if (prev.some((m) => m.id === local.id)) return prev;
+      return [...prev, local];
     });
-    return !error;
+
+    return true;
   }, [conversationId]);
 
   return { messages, otherUser, currentUserId, loading, sendMessage };

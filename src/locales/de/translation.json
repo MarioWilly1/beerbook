@@ -422,7 +422,9 @@
     "noBeers":        "Keine Biere an diesem Punkt.",
     "triedByTitle":   "Wer hat es probiert?",
     "triedByLoading": "Wird geladen...",
-    "triedByEmpty":   "Noch niemand mit öffentlichem Profil hat es probiert."
+    "triedByEmpty":   "Noch niemand mit öffentlichem Profil hat es probiert.",
+    "expand":         "Karte vergrößern",
+    "collapse":       "Schließen"
   },
   "chat": {
     "title":                 "Nachrichten",

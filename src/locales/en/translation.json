@@ -422,7 +422,9 @@
     "noBeers":        "No beers at this point.",
     "triedByTitle":   "Who tried it?",
     "triedByLoading": "Loading...",
-    "triedByEmpty":   "No one with a public profile has tried it yet."
+    "triedByEmpty":   "No one with a public profile has tried it yet.",
+    "expand":         "Expand map",
+    "collapse":       "Close"
   },
   "chat": {
     "title":                 "Messages",

@@ -422,7 +422,9 @@
     "noBeers":        "Sin cervezas en este punto.",
     "triedByTitle":   "¿Quién la probó?",
     "triedByLoading": "Cargando...",
-    "triedByEmpty":   "Nadie con perfil público la ha probado aún."
+    "triedByEmpty":   "Nadie con perfil público la ha probado aún.",
+    "expand":         "Ampliar mapa",
+    "collapse":       "Cerrar"
   },
   "chat": {
     "title":                 "Mensajes",

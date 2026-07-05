@@ -134,6 +134,11 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
           </button>
         </div>
         <p style={metaStyle}>{beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%</p>
+        {beer.sugerida_por_nombre && (
+          <p style={{ margin: "0 0 4px", fontSize: 11, color: "#8b6b2e", fontStyle: "italic" }}>
+            💡 {t("beercard.suggestedBy", { nombre: beer.sugerida_por_nombre })}
+          </p>
+        )}
 
         <div style={fieldStyle}>
           <label style={labelStyle}>{t("beerform.timesLabel")}</label>

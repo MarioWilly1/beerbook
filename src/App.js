@@ -20,6 +20,7 @@ import AgeVerificationPage from "./pages/AgeVerificationPage";
 import LugarPage from "./pages/LugarPage";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   const location = useLocation();
@@ -118,6 +119,7 @@ function App() {
         <Route path="/perfil/:userId" element={<ProfilePage />} />
         <Route path="/chats" element={<Chats />} />
         <Route path="/chats/:id" element={<ChatPage />} />
+        <Route path="/admin" element={<AdminPanel profile={profile} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

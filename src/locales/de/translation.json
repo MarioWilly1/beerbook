@@ -9,7 +9,8 @@
     "ranking":      "Ranking",
     "about":        "Über uns",
     "settings":     "Einstellungen",
-    "logout":       "Abmelden"
+    "logout":       "Abmelden",
+    "admin":        "Admin-Panel"
   },
   "sidebar": {
     "changeAvatar": "Avatar ändern →"
@@ -25,7 +26,22 @@
     "tabs": {
       "profile":     "Profil",
       "privacy":     "Datenschutz",
-      "preferences": "Einstellungen"
+      "preferences": "Einstellungen",
+      "support":     "Hilfe"
+    },
+    "support": {
+      "description":         "Hast du eine Frage oder einen Fehler gefunden? Schreib uns und wir antworten so bald wie möglich.",
+      "subjectLabel":        "Betreff",
+      "subjectPlaceholder":  "Beschreibe kurz deine Frage oder dein Problem",
+      "messageLabel":        "Nachricht",
+      "messagePlaceholder":  "Erzähl uns ausführlich, was passiert ist oder was du brauchst...",
+      "sendBtn":             "Nachricht senden",
+      "sending":             "Wird gesendet...",
+      "sent":                "Nachricht gesendet. Wir melden uns bald.",
+      "historyTitle":        "Meine Anfragen",
+      "historyEmpty":        "Du hast noch keine Anfragen gesendet.",
+      "statusOpen":          "Offen",
+      "statusResolved":      "Gelöst"
     },
     "profile": {
       "changeAvatar":         "Avatar ändern →",
@@ -159,7 +175,48 @@
     "loading":      "Biere werden geladen...",
     "statsBar":     "🏆 Stufe: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} Biere ({{verified}} verifiziert)",
     "found_one":    "{{count}} Bier gefunden",
-    "found_other":  "{{count}} Biere gefunden"
+    "found_other":  "{{count}} Biere gefunden",
+    "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →"
+  },
+  "suggest": {
+    "title":             "Bier vorschlagen",
+    "subtitle":          "Fehlt ein Bier im Katalog? Lass es uns wissen und wir prüfen es.",
+    "nombreLabel":       "Biername",
+    "nombrePlaceholder": "z. B. Weihenstephaner Hefeweißbier",
+    "estiloLabel":       "Stil",
+    "estiloPlaceholder": "z. B. Weizen, IPA, Stout...",
+    "paisLabel":         "Herkunftsland",
+    "paisPlaceholder":   "z. B. Deutschland, USA...",
+    "reasonLabel":       "Warum sollte es hinzugefügt werden?",
+    "reasonPlaceholder": "Erzähl uns etwas über dieses Bier...",
+    "sendBtn":           "Vorschlag senden",
+    "sending":           "Wird gesendet...",
+    "sent":              "Danke! Wir prüfen deinen Vorschlag.",
+    "errorNombre":       "Name ist erforderlich."
+  },
+  "beercard": {
+    "suggestedBy": "Vorgeschlagen von {{nombre}}"
+  },
+  "admin": {
+    "title":               "Admin-Panel",
+    "subtitle":            "Support & Vorschläge verwalten",
+    "loading":             "Wird geladen...",
+    "tabSupport":          "Support",
+    "tabSuggestions":      "Vorschläge",
+    "ticketsEmpty":        "Keine Support-Tickets vorhanden.",
+    "suggestionsEmpty":    "Noch keine Vorschläge.",
+    "noPendingSuggestions":"Keine ausstehenden Vorschläge.",
+    "statusOpen":          "Offen",
+    "statusResolved":      "Gelöst",
+    "status_pending":      "Ausstehend",
+    "status_approved":     "Genehmigt",
+    "status_rejected":     "Abgelehnt",
+    "adminNote":           "Notiz für Benutzer",
+    "adminNotePlaceholder":"Interne Antwort oder Notiz (optional)...",
+    "markResolved":        "Als gelöst markieren",
+    "approve":             "Genehmigen",
+    "reject":              "Ablehnen",
+    "from":                "Von"
   },
   "filters": {
     "searchPlaceholder": "Biere suchen...",
@@ -353,18 +410,27 @@
     }
   },
   "chat": {
-    "title":           "Nachrichten",
-    "subtitle":        "Deine privaten Gespräche",
-    "loading":         "Nachrichten werden geladen...",
-    "empty":           "Noch keine Nachrichten.",
-    "emptyHint":       "Starte ein Gespräch über die Freunde-Seite.",
-    "noMessages":      "Noch keine Nachrichten",
-    "sendFirstMessage": "Sei der Erste, der etwas schreibt.",
-    "typeMessage":     "Schreib eine Nachricht...",
-    "send":            "Senden",
-    "you":             "Du",
-    "unknownUser":     "Unbekannter Benutzer",
-    "lastMessagePhoto": "📷 Foto",
-    "lastMessageBeer":  "🍺 Geteiltes Bier"
+    "title":                 "Nachrichten",
+    "subtitle":              "Deine privaten Gespräche",
+    "loading":               "Nachrichten werden geladen...",
+    "empty":                 "Noch keine Nachrichten.",
+    "emptyHint":             "Starte ein Gespräch über die Freunde-Seite.",
+    "noMessages":            "Noch keine Nachrichten",
+    "sendFirstMessage":      "Sei der Erste, der etwas schreibt.",
+    "typeMessage":           "Schreib eine Nachricht...",
+    "send":                  "Senden",
+    "you":                   "Du",
+    "unknownUser":           "Unbekannter Benutzer",
+    "lastMessagePhoto":      "📷 Foto",
+    "lastMessageBeer":       "🍺 Geteiltes Bier",
+    "lastMessageStoryReply": "📖 Story-Antwort",
+    "shareBeer":             "Bier teilen",
+    "searchBeer":            "In meinem Notizbuch suchen...",
+    "noBeerResults":         "Kein Bier in deinem Notizbuch.",
+    "sendPhoto":             "Foto senden",
+    "storyExpired":          "Story abgelaufen",
+    "storyReplyLabel":       "Story von {{nombre}}",
+    "replyTo":               "An {{nombre}} antworten...",
+    "replySent":             "Gesendet ✓"
   }
 }

@@ -7,12 +7,14 @@ import Avatar from "./Avatar";
 import AvatarSelector from "./AvatarSelector";
 import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
+import { useTotalUnread } from "../hooks/useTotalUnread";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const location = useLocation();
   const { t } = useTranslation();
   const { badges } = useBadges();
+  const totalUnread = useTotalUnread();
 
   const username =
     profile?.nombre ||
@@ -127,7 +129,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             <SidebarLink to="/cuaderno" label={t("nav.notebook")} />
             <SidebarLink to="/feed" label={`📡 ${t("nav.feed")}`} />
             <SidebarLink to="/amigos" label={`👥 ${t("nav.friends")}`} />
-            <SidebarLink to="/chats" label={`💬 ${t("nav.messages")}`} />
+            <SidebarLink to="/chats" label={`💬 ${t("nav.messages")}`} badge={totalUnread} />
             <SidebarLink to="/logros" label={t("nav.achievements")} />
             <SidebarLink to="/ranking" label={t("nav.ranking")} />
             <SidebarLink to="/sobre-nosotros" label={t("nav.about")} />
@@ -136,6 +138,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
 
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <SidebarLink to="/configuracion" label={`⚙️ ${t("nav.settings")}`} />
+          {profile?.is_admin && <SidebarLink to="/admin" label={`🔧 ${t("nav.admin")}`} />}
           <SidebarButton label={`🚪 ${t("nav.logout")}`} onClick={handleLogout} />
         </div>
       </aside>
@@ -162,8 +165,9 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
   );
 };
 
-const SidebarLink = ({ to, label }) => {
+const SidebarLink = ({ to, label, badge }) => {
   const [hovered, setHovered] = useState(false);
+  const hasBadge = badge > 0;
   return (
     <NavLink
       to={to}
@@ -183,11 +187,33 @@ const SidebarLink = ({ to, label }) => {
         fontWeight: isActive ? "700" : "500",
         transition: "background 0.18s ease, transform 0.12s ease",
         transform: hovered && !isActive ? "translateX(2px)" : "none",
-        display: "block",
-        borderLeft: isActive ? "none" : "none",
+        display: hasBadge ? "flex" : "block",
+        alignItems: "center",
+        justifyContent: "space-between",
       })}
     >
-      {label}
+      {hasBadge ? (
+        <>
+          <span>{label}</span>
+          <span style={{
+            background: "#c0392b",
+            color: "#fff",
+            borderRadius: 999,
+            minWidth: 18,
+            height: 18,
+            padding: "0 5px",
+            fontSize: 11,
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: 1,
+            flexShrink: 0,
+          }}>
+            {badge > 99 ? "99+" : badge}
+          </span>
+        </>
+      ) : label}
     </NavLink>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { useBadges } from "../hooks/useBadges";
@@ -11,6 +11,7 @@ const TABS = [
   { key: "perfil",       icon: "👤", tKey: "settings.tabs.profile"     },
   { key: "privacidad",   icon: "🔒", tKey: "settings.tabs.privacy"     },
   { key: "preferencias", icon: "🎛", tKey: "settings.tabs.preferences" },
+  { key: "ayuda",        icon: "🆘", tKey: "settings.tabs.support"     },
 ];
 
 const LANGUAGES = [
@@ -393,6 +394,9 @@ const Configuracion = ({ onProfileChange }) => {
         </div>
       )}
 
+      {/* Tab: Ayuda y Soporte */}
+      {tab === "ayuda" && session && <SupportTab session={session} t={t} />}
+
       {/* Avatar selector modal */}
       {showAvatarSelector && session && (
         <AvatarSelector
@@ -416,6 +420,139 @@ const labelStyle = {
 const inputStyle = {
   width: "100%", padding: "10px 12px", border: "1px solid #2e2215",
   borderRadius: 8, fontSize: 14, boxSizing: "border-box", background: "#2a1e0f", color: "#f0e4cc",
+};
+
+// ── Tab Ayuda y Soporte ───────────────────────────────────────────────────────
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString([], { day: "2-digit", month: "short", year: "numeric" });
+}
+
+const SupportTab = ({ session, t }) => {
+  const [subject, setSubject]     = useState("");
+  const [message, setMessage]     = useState("");
+  const [sending, setSending]     = useState(false);
+  const [sent, setSent]           = useState(false);
+  const [tickets, setTickets]     = useState([]);
+  const [ticketsLoading, setTicketsLoading] = useState(true);
+
+  const loadTickets = useCallback(async () => {
+    setTicketsLoading(true);
+    const { data } = await supabase
+      .from("support_tickets")
+      .select("id, subject, status, created_at")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false });
+    setTickets(data || []);
+    setTicketsLoading(false);
+  }, [session.user.id]);
+
+  useEffect(() => { loadTickets(); }, [loadTickets]);
+
+  const handleSend = async () => {
+    if (!subject.trim() || !message.trim()) return;
+    setSending(true);
+    const { error } = await supabase.from("support_tickets").insert({
+      user_id: session.user.id,
+      subject: subject.trim(),
+      message: message.trim(),
+    });
+    if (!error) {
+      setSubject("");
+      setMessage("");
+      setSent(true);
+      await loadTickets();
+      setTimeout(() => setSent(false), 3000);
+    }
+    setSending(false);
+  };
+
+  return (
+    <div>
+      <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 20px", lineHeight: 1.6 }}>
+        {t("settings.support.description")}
+      </p>
+
+      {/* Formulario */}
+      <div style={{ background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: 20, marginBottom: 28 }}>
+        <div style={{ marginBottom: 16 }}>
+          <label style={labelStyle}>{t("settings.support.subjectLabel")}</label>
+          <input
+            value={subject}
+            onChange={(e) => setSubject(e.target.value.slice(0, 120))}
+            placeholder={t("settings.support.subjectPlaceholder")}
+            style={inputStyle}
+            disabled={sending}
+          />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={labelStyle}>{t("settings.support.messageLabel")}</label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value.slice(0, 1000))}
+            placeholder={t("settings.support.messagePlaceholder")}
+            rows={4}
+            style={{ ...inputStyle, resize: "vertical", fontFamily: "Inter, sans-serif" }}
+            disabled={sending}
+          />
+          <div style={{ fontSize: 11, color: message.length > 900 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+            {message.length}/1000
+          </div>
+        </div>
+        {sent ? (
+          <p style={{ color: "#4caf50", fontWeight: 600, fontSize: 14, margin: 0 }}>
+            ✓ {t("settings.support.sent")}
+          </p>
+        ) : (
+          <button
+            onClick={handleSend}
+            disabled={!subject.trim() || !message.trim() || sending}
+            style={{
+              padding: "10px 24px", borderRadius: 8, border: "none",
+              background: !subject.trim() || !message.trim() || sending ? "#2a1e0f" : "#d4af37",
+              color: !subject.trim() || !message.trim() || sending ? "#5a4535" : "#0d0a06",
+              fontWeight: 700, fontSize: 14,
+              cursor: !subject.trim() || !message.trim() || sending ? "not-allowed" : "pointer",
+              transition: "all 0.15s",
+            }}
+          >
+            {sending ? t("settings.support.sending") : t("settings.support.sendBtn")}
+          </button>
+        )}
+      </div>
+
+      {/* Historial */}
+      <div>
+        <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: "#f0e4cc" }}>
+          {t("settings.support.historyTitle")}
+        </h3>
+        {ticketsLoading ? (
+          <p style={{ color: "#9a7d62", fontSize: 13 }}>{t("settings.loading")}</p>
+        ) : tickets.length === 0 ? (
+          <p style={{ color: "#5a4535", fontSize: 13 }}>{t("settings.support.historyEmpty")}</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {tickets.map((tk) => (
+              <div key={tk.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#1c1409", border: "1px solid #2e2215", borderRadius: 10 }}>
+                <span style={{
+                  fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, flexShrink: 0,
+                  background: tk.status === "open" ? "rgba(212,175,55,0.12)" : "rgba(42,107,58,0.18)",
+                  color: tk.status === "open" ? "#d4af37" : "#4caf50",
+                }}>
+                  {tk.status === "open" ? t("settings.support.statusOpen") : t("settings.support.statusResolved")}
+                </span>
+                <span style={{ flex: 1, color: "#f0e4cc", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {tk.subject}
+                </span>
+                <span style={{ fontSize: 12, color: "#5a4535", flexShrink: 0 }}>
+                  {fmtDate(tk.created_at)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Configuracion;

@@ -54,6 +54,45 @@ const StoryViewer = ({
   const isMine  = group?.userId === currentUserId;
   const isPhoto = story?.type === "photo";
 
+  // ── Reply (solo cuando !isMine) ───────────────────────────────────────────
+  const [replyText,    setReplyText]    = useState("");
+  const [replySending, setReplySending] = useState(false);
+  const [replySent,    setReplySent]    = useState(false);
+
+  useEffect(() => {
+    setReplyText("");
+    setReplySent(false);
+  }, [groupIdx, storyIdx]);
+
+  const handleReply = useCallback(async () => {
+    if (!replyText.trim() || replySending || !currentUserId) return;
+    setReplySending(true);
+    const content = JSON.stringify({
+      text: replyText.trim(),
+      story_photo_url: isPhoto ? signedUrl : null,
+      story_type: story.type,
+      story_text: story.text_content || null,
+      story_bg:   story.text_bg   || null,
+      owner_nombre: group.nombre,
+    });
+    const { data: convId, error } = await supabase.rpc("get_or_create_direct_conversation", {
+      other_user_id: group.userId,
+    });
+    if (!error && convId) {
+      await supabase.from("messages").insert({
+        conversation_id: convId,
+        sender_id: currentUserId,
+        type: "story_reply",
+        content,
+      });
+      setReplyText("");
+      setReplySent(true);
+      setPaused(false);
+      setTimeout(() => setReplySent(false), 2500);
+    }
+    setReplySending(false);
+  }, [replyText, replySending, currentUserId, isPhoto, signedUrl, story, group]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Cargar signed URL cuando cambia la historia ──────────────────────────
   useEffect(() => {
     setSignedUrl(null);
@@ -382,6 +421,43 @@ const StoryViewer = ({
           ›
         </button>
       )}
+
+      {/* Reply bar (solo cuando !isMine) */}
+      {!isMine && (
+        <div
+          style={replyBarStyle}
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
+        >
+          {replySent ? (
+            <span style={{ color: "#d4af37", fontSize: 13, fontWeight: 600, flex: 1, textAlign: "center" }}>
+              {t("chat.replySent")}
+            </span>
+          ) : (
+            <>
+              <input
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                onFocus={() => { stopProgress(); setPaused(true); }}
+                onBlur={() => { if (!replySending) setPaused(false); }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleReply(); }}
+                placeholder={t("chat.replyTo", { nombre: group.nombre })}
+                style={replyInputStyle}
+              />
+              <button
+                onClick={handleReply}
+                disabled={!replyText.trim() || replySending}
+                style={replySendBtnStyle(!replyText.trim() || replySending)}
+              >
+                ➤
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -554,6 +630,48 @@ const confirmPanelStyle = {
   padding:        "24px 20px",
   zIndex:         20,
 };
+
+const replyBarStyle = {
+  position:       "absolute",
+  bottom:         0,
+  left:           0,
+  right:          0,
+  display:        "flex",
+  alignItems:     "center",
+  gap:            8,
+  padding:        "10px 14px 18px",
+  background:     "linear-gradient(transparent, rgba(0,0,0,0.75))",
+  zIndex:         15,
+  pointerEvents:  "all",
+};
+
+const replyInputStyle = {
+  flex:           1,
+  padding:        "9px 16px",
+  background:     "rgba(28,20,9,0.85)",
+  border:         "1px solid rgba(212,175,55,0.35)",
+  borderRadius:   24,
+  color:          "#f0e4cc",
+  fontSize:       14,
+  outline:        "none",
+  backdropFilter: "blur(4px)",
+};
+
+const replySendBtnStyle = (disabled) => ({
+  width:          38,
+  height:         38,
+  borderRadius:   "50%",
+  border:         "none",
+  background:     disabled ? "rgba(28,20,9,0.7)" : "#d4af37",
+  color:          disabled ? "#5a4535" : "#0d0a06",
+  fontSize:       15,
+  cursor:         disabled ? "default" : "pointer",
+  display:        "flex",
+  alignItems:     "center",
+  justifyContent: "center",
+  flexShrink:     0,
+  transition:     "background 0.15s, color 0.15s",
+});
 
 const cancelBtnStyle = {
   background:   "#2a1e0f",

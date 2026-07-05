@@ -9,7 +9,8 @@
     "ranking":      "Ranking",
     "about":        "Sobre nosotros",
     "settings":     "Configuración",
-    "logout":       "Cerrar sesión"
+    "logout":       "Cerrar sesión",
+    "admin":        "Panel Admin"
   },
   "sidebar": {
     "changeAvatar": "Cambiar avatar →"
@@ -25,7 +26,22 @@
     "tabs": {
       "profile":     "Perfil",
       "privacy":     "Privacidad",
-      "preferences": "Preferencias"
+      "preferences": "Preferencias",
+      "support":     "Ayuda"
+    },
+    "support": {
+      "description":         "¿Tienes alguna duda o has encontrado un error? Escríbenos y te responderemos en cuanto podamos.",
+      "subjectLabel":        "Asunto",
+      "subjectPlaceholder":  "Describe brevemente tu consulta o problema",
+      "messageLabel":        "Mensaje",
+      "messagePlaceholder":  "Cuéntanos con detalle qué ocurrió o qué necesitas...",
+      "sendBtn":             "Enviar mensaje",
+      "sending":             "Enviando...",
+      "sent":                "Mensaje enviado. Te responderemos pronto.",
+      "historyTitle":        "Mis solicitudes",
+      "historyEmpty":        "Aún no has enviado ninguna solicitud.",
+      "statusOpen":          "Abierto",
+      "statusResolved":      "Resuelto"
     },
     "profile": {
       "changeAvatar":         "Cambiar avatar →",
@@ -34,12 +50,12 @@
       "errorEmpty":           "El nombre no puede estar vacío.",
       "errorMinLength":       "Mínimo 2 caracteres.",
       "bioLabel":             "Biografía",
-      "bioPlaceholder":       "Contá algo sobre vos como tomador de cerveza...",
+      "bioPlaceholder":       "Cuenta algo sobre ti como amante de la cerveza...",
       "countryLabel":         "País de origen",
       "countryPlaceholder":   "Ej: Argentina, España...",
       "featuredBadgesLabel":  "Insignias destacadas",
       "featuredBadgesCount":  "({{count}}/3 seleccionadas)",
-      "noBadgesHint":         "Desbloqueá insignias en Logros para poder destacarlas aquí.",
+      "noBadgesHint":         "Desbloquea insignias en Logros para poder destacarlas aquí.",
       "maxBadgesHint":        "Máximo 3 insignias",
       "saveBtn":              "Guardar cambios",
       "savingBtn":            "Guardando...",
@@ -52,13 +68,13 @@
       "publicProfileOff":   "Solo tus amigos ven tus estadísticas. Los demás solo ven tu nombre y avatar.",
       "rankingLabel":       "Aparecer en rankings globales",
       "rankingOn":          "Tu posición aparece en el ranking global y semanal.",
-      "rankingOff":         "Tu XP sigue acumulándose normalmente, pero no aparecés en los rankings públicos. Sí seguís visible en el ranking entre amigos.",
+      "rankingOff":         "Tu XP sigue acumulándose normalmente, pero no apareces en los rankings públicos. Sí sigues visible en el ranking entre amigos.",
       "note":               "Los cambios de privacidad se aplican de inmediato.",
       "hiddenStories": {
         "title":       "Ocultar historia de...",
-        "description": "Estas personas no verán tus historias, pero vos seguís viendo las de ellas.",
+        "description": "Estas personas no verán tus historias, pero tú seguirás viendo las de ellas.",
         "loading":     "Cargando amigos...",
-        "noFriends":   "Todavía no tenés amigos. Agregá amigos para gestionar la visibilidad de tus historias.",
+        "noFriends":   "Todavía no tienes amigos. Añade amigos para gestionar la visibilidad de tus historias.",
         "show":        "Mostrar",
         "hide":        "Ocultar",
         "note":        "Tu historia está oculta para {{count}} persona(s)."
@@ -67,7 +83,7 @@
     "prefs": {
       "audioTitle":    "Efectos de sonido",
       "audioOn":       "Clink al guardar una cerveza · acorde al subir de nivel · tono al desbloquear logros.",
-      "audioOff":      "Activá para escuchar efectos de sonido sutiles en acciones clave.",
+      "audioOff":      "Activa para escuchar efectos de sonido sutiles en acciones clave.",
       "audioNote":     "Preferencias de audio. Se guardan en este dispositivo.",
       "languageTitle": "Idioma",
       "languageNote":  "La preferencia se sincroniza con tu cuenta."
@@ -88,7 +104,7 @@
     "userPhotoAlt": "Foto del usuario",
     "empty": {
       "title":    "Nada por aquí todavía",
-      "bodyPre":  "Agregá amigos en ",
+      "bodyPre":  "Añade amigos en ",
       "bodyLink": "Amigos",
       "bodyPost": " para ver su actividad."
     },
@@ -121,9 +137,9 @@
     "noResults":            "Sin resultados para \"{{term}}\"",
     "statusFriends":        "Amigos",
     "statusSent":           "Solicitud enviada",
-    "addBtn":               "Agregar",
+    "addBtn":               "Añadir",
     "myFriends":            "Mis amigos",
-    "empty":                "Aún no tenés amigos en BeerBook. ¡Buscalos arriba!",
+    "empty":                "Aún no tienes amigos en BeerBook. ¡Búscalos arriba!",
     "removeBtn":            "Eliminar",
     "sentRequests":         "Solicitudes enviadas ({{count}})",
     "pending":              "Pendiente...",
@@ -159,7 +175,48 @@
     "loading":      "Cargando cervezas...",
     "statsBar":     "🏆 Nivel: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} cervezas ({{verified}} verificadas)",
     "found_one":    "{{count}} cerveza encontrada",
-    "found_other":  "{{count}} cervezas encontradas"
+    "found_other":  "{{count}} cervezas encontradas",
+    "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →"
+  },
+  "suggest": {
+    "title":         "Sugerir cerveza",
+    "subtitle":      "¿Falta alguna cerveza en el catálogo? Cuéntanos y la revisaremos.",
+    "nombreLabel":   "Nombre de la cerveza",
+    "nombrePlaceholder": "p. ej. Voll-Damm Doble Malta",
+    "estiloLabel":   "Estilo",
+    "estiloPlaceholder": "p. ej. Märzen, IPA, Stout...",
+    "paisLabel":     "País de origen",
+    "paisPlaceholder": "p. ej. España, Alemania...",
+    "reasonLabel":   "¿Por qué crees que debería añadirse?",
+    "reasonPlaceholder": "Cuéntanos algo sobre esta cerveza...",
+    "sendBtn":       "Enviar sugerencia",
+    "sending":       "Enviando...",
+    "sent":          "¡Gracias! Revisaremos tu sugerencia.",
+    "errorNombre":   "El nombre es obligatorio."
+  },
+  "beercard": {
+    "suggestedBy": "Sugerida por {{nombre}}"
+  },
+  "admin": {
+    "title":               "Panel de Administración",
+    "subtitle":            "Gestión de soporte y sugerencias",
+    "loading":             "Cargando...",
+    "tabSupport":          "Soporte",
+    "tabSuggestions":      "Sugerencias",
+    "ticketsEmpty":        "No hay tickets de soporte.",
+    "suggestionsEmpty":    "No hay sugerencias todavía.",
+    "noPendingSuggestions":"No hay sugerencias pendientes.",
+    "statusOpen":          "Abierto",
+    "statusResolved":      "Resuelto",
+    "status_pending":      "Pendiente",
+    "status_approved":     "Aprobada",
+    "status_rejected":     "Rechazada",
+    "adminNote":           "Nota para el usuario",
+    "adminNotePlaceholder":"Respuesta interna o nota (opcional)...",
+    "markResolved":        "Marcar como resuelto",
+    "approve":             "Aprobar",
+    "reject":              "Rechazar",
+    "from":                "De"
   },
   "filters": {
     "searchPlaceholder": "Buscar cervezas...",
@@ -197,25 +254,25 @@
     "deleteBtn":          "Borrar"
   },
   "location": {
-    "addBtn":       "Agregar ubicación",
+    "addBtn":       "Añadir ubicación",
     "getting":      "Obteniendo ubicación...",
     "visibleFeed":  "Visible en feed y perfil",
     "privateOnly":  "Solo en tu cuaderno",
     "removeBtn":    "Quitar",
-    "errorDenied":  "Permiso denegado. Podés continuar sin ubicación.",
-    "errorTimeout": "No se pudo obtener la ubicación. Intentá de nuevo.",
+    "errorDenied":  "Permiso denegado. Puedes continuar sin ubicación.",
+    "errorTimeout": "No se pudo obtener la ubicación. Inténtalo de nuevo.",
     "errorSupport": "Tu navegador no soporta geolocalización.",
     "private":      "privada"
   },
   "ranking": {
     "title":               "Ranking BeerBook",
     "loading":             "Cargando ranking...",
-    "self":                "← vos",
+    "self":                "← tú",
     "verifiedLabel":       "verificadas",
     "disabledWeekly":      "No disponible en modo Cervezas Verificadas",
-    "notInRankingBeers":   "Aún no aparecés — subí fotos de tus cervezas para entrar.",
-    "notInRankingXP":      "Aún no aparecés en el ranking — registrá tu primera cerveza para entrar.",
-    "onlyYou":             "Solo aparecés vos. Invitá amigos para tener más competencia.",
+    "notInRankingBeers":   "Aún no apareces — sube fotos de tus cervezas para entrar.",
+    "notInRankingXP":      "Aún no apareces en el ranking — registra tu primera cerveza para entrar.",
+    "onlyYou":             "Solo apareces tú. Invita amigos para tener más competencia.",
     "scope": {
       "total":   "Total histórico",
       "weekly":  "Esta semana",
@@ -228,21 +285,21 @@
     "subtitles": {
       "xpTotal":     "XP histórico acumulado · solo entradas con foto",
       "xpWeekly":    "Cervezas verificadas nuevas en los últimos 7 días",
-      "xpFriends":   "Vos y tus amigos, ordenados por XP total",
+      "xpFriends":   "Tú y tus amigos, ordenados por XP total",
       "beersTotal":  "Quién registró más cervezas verificadas (con foto)",
       "beersFriends":"Quién registró más cervezas verificadas entre tus amigos"
     },
     "empty": {
       "xpTotal":     "El ranking está vacío.",
-      "xpWeekly":    "Nadie agregó cervezas verificadas esta semana todavía.",
-      "xpFriends":   "Agregá amigos para ver el ranking entre amigos.",
+      "xpWeekly":    "Nadie añadió cervezas verificadas esta semana todavía.",
+      "xpFriends":   "Añade amigos para ver el ranking entre amigos.",
       "beersTotal":  "Nadie tiene cervezas verificadas todavía.",
       "beersFriends":"Ninguno de tus amigos tiene cervezas verificadas todavía."
     },
     "consent": {
-      "title":       "¿Querés aparecer en el ranking?",
-      "body":        "Tu XP siempre se acumula. Solo decidís si tu posición es visible para todos en el ranking global.",
-      "settingsHint":"Podés cambiar esto cuando quieras en",
+      "title":       "¿Quieres aparecer en el ranking?",
+      "body":        "Tu XP siempre se acumula. Solo decides si tu posición es visible para todos en el ranking global.",
+      "settingsHint":"Puedes cambiar esto cuando quieras en",
       "settingsLink":"Configuración → Privacidad",
       "btnPrivate":  "Mantenerme privado",
       "btnPublic":   "Sí, aparecer"
@@ -255,8 +312,8 @@
       "choosePhoto":   "Elegir foto · máx. 5 MB",
       "saving":        "Guardando...",
       "savePhoto":     "💾 Guardar",
-      "errorUpload":   "Error al subir la foto. Intentá de nuevo.",
-      "errorSave":     "Error al guardar. Intentá de nuevo.",
+      "errorUpload":   "Error al subir la foto. Inténtalo de nuevo.",
+      "errorSave":     "Error al guardar. Inténtalo de nuevo.",
       "errorSize":     "La foto no puede superar 5 MB.",
       "presetSection": "🎨 Elegir personaje"
     },
@@ -274,7 +331,7 @@
     "novato":     { "name": "El Novato",            "desc": "Descubriendo el mundo de la cerveza" }
   },
   "achievement": {
-    "primera-ronda":         { "name": "Primera Ronda",         "desc": "Registrá tu primera cerveza" },
+    "primera-ronda":         { "name": "Primera Ronda",         "desc": "Registra tu primera cerveza" },
     "seis-pack":             { "name": "Seis Pack",             "desc": "6 cervezas verificadas (con foto)" },
     "caja-completa":         { "name": "Caja Completa",         "desc": "24 cervezas verificadas (con foto)" },
     "barril":                { "name": "Barril",                "desc": "50 cervezas verificadas (con foto)" },
@@ -289,7 +346,7 @@
     "perfeccionista":        { "name": "Perfeccionista",        "desc": "5 entradas con todos los campos completos" },
     "constante":             { "name": "Constante",             "desc": "Racha de 7 días seguidos" },
     "leyenda-activa":        { "name": "Leyenda Activa",        "desc": "Racha de 30 días seguidos" },
-    "primer-contacto":       { "name": "Primer Contacto",       "desc": "Seguí a tu primer amigo" },
+    "primer-contacto":       { "name": "Primer Contacto",       "desc": "Sigue a tu primer amigo" },
     "companeros-de-cata":    { "name": "Compañeros de Cata",    "desc": "5 amigos en la app" }
   },
   "badge": {
@@ -335,7 +392,7 @@
     "viewedBy": "Visto por",
     "noViewersYet": "Nadie la vio todavía",
     "photoUnavailable": "Foto no disponible",
-    "addStory": "Agregar historia",
+    "addStory": "Añadir historia",
     "deleteBtn": "Borrar historia",
     "deleteConfirm": "¿Borrar esta historia?",
     "deleteCancel": "Cancelar",
@@ -345,7 +402,7 @@
       "tabPhoto": "Foto",
       "tabText": "Texto",
       "choosePhoto": "Toca para elegir una foto",
-      "textPlaceholder": "Escribí algo...",
+      "textPlaceholder": "Escribe algo...",
       "bgColor": "Color de fondo",
       "publish": "Publicar historia",
       "publishing": "Publicando...",
@@ -353,18 +410,27 @@
     }
   },
   "chat": {
-    "title":           "Mensajes",
-    "subtitle":        "Tus conversaciones privadas",
-    "loading":         "Cargando mensajes...",
-    "empty":           "Todavía no tenés mensajes.",
-    "emptyHint":       "Iniciá una conversación desde la página de Amigos.",
-    "noMessages":      "Sin mensajes aún",
-    "sendFirstMessage": "Sé el primero en escribir algo.",
-    "typeMessage":     "Escribí un mensaje...",
-    "send":            "Enviar",
-    "you":             "Vos",
-    "unknownUser":     "Usuario desconocido",
-    "lastMessagePhoto": "📷 Foto",
-    "lastMessageBeer":  "🍺 Cerveza compartida"
+    "title":                 "Mensajes",
+    "subtitle":              "Tus conversaciones privadas",
+    "loading":               "Cargando mensajes...",
+    "empty":                 "Todavía no tienes mensajes.",
+    "emptyHint":             "Inicia una conversación desde la página de Amigos.",
+    "noMessages":            "Sin mensajes aún",
+    "sendFirstMessage":      "Sé el primero en escribir algo.",
+    "typeMessage":           "Escribe un mensaje...",
+    "send":                  "Enviar",
+    "you":                   "Tú",
+    "unknownUser":           "Usuario desconocido",
+    "lastMessagePhoto":      "📷 Foto",
+    "lastMessageBeer":       "🍺 Cerveza compartida",
+    "lastMessageStoryReply": "📖 Respuesta a historia",
+    "shareBeer":             "Compartir cerveza",
+    "searchBeer":            "Buscar en mi cuaderno...",
+    "noBeerResults":         "No tienes cervezas en tu cuaderno.",
+    "sendPhoto":             "Enviar foto",
+    "storyExpired":          "Historia expirada",
+    "storyReplyLabel":       "Historia de {{nombre}}",
+    "replyTo":               "Responder a {{nombre}}...",
+    "replySent":             "Enviado ✓"
   }
 }

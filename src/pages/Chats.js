@@ -52,7 +52,18 @@ const ConvRow = ({ conv, onClick, t }) => {
   const hasUnread = Number(conv.unread_count) > 0;
   let preview = "";
   if (conv.last_message) {
-    preview = conv.last_message_type === "photo" ? t("chat.lastMessagePhoto") : conv.last_message;
+    if (conv.last_message_type === "photo") {
+      preview = t("chat.lastMessagePhoto");
+    } else if (conv.last_message_type === "beer") {
+      preview = t("chat.lastMessageBeer");
+    } else if (conv.last_message_type === "story_reply") {
+      try {
+        const d = JSON.parse(conv.last_message);
+        preview = d.text ? `📖 ${d.text}` : t("chat.lastMessageStoryReply");
+      } catch { preview = t("chat.lastMessageStoryReply"); }
+    } else {
+      preview = conv.last_message;
+    }
     if (preview.length > 60) preview = preview.slice(0, 60) + "…";
   } else {
     preview = t("chat.noMessages");

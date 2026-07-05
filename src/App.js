@@ -18,6 +18,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
 import LugarPage from "./pages/LugarPage";
+import Chats from "./pages/Chats";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   const location = useLocation();
@@ -114,6 +116,8 @@ function App() {
         <Route path="/sobre-nosotros" element={<SobreNosotros />} />
         <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
         <Route path="/perfil/:userId" element={<ProfilePage />} />
+        <Route path="/chats" element={<Chats />} />
+        <Route path="/chats/:id" element={<ChatPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

@@ -4,6 +4,7 @@
     "notebook":     "Mi Cuaderno",
     "feed":         "Feed",
     "friends":      "Amigos",
+    "messages":     "Mensajes",
     "achievements": "Logros",
     "ranking":      "Ranking",
     "about":        "Sobre nosotros",
@@ -131,7 +132,8 @@
     "nowFriends":           "¡Ahora son amigos! 🎉",
     "requestRejected":      "Solicitud rechazada",
     "confirmRemove":        "¿Eliminar este amigo?",
-    "friendRemoved":        "Amigo eliminado"
+    "friendRemoved":        "Amigo eliminado",
+    "sendMessage":          "Mensaje"
   },
   "profile": {
     "loading":              "Cargando perfil...",
@@ -349,5 +351,20 @@
       "publishing": "Publicando...",
       "errorSize": "La imagen no puede superar los 15 MB"
     }
+  },
+  "chat": {
+    "title":           "Mensajes",
+    "subtitle":        "Tus conversaciones privadas",
+    "loading":         "Cargando mensajes...",
+    "empty":           "Todavía no tenés mensajes.",
+    "emptyHint":       "Iniciá una conversación desde la página de Amigos.",
+    "noMessages":      "Sin mensajes aún",
+    "sendFirstMessage": "Sé el primero en escribir algo.",
+    "typeMessage":     "Escribí un mensaje...",
+    "send":            "Enviar",
+    "you":             "Vos",
+    "unknownUser":     "Usuario desconocido",
+    "lastMessagePhoto": "📷 Foto",
+    "lastMessageBeer":  "🍺 Cerveza compartida"
   }
 }

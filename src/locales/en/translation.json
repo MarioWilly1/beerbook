@@ -4,6 +4,7 @@
     "notebook":     "My Notebook",
     "feed":         "Feed",
     "friends":      "Friends",
+    "messages":     "Messages",
     "achievements": "Achievements",
     "ranking":      "Ranking",
     "about":        "About us",
@@ -131,7 +132,8 @@
     "nowFriends":          "You're now friends! 🎉",
     "requestRejected":     "Request rejected",
     "confirmRemove":       "Remove this friend?",
-    "friendRemoved":       "Friend removed"
+    "friendRemoved":       "Friend removed",
+    "sendMessage":         "Message"
   },
   "profile": {
     "loading":             "Loading profile...",
@@ -349,5 +351,20 @@
       "publishing": "Publishing...",
       "errorSize": "Image cannot exceed 15 MB"
     }
+  },
+  "chat": {
+    "title":           "Messages",
+    "subtitle":        "Your private conversations",
+    "loading":         "Loading messages...",
+    "empty":           "No messages yet.",
+    "emptyHint":       "Start a conversation from the Friends page.",
+    "noMessages":      "No messages yet",
+    "sendFirstMessage": "Be the first to write something.",
+    "typeMessage":     "Type a message...",
+    "send":            "Send",
+    "you":             "You",
+    "unknownUser":     "Unknown user",
+    "lastMessagePhoto": "📷 Photo",
+    "lastMessageBeer":  "🍺 Shared beer"
   }
 }

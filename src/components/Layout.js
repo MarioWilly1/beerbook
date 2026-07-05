@@ -132,6 +132,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             <SidebarLink to="/chats" label={`💬 ${t("nav.messages")}`} badge={totalUnread} />
             <SidebarLink to="/logros" label={t("nav.achievements")} />
             <SidebarLink to="/ranking" label={t("nav.ranking")} />
+            <SidebarLink to="/mapa" label={`🗺️ ${t("nav.map")}`} />
             <SidebarLink to="/sobre-nosotros" label={t("nav.about")} />
           </nav>
         </div>

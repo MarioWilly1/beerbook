@@ -21,6 +21,7 @@ import LugarPage from "./pages/LugarPage";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 import AdminPanel from "./pages/AdminPanel";
+import MapaMundial from "./pages/MapaMundial";
 
 function App() {
   const location = useLocation();
@@ -120,6 +121,7 @@ function App() {
         <Route path="/chats" element={<Chats />} />
         <Route path="/chats/:id" element={<ChatPage />} />
         <Route path="/admin" element={<AdminPanel profile={profile} />} />
+        <Route path="/mapa" element={<MapaMundial />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

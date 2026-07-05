@@ -10,7 +10,8 @@
     "about":        "About us",
     "settings":     "Settings",
     "logout":       "Log out",
-    "admin":        "Admin Panel"
+    "admin":        "Admin Panel",
+    "map":          "World map"
   },
   "sidebar": {
     "changeAvatar": "Change avatar →"
@@ -408,6 +409,16 @@
       "publishing": "Publishing...",
       "errorSize": "Image cannot exceed 15 MB"
     }
+  },
+  "map": {
+    "hint":          "Click a golden country to see its beers",
+    "resetZoom":     "Reset view",
+    "beerCount_one": "{{count}} beer in the catalog",
+    "beerCount_other":"{{count}} beers in the catalog",
+    "noBeers":       "No beers from this country.",
+    "triedByTitle":  "Who tried it?",
+    "triedByLoading":"Loading...",
+    "triedByEmpty":  "No one with a public profile has tried it yet."
   },
   "chat": {
     "title":                 "Messages",

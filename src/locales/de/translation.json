@@ -10,7 +10,8 @@
     "about":        "Über uns",
     "settings":     "Einstellungen",
     "logout":       "Abmelden",
-    "admin":        "Admin-Panel"
+    "admin":        "Admin-Panel",
+    "map":          "Weltkarte"
   },
   "sidebar": {
     "changeAvatar": "Avatar ändern →"
@@ -408,6 +409,16 @@
       "publishing": "Wird veröffentlicht...",
       "errorSize": "Das Bild darf 15 MB nicht überschreiten"
     }
+  },
+  "map": {
+    "hint":          "Klicke auf ein goldenes Land, um seine Biere zu sehen",
+    "resetZoom":     "Ansicht zurücksetzen",
+    "beerCount_one": "{{count}} Bier im Katalog",
+    "beerCount_other":"{{count}} Biere im Katalog",
+    "noBeers":       "Keine Biere aus diesem Land.",
+    "triedByTitle":  "Wer hat es probiert?",
+    "triedByLoading":"Wird geladen...",
+    "triedByEmpty":  "Noch niemand mit öffentlichem Profil hat es probiert."
   },
   "chat": {
     "title":                 "Nachrichten",

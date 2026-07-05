@@ -10,7 +10,8 @@
     "about":        "Sobre nosotros",
     "settings":     "Configuración",
     "logout":       "Cerrar sesión",
-    "admin":        "Panel Admin"
+    "admin":        "Panel Admin",
+    "map":          "Mapa mundial"
   },
   "sidebar": {
     "changeAvatar": "Cambiar avatar →"
@@ -408,6 +409,16 @@
       "publishing": "Publicando...",
       "errorSize": "La imagen no puede superar los 15 MB"
     }
+  },
+  "map": {
+    "hint":          "Haz clic en un país dorado para ver sus cervezas",
+    "resetZoom":     "Restablecer vista",
+    "beerCount_one": "{{count}} cerveza en el catálogo",
+    "beerCount_other":"{{count}} cervezas en el catálogo",
+    "noBeers":       "Sin cervezas en este país.",
+    "triedByTitle":  "¿Quién la probó?",
+    "triedByLoading":"Cargando...",
+    "triedByEmpty":  "Nadie con perfil público la ha probado aún."
   },
   "chat": {
     "title":                 "Mensajes",

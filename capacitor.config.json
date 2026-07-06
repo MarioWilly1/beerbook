@@ -1,0 +1,25 @@
+{
+  "appId": "com.mariowilly.beerbook",
+  "appName": "BeerBook",
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0d0a06",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true,
+      "androidSplashResourceName": "splash"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0d0a06"
+    },
+    "Camera": {
+      "permissions": ["camera", "photos"]
+    }
+  }
+}

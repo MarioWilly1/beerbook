@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BeerBook</string>
+    <string name="title_activity_main">BeerBook</string>
+    <string name="package_name">com.mariowilly.beerbook</string>
+    <string name="custom_url_scheme">com.mariowilly.beerbook</string>
+</resources>

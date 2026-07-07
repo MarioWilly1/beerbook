@@ -156,7 +156,7 @@ const Configuracion = ({ onProfileChange }) => {
       <h2 style={{ margin: "0 0 24px" }}>⚙️ {t("settings.pageTitle")}</h2>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #2e2215" }}>
+      <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #2e2215", overflowX: "auto" }}>
         {TABS.map(({ key, icon, tKey }) => (
           <button
             key={key}

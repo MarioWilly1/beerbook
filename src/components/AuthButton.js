@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "../services/supabase";
 import { useAuth } from "../hooks/useAuth";
 
@@ -5,9 +6,19 @@ const AuthButton = () => {
   const { session } = useAuth();
 
   const login = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
+    const isNative = Capacitor.isNativePlatform();
+    if (isNative) {
+      const { data } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "com.mariowilly.beerbook://login-callback",
+          skipBrowserRedirect: true,
+        },
+      });
+      if (data?.url) window.open(data.url, "_system");
+    } else {
+      await supabase.auth.signInWithOAuth({ provider: "google" });
+    }
   };
 
   const logout = async () => {

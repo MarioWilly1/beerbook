@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 // ── Marker icons ───────────────────────────────────────────────────────────────
 function makeIcon(count, selected = false) {
@@ -77,6 +78,7 @@ const UserChip = ({ ub }) => (
 // ── Main panel ────────────────────────────────────────────────────────────────
 const OriginMapPanel = ({ beers }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const [expanded,    setExpanded]    = useState(false);
   const [selectedLoc, setSelectedLoc] = useState(null);
   const [selectedBeer, setSelectedBeer] = useState(null);
@@ -200,7 +202,7 @@ const OriginMapPanel = ({ beers }) => {
   // ── Fullscreen modal ───────────────────────────────────────────────────────
   if (expanded) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#0d0a06", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "fixed", top: isMobile ? 52 : 0, left: 0, right: 0, bottom: 0, zIndex: 9999, background: "#0d0a06", display: "flex", flexDirection: "column" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid #2e2215", background: "#1c1409", flexShrink: 0 }}>
           <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 16, color: "#f0e4cc", flex: 1 }}>
@@ -214,10 +216,10 @@ const OriginMapPanel = ({ beers }) => {
           </button>
         </div>
 
-        {/* Two-column layout: map left, panels right */}
-        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+        {/* Map + detail panel — stacked on mobile, side-by-side on desktop */}
+        <div style={{ flex: 1, display: "flex", flexDirection: isMobile ? "column" : "row", overflow: "hidden" }}>
           {/* Map */}
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minHeight: isMobile ? "50%" : "auto" }}>
             <MapContainer center={[46, 10]} zoom={4}
               style={{ height: "100%", width: "100%", background: "#0d0a06" }}
               scrollWheelZoom>
@@ -227,8 +229,15 @@ const OriginMapPanel = ({ beers }) => {
             </MapContainer>
           </div>
 
-          {/* Right panel */}
-          <div style={{ width: 340, flexShrink: 0, overflowY: "auto", borderLeft: "1px solid #2e2215", background: "#0d0a06" }}>
+          {/* Detail panel */}
+          <div style={{
+            width: isMobile ? "100%" : 340,
+            flexShrink: 0,
+            overflowY: "auto",
+            borderTop: isMobile ? "1px solid #2e2215" : "none",
+            borderLeft: isMobile ? "none" : "1px solid #2e2215",
+            background: "#0d0a06",
+          }}>
             {!selectedLoc ? (
               <p style={{ color: "#5a4535", fontSize: 13, padding: 20, textAlign: "center" }}>
                 {t("map.hint")}

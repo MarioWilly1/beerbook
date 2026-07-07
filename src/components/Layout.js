@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
@@ -8,13 +8,16 @@ import AvatarSelector from "./AvatarSelector";
 import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
 import { useTotalUnread } from "../hooks/useTotalUnread";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
   const { t } = useTranslation();
   const { badges } = useBadges();
   const totalUnread = useTotalUnread();
+  const isMobile = useIsMobile();
 
   const username =
     profile?.nombre ||
@@ -26,9 +29,53 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
     await supabase.auth.signOut();
   };
 
+  const closeDrawer = () => setDrawerOpen(false);
+
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
+
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      {/* SIDEBAR */}
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", position: "relative" }}>
+
+      {/* ── Mobile: fixed top header ─────────────────────────────────────────── */}
+      {isMobile && (
+        <header style={{
+          position: "fixed", top: 0, left: 0, right: 0, height: 52,
+          backgroundImage: "linear-gradient(rgba(13,10,6,0.97), rgba(13,10,6,0.97)), url('/wood.jpg')",
+          backgroundSize: "cover", backgroundPosition: "center",
+          borderBottom: "1px solid #2e2215",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0 16px", zIndex: 1200,
+        }}>
+          <button
+            onClick={() => setDrawerOpen(o => !o)}
+            style={{ background: "none", border: "none", color: "#d4af37", fontSize: 22, cursor: "pointer", padding: "4px 8px", lineHeight: 1 }}
+          >
+            ☰
+          </button>
+          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#d4af37", fontWeight: 700 }}>
+            🍺 BeerBook
+          </span>
+          {totalUnread > 0 ? (
+            <span style={{ background: "#c0392b", color: "#fff", borderRadius: 999, minWidth: 20, height: 20, padding: "0 5px", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {totalUnread > 99 ? "99+" : totalUnread}
+            </span>
+          ) : (
+            <span style={{ width: 36 }} />
+          )}
+        </header>
+      )}
+
+      {/* ── Mobile: drawer backdrop ──────────────────────────────────────────── */}
+      {isMobile && drawerOpen && (
+        <div
+          onClick={closeDrawer}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 1099 }}
+        />
+      )}
+
+      {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
       <aside
         style={{
           width: "260px",
@@ -42,23 +89,38 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           justifyContent: "space-between",
           padding: "24px 16px",
           borderRight: "1px solid #2e2215",
+          ...(isMobile ? {
+            position: "fixed",
+            top: 52,
+            left: 0,
+            bottom: 0,
+            width: "280px",
+            padding: "16px 16px 24px",
+            zIndex: 1100,
+            overflowY: "auto",
+            transform: drawerOpen ? "translateX(0)" : "translateX(-100%)",
+            transition: "transform 0.25s ease",
+          } : {}),
         }}
       >
         <div>
-          <h1 style={{
-            fontSize: "22px",
-            marginBottom: "16px",
-            textAlign: "center",
-            letterSpacing: "1px",
-            fontFamily: "'Playfair Display', serif",
-            color: "#d4af37",
-          }}>
-            🍺 BeerBook
-          </h1>
+          {/* Title only on desktop — header has branding on mobile */}
+          {!isMobile && (
+            <h1 style={{
+              fontSize: "22px",
+              marginBottom: "16px",
+              textAlign: "center",
+              letterSpacing: "1px",
+              fontFamily: "'Playfair Display', serif",
+              color: "#d4af37",
+            }}>
+              🍺 BeerBook
+            </h1>
+          )}
 
           {/* Avatar + username */}
           <div
-            onClick={() => setShowAvatarSelector(true)}
+            onClick={() => { setShowAvatarSelector(true); closeDrawer(); }}
             title={t("sidebar.changeAvatar")}
             style={{
               display: "flex", flexDirection: "column", alignItems: "center",
@@ -125,29 +187,34 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           )}
 
           <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <SidebarLink to="/" label={t("nav.catalog")} />
-            <SidebarLink to="/cuaderno" label={t("nav.notebook")} />
-            <SidebarLink to="/feed" label={`📡 ${t("nav.feed")}`} />
-            <SidebarLink to="/amigos" label={`👥 ${t("nav.friends")}`} />
-            <SidebarLink to="/chats" label={`💬 ${t("nav.messages")}`} badge={totalUnread} />
-            <SidebarLink to="/logros" label={t("nav.achievements")} />
-            <SidebarLink to="/ranking" label={t("nav.ranking")} />
-            <SidebarLink to="/sobre-nosotros" label={t("nav.about")} />
+            <SidebarLink to="/" label={t("nav.catalog")} onClick={closeDrawer} />
+            <SidebarLink to="/cuaderno" label={t("nav.notebook")} onClick={closeDrawer} />
+            <SidebarLink to="/feed" label={`📡 ${t("nav.feed")}`} onClick={closeDrawer} />
+            <SidebarLink to="/amigos" label={`👥 ${t("nav.friends")}`} onClick={closeDrawer} />
+            <SidebarLink to="/chats" label={`💬 ${t("nav.messages")}`} badge={totalUnread} onClick={closeDrawer} />
+            <SidebarLink to="/logros" label={t("nav.achievements")} onClick={closeDrawer} />
+            <SidebarLink to="/ranking" label={t("nav.ranking")} onClick={closeDrawer} />
+            <SidebarLink to="/sobre-nosotros" label={t("nav.about")} onClick={closeDrawer} />
           </nav>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <SidebarLink to="/configuracion" label={`⚙️ ${t("nav.settings")}`} />
-          {profile?.is_admin && <SidebarLink to="/admin" label={`🔧 ${t("nav.admin")}`} />}
+          <SidebarLink to="/configuracion" label={`⚙️ ${t("nav.settings")}`} onClick={closeDrawer} />
+          {profile?.is_admin && <SidebarLink to="/admin" label={`🔧 ${t("nav.admin")}`} onClick={closeDrawer} />}
           <SidebarButton label={`🚪 ${t("nav.logout")}`} onClick={handleLogout} />
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
+      {/* ── Main content ─────────────────────────────────────────────────────── */}
       <main
         key={location.pathname}
         className="page-enter"
-        style={{ flex: 1, overflowY: "auto", padding: "28px", background: "#0d0a06" }}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: isMobile ? "68px 16px 16px" : "28px",
+          background: "#0d0a06",
+        }}
       >
         {children}
       </main>
@@ -165,12 +232,13 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
   );
 };
 
-const SidebarLink = ({ to, label, badge }) => {
+const SidebarLink = ({ to, label, badge, onClick }) => {
   const [hovered, setHovered] = useState(false);
   const hasBadge = badge > 0;
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={({ isActive }) => ({

@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { Capacitor } from "@capacitor/core";
+import { App as CapacitorApp } from "@capacitor/app";
+import { StatusBar } from "@capacitor/status-bar";
 import i18n from "./i18n";
 import { useAuth } from "./hooks/useAuth";
 import { useProfile } from "./hooks/useProfile";
+import { supabase } from "./services/supabase";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import MiCuaderno from "./pages/MiCuaderno";
@@ -35,6 +39,58 @@ function App() {
       i18n.changeLanguage(profile.preferred_language);
     }
   }, [profile?.preferred_language]);
+
+  // Immersive fullscreen on native (status bar overlays WebView)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
+    StatusBar.hide().catch(() => {});
+    const sub = CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+      if (isActive) StatusBar.hide().catch(() => {});
+    });
+    return () => { sub.then((h) => h.remove()); };
+  }, []);
+
+  // Handle OAuth deep link callback (native only)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const handleUrl = async (url) => {
+      if (!url || !url.includes("login-callback")) return;
+      try {
+        // Implicit flow: tokens arrive in the URL fragment (#access_token=...&refresh_token=...)
+        const fragment = url.includes("#") ? url.split("#")[1] : "";
+        if (fragment) {
+          const params = new URLSearchParams(fragment);
+          const access_token = params.get("access_token");
+          const refresh_token = params.get("refresh_token") || "";
+          if (access_token) {
+            await supabase.auth.setSession({ access_token, refresh_token });
+            return;
+          }
+        }
+        // PKCE flow fallback: code arrives as a query param (?code=...)
+        const query = url.includes("?") ? url.split("?")[1].split("#")[0] : "";
+        if (query) {
+          const params = new URLSearchParams(query);
+          const code = params.get("code");
+          if (code) await supabase.auth.exchangeCodeForSession(code);
+        }
+      } catch (e) {
+        console.error("OAuth callback error:", e);
+      }
+    };
+
+    // Cold start: app launched via deep link before listener registered
+    CapacitorApp.getLaunchUrl()
+      .then(({ url } = {}) => { if (url) handleUrl(url); })
+      .catch(() => {});
+
+    let handle;
+    CapacitorApp.addListener("appUrlOpen", ({ url }) => handleUrl(url))
+      .then((h) => { handle = h; });
+    return () => { handle?.remove(); };
+  }, []);
 
   // Ruta pública /lugar/:id — accessible sin autenticación
   if (location.pathname.startsWith("/lugar/")) {

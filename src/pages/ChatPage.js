@@ -5,6 +5,7 @@ import { useChat } from "../hooks/useChat";
 import { useChatPhoto } from "../hooks/useChatPhoto";
 import Avatar from "../components/Avatar";
 import ChatBeerPicker from "../components/ChatBeerPicker";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 function formatMsgTime(ts) {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -134,6 +135,7 @@ const ChatPage = () => {
   const { id }          = useParams();
   const navigate        = useNavigate();
   const { t }           = useTranslation();
+  const isMobile        = useIsMobile();
   const { messages, otherUser, currentUserId, loading, sendMessage } = useChat(id);
   const { uploadChatPhoto, uploading: uploadingPhoto } = useChatPhoto();
 
@@ -207,7 +209,7 @@ const ChatPage = () => {
   };
 
   return (
-    <div style={pageStyle}>
+    <div style={isMobile ? mobilePageStyle : pageStyle}>
       {/* Header */}
       <div style={headerStyle}>
         <button onClick={() => navigate("/chats")} style={backBtnStyle}>←</button>
@@ -303,6 +305,12 @@ const ChatPage = () => {
 const pageStyle = {
   display: "flex", flexDirection: "column",
   height: "calc(100vh - 56px)", margin: "-28px", overflow: "hidden",
+};
+// On mobile: fixed below the 52px header, full width
+const mobilePageStyle = {
+  position: "fixed", top: 52, left: 0, right: 0, bottom: 0,
+  display: "flex", flexDirection: "column", overflow: "hidden",
+  background: "#0d0a06",
 };
 const headerStyle = {
   display: "flex", alignItems: "center", gap: 10,

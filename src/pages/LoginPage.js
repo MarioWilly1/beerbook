@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { Capacitor } from "@capacitor/core";
 import { supabase } from "../services/supabase";
 
 const LoginPage = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,13 +21,26 @@ const LoginPage = ({ onSwitchToRegister }) => {
   };
 
   const handleGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-        queryParams: { prompt: "select_account" },
-      },
-    });
+    const isNative = Capacitor.isNativePlatform();
+    if (isNative) {
+      const { data } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "com.mariowilly.beerbook://login-callback",
+          queryParams: { prompt: "select_account" },
+          skipBrowserRedirect: true,
+        },
+      });
+      if (data?.url) window.open(data.url, "_system");
+    } else {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: { prompt: "select_account" },
+        },
+      });
+    }
   };
 
   const isInvalidCredentials =
@@ -58,14 +73,19 @@ const LoginPage = ({ onSwitchToRegister }) => {
           </Field>
 
           <Field label="Contraseña">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-              style={inputStyle}
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                style={inputStyle}
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} style={eyeBtnStyle}>
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
           </Field>
 
           {error && (
@@ -177,6 +197,20 @@ const inputStyle = {
   outline: "none",
   boxSizing: "border-box",
   color: "#111",
+  background: "#fff",
+};
+
+const eyeBtnStyle = {
+  position: "absolute",
+  right: "12px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "16px",
+  padding: "4px",
+  lineHeight: 1,
 };
 
 const primaryBtnStyle = {

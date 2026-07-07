@@ -15,6 +15,7 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [error, setError] = useState("");
@@ -130,15 +131,20 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
           </Field>
 
           <Field label="Contraseña *">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              placeholder="Mínimo 6 caracteres"
-              style={inputStyle}
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                placeholder="Mínimo 6 caracteres"
+                style={inputStyle}
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} style={eyeBtnStyle}>
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
           </Field>
 
           <Field
@@ -244,6 +250,20 @@ const inputStyle = {
   outline: "none",
   boxSizing: "border-box",
   color: "#111",
+  background: "#fff",
+};
+
+const eyeBtnStyle = {
+  position: "absolute",
+  right: "12px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "16px",
+  padding: "4px",
+  lineHeight: 1,
 };
 
 const ageBannerStyle = {

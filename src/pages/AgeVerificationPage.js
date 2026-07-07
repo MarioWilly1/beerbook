@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../services/supabase";
+import DateInput from "../components/DateInput";
 
 const isOver18 = (dateStr) => {
   if (!dateStr) return true;
@@ -87,13 +88,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
             label="Fecha de nacimiento"
             hint="Opcional · Mayor seguridad legal"
           >
-            <input
-              type="date"
-              value={fechaNacimiento}
-              onChange={(e) => setFechaNacimiento(e.target.value)}
-              max={new Date().toISOString().split("T")[0]}
-              style={inputStyle}
-            />
+            <DateInput onChange={setFechaNacimiento} />
           </Field>
 
           <div style={ageBannerStyle}>

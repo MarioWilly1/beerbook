@@ -15,7 +15,7 @@ const TABS = [
 ];
 
 const LANGUAGES = [
-  { code: "es", label: "Español",  flag: "🇦🇷" },
+  { code: "es", label: "Español",  flag: "🇪🇸" },
   { code: "en", label: "English",  flag: "🇬🇧" },
   { code: "de", label: "Deutsch",  flag: "🇩🇪" },
 ];

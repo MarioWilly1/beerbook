@@ -15,22 +15,22 @@ const BadgeCard = ({ badge }) => {
   return (
     <div
       style={{
-        borderRadius: 14,
-        padding: "18px 16px",
+        borderRadius: 10,
+        padding: "12px 12px",
         background: "#1c1409",
         border: `2px solid ${currentTier ? borderColor : "#2e2215"}`,
         opacity: currentTier ? 1 : 0.7,
         display: "flex",
         flexDirection: "column",
-        minHeight: 190,
+        minHeight: 160,
       }}
     >
       {/* Icon */}
       <div
         style={{
-          fontSize: 40,
+          fontSize: 32,
           textAlign: "center",
-          marginBottom: 10,
+          marginBottom: 8,
           filter: !currentTier ? "grayscale(1)" : "none",
         }}
       >
@@ -38,15 +38,15 @@ const BadgeCard = ({ badge }) => {
       </div>
 
       {/* Name + description */}
-      <div style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc", marginBottom: 2 }}>
+      <div style={{ fontWeight: 700, fontSize: 13, color: "#f0e4cc", marginBottom: 2, overflowWrap: "break-word", wordBreak: "break-word" }}>
         {t(`badge.${slug}.name`)}
       </div>
-      <div style={{ fontSize: 11, color: "#9a7d62", lineHeight: 1.4, marginBottom: 12 }}>
+      <div style={{ fontSize: 10, color: "#9a7d62", lineHeight: 1.4, marginBottom: 8, overflowWrap: "break-word", wordBreak: "break-word" }}>
         {t(`badge.${slug}.desc`)}
       </div>
 
       {/* Tier progress bars */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 10 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
         {TIERS.map((tier) => (
           <div
             key={tier}
@@ -70,26 +70,26 @@ const BadgeCard = ({ badge }) => {
             alignItems: "center",
             gap: 4,
             alignSelf: "flex-start",
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 700,
             color: tierMeta.color,
             background: "rgba(255,255,255,0.06)",
             border: `1px solid ${borderColor}`,
-            borderRadius: 6,
-            padding: "2px 8px",
-            marginBottom: 8,
+            borderRadius: 5,
+            padding: "1px 6px",
+            marginBottom: 6,
           }}
         >
           {TIER_ICON[currentTier]} {t(`badge.tier.${currentTier}`)} · +{TIER_META[currentTier].xp} XP
         </div>
       ) : (
-        <div style={{ fontSize: 11, color: "#5a4535", fontWeight: 600, marginBottom: 8 }}>
+        <div style={{ fontSize: 10, color: "#5a4535", fontWeight: 600, marginBottom: 6 }}>
           🔒 {t("badge.locked")}
         </div>
       )}
 
       {/* Progress hint */}
-      <div style={{ fontSize: 11, color: "#9a7d62", marginTop: "auto" }}>
+      <div style={{ fontSize: 10, color: "#9a7d62", marginTop: "auto" }}>
         {nextTier ? (
           t("badge.progress.next", {
             value,

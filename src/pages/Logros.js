@@ -52,8 +52,8 @@ const Logros = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-            gap: 14,
+            gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+            gap: 10,
           }}
         >
           {badges.map((badge) => (
@@ -75,8 +75,8 @@ const Logros = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: 14,
+            gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))",
+            gap: 10,
           }}
         >
           {ACHIEVEMENTS.map((ach) => {
@@ -92,8 +92,8 @@ const Logros = () => {
               <div
                 key={ach.slug}
                 style={{
-                  borderRadius: 14,
-                  padding: "16px 14px",
+                  borderRadius: 10,
+                  padding: "12px 10px",
                   background: "#1c1409",
                   border: isUnlocked ? "2px solid #d4af37" : "2px solid #2e2215",
                   opacity: isUnlocked ? 1 : 0.6,
@@ -104,44 +104,44 @@ const Logros = () => {
               >
                 <div
                   style={{
-                    fontSize: 32,
-                    marginBottom: 8,
+                    fontSize: 26,
+                    marginBottom: 6,
                     filter: isUnlocked ? "none" : "grayscale(1)",
                     lineHeight: 1,
                   }}
                 >
                   {ach.emoji}
                 </div>
-                <div style={{ fontWeight: 700, fontSize: 13, color: "#f0e4cc", marginBottom: 4, overflowWrap: "break-word", wordBreak: "break-word", lineHeight: 1.3 }}>
+                <div style={{ fontWeight: 700, fontSize: 12, color: "#f0e4cc", marginBottom: 3, overflowWrap: "break-word", wordBreak: "break-word", lineHeight: 1.3 }}>
                   {t(`achievement.${ach.slug}.name`)}
                 </div>
-                <div style={{ fontSize: 11, color: "#9a7d62", lineHeight: 1.4, marginBottom: 8, overflowWrap: "break-word", wordBreak: "break-word" }}>
+                <div style={{ fontSize: 10, color: "#9a7d62", lineHeight: 1.4, marginBottom: 6, overflowWrap: "break-word", wordBreak: "break-word" }}>
                   {t(`achievement.${ach.slug}.desc`)}
                 </div>
                 <div
                   style={{
                     display: "inline-block",
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: 700,
                     color: isUnlocked ? "#d4af37" : "#5a4535",
                     background: isUnlocked ? "rgba(212,175,55,0.12)" : "#2a1e0f",
                     border: `1px solid ${isUnlocked ? "rgba(212,175,55,0.35)" : "#2e2215"}`,
-                    borderRadius: 6,
-                    padding: "2px 8px",
+                    borderRadius: 5,
+                    padding: "1px 6px",
                   }}
                 >
                   +{ach.xpBonus} XP
                 </div>
                 {isUnlocked && date && (
-                  <div style={{ fontSize: 10, color: "#5a4535", marginTop: 6 }}>✓ {date}</div>
+                  <div style={{ fontSize: 9, color: "#5a4535", marginTop: 4 }}>✓ {date}</div>
                 )}
                 {!isUnlocked && (
                   <div
                     style={{
                       position: "absolute",
-                      top: 10,
-                      right: 10,
-                      fontSize: 14,
+                      top: 8,
+                      right: 8,
+                      fontSize: 12,
                       opacity: 0.3,
                     }}
                   >

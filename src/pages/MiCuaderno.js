@@ -550,14 +550,14 @@ const MiCuaderno = () => {
                     <label style={labelStyle}>{t("beerform.timesLabel")}</label>
                     <input type="number" min="0" value={beer.times}
                       onChange={(e) => handleChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
-                      style={{ width: "70px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
+                      style={{ width: "80px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
                     />
                   </div>
 
                   <div style={rowStyle}>
                     <label style={labelStyle}>{t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} /></label>
                     <select value={beer.Rating ?? ""} onChange={(e) => handleChange(beer.id, "Rating", e.target.value)}
-                      style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}>
+                      style={{ width: "100%", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}>
                       {RATING_OPTIONS.map((v) => (
                         <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
                       ))}
@@ -568,7 +568,7 @@ const MiCuaderno = () => {
                     <label style={labelStyle}>{t("notebook.commercializedLabel")}</label>
                     <select value={beer.commercialized ? "yes" : "no"}
                       onChange={(e) => handleChange(beer.id, "commercialized", e.target.value === "yes")}
-                      style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}>
+                      style={{ width: "100%", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}>
                       <option value="yes">{t("notebook.yes")}</option>
                       <option value="no">{t("notebook.no")}</option>
                     </select>
@@ -633,8 +633,8 @@ const XpBadge = ({ xp }) => (
 );
 
 const infoBtnStyle     = { background: "none", border: "none", color: "#8b6b2e", fontSize: 16, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 };
-const rowStyle         = { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" };
-const labelStyle       = { fontSize: "12px", fontWeight: "600", color: "#9a7d62", minWidth: "120px", textTransform: "uppercase", letterSpacing: "0.4px" };
+const rowStyle         = { marginBottom: "8px" };
+const labelStyle       = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: "3px" };
 const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
 const saveBtnStyle     = { padding: "8px 14px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
 const deleteBtnStyle   = { padding: "8px 14px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };

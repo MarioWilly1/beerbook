@@ -25,6 +25,10 @@ const RAREZA_LABEL = {
   comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
   epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
 };
+const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
+
+const puedeColeccionar = (beer) =>
+  beer.es_edicion_especial === true || RAREZA_COLECCIONABLE.has(beer.rareza);
 
 // ── CollectionEditModal ────────────────────────────────────────────────────────
 const CollectionEditModal = ({ beer, userBeer, onClose, onSaved }) => {
@@ -78,9 +82,11 @@ const CollectionEditModal = ({ beer, userBeer, onClose, onSaved }) => {
         />
 
         <button onClick={handleSave} disabled={saving}
-          style={{ width: "100%", marginTop: 18, padding: "11px 0", borderRadius: 8, border: "none",
+          style={{
+            width: "100%", marginTop: 18, padding: "11px 0", borderRadius: 8, border: "none",
             background: saving ? "#2a1e0f" : "#d4af37", color: saving ? "#5a4535" : "#0d0a06",
-            fontWeight: 700, fontSize: 15, cursor: saving ? "not-allowed" : "pointer" }}>
+            fontWeight: 700, fontSize: 15, cursor: saving ? "not-allowed" : "pointer",
+          }}>
           {saving ? "Guardando…" : "💾 Guardar en colección"}
         </button>
       </div>
@@ -88,16 +94,24 @@ const CollectionEditModal = ({ beer, userBeer, onClose, onSaved }) => {
   );
 };
 
-const overlayS = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex",
-  alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 };
-const panelS = { background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
-  padding: "24px 20px", width: "100%", maxWidth: 420, boxShadow: "0 8px 40px rgba(0,0,0,0.7)" };
+const overlayS = {
+  position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+  display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16,
+};
+const panelS = {
+  background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
+  padding: "24px 20px", width: "100%", maxWidth: 420, boxShadow: "0 8px 40px rgba(0,0,0,0.7)",
+};
 const closeBtnS = { background: "none", border: "none", color: "rgba(240,228,204,0.4)", fontSize: 20, cursor: "pointer" };
-const mLabelS = { display: "block", fontSize: 11, fontWeight: 700, color: "#9a7d62",
-  textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 5 };
-const mInputS = { width: "100%", padding: "9px 12px", marginBottom: 0, borderRadius: 8,
+const mLabelS = {
+  display: "block", fontSize: 11, fontWeight: 700, color: "#9a7d62",
+  textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 5,
+};
+const mInputS = {
+  width: "100%", padding: "9px 12px", marginBottom: 0, borderRadius: 8,
   background: "#0d0a06", border: "1px solid #2e2215", color: "#f0e4cc",
-  fontSize: 14, outline: "none", boxSizing: "border-box" };
+  fontSize: 14, outline: "none", boxSizing: "border-box",
+};
 
 // ── ColeccionTab ───────────────────────────────────────────────────────────────
 const ColeccionTab = ({ beers, onToggle, onEdit }) => {
@@ -119,7 +133,6 @@ const ColeccionTab = ({ beers, onToggle, onEdit }) => {
       return 0;
     });
 
-  // Stats by rareza
   const stats = RAREZA_ORDER.reduce((acc, r) => {
     acc[r] = coleccion.filter((b) => b.rareza === r).length;
     return acc;
@@ -133,6 +146,7 @@ const ColeccionTab = ({ beers, onToggle, onEdit }) => {
         <p style={{ fontSize: 13, lineHeight: 1.6 }}>
           En la pestaña <strong style={{ color: "#d4af37" }}>📓 Mi Cuaderno</strong> podés marcar
           cervezas como parte de tu colección con el botón <strong style={{ color: "#d4af37" }}>💎</strong>.
+          Solo aplica a cervezas raras, épicas, legendarias, míticas o de edición especial.
         </p>
       </div>
     );
@@ -177,17 +191,16 @@ const ColeccionTab = ({ beers, onToggle, onEdit }) => {
         {filtered.length} de {coleccion.length} cerveza{coleccion.length !== 1 ? "s" : ""}
       </p>
 
-      {/* Grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-        gap: 14,
-      }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14 }}>
         {filtered.map((beer) => (
           <CollectionCard
             key={beer.id}
             beer={beer}
-            userBeer={{ condicion: beer.condicion, fecha_adquisicion: beer.fecha_adquisicion, notas_coleccion: beer.notas_coleccion }}
+            userBeer={{
+              condicion: beer.condicion,
+              fecha_adquisicion: beer.fecha_adquisicion,
+              notas_coleccion: beer.notas_coleccion,
+            }}
             onToggleColeccion={onToggle}
             onEditColeccion={onEdit}
           />
@@ -215,7 +228,8 @@ const MiCuaderno = () => {
   const [showImage, setShowImage] = useState(null);
   const [infoModal, setInfoModal] = useState(null);
   const [activeTab, setActiveTab] = useState("cuaderno");
-  const [collectionModal, setCollectionModal] = useState(null); // { beer, userBeer }
+  const [collectionModal, setCollectionModal] = useState(null);
+  const [notebookSearch, setNotebookSearch] = useState("");
 
   useEffect(() => {
     setEditableBeers(
@@ -308,10 +322,22 @@ const MiCuaderno = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
     if (addToCollection) {
-      setCollectionModal({ beer, userBeer: { condicion: beer.condicion, fecha_adquisicion: beer.fecha_adquisicion, notas_coleccion: beer.notas_coleccion } });
+      setCollectionModal({
+        beer,
+        userBeer: {
+          condicion: beer.condicion,
+          fecha_adquisicion: beer.fecha_adquisicion,
+          notas_coleccion: beer.notas_coleccion,
+        },
+      });
     } else {
-      await supabase.from("user_beers").update({ en_coleccion: false }).eq("user_id", session.user.id).eq("beer_id", beer.id);
-      setEditableBeers((prev) => prev.map((b) => b.id === beer.id ? { ...b, en_coleccion: false } : b));
+      await supabase.from("user_beers")
+        .update({ en_coleccion: false })
+        .eq("user_id", session.user.id)
+        .eq("beer_id", beer.id);
+      setEditableBeers((prev) =>
+        prev.map((b) => b.id === beer.id ? { ...b, en_coleccion: false } : b)
+      );
     }
   }, []);
 
@@ -320,9 +346,9 @@ const MiCuaderno = () => {
   }, []);
 
   const handleCollectionSaved = useCallback((beerData, updates) => {
-    setEditableBeers((prev) => prev.map((b) =>
-      b.id === beerData.id ? { ...b, en_coleccion: true, ...updates } : b
-    ));
+    setEditableBeers((prev) =>
+      prev.map((b) => b.id === beerData.id ? { ...b, en_coleccion: true, ...updates } : b)
+    );
   }, []);
 
   if (loading) return <p style={{ color: "#9a7d62" }}>{t("notebook.loading")}</p>;
@@ -331,10 +357,16 @@ const MiCuaderno = () => {
 
   const coleccionCount = editableBeers.filter((b) => b.en_coleccion).length;
 
+  // Buscador: filtrar antes del render
+  const searchQuery = notebookSearch.trim().toLowerCase();
+  const visibleBeers = searchQuery
+    ? editableBeers.filter((b) => b.nombre?.toLowerCase().includes(searchQuery))
+    : editableBeers;
+
   return (
     <div>
       {/* Tab bar */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215", paddingBottom: 0 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215" }}>
         {[
           { id: "cuaderno", label: `📓 ${t("notebook.title")}` },
           { id: "coleccion", label: `💎 Colección${coleccionCount > 0 ? ` (${coleccionCount})` : ""}` },
@@ -346,8 +378,7 @@ const MiCuaderno = () => {
               background: activeTab === tab.id ? "#2a1e0f" : "none",
               color: activeTab === tab.id ? "#d4af37" : "#5a4535",
               borderBottom: activeTab === tab.id ? "2px solid #d4af37" : "2px solid transparent",
-              marginBottom: -1,
-              transition: "all 0.15s",
+              marginBottom: -1, transition: "all 0.15s",
             }}>
             {tab.label}
           </button>
@@ -355,141 +386,218 @@ const MiCuaderno = () => {
       </div>
 
       {/* ── CUADERNO TAB ── */}
-      {activeTab === "cuaderno" && editableBeers.map((beer) => {
-        const xpPreview = computeEntryXP({ rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
-        const isComplete =
-          beer.Rating !== "" && Number(beer.Rating) > 0 &&
-          beer.comment.trim().length > 0 &&
-          beer.user_photo_url.trim().length > 0;
-        const intensity = Math.min(beer.times / 100, 1);
-
-        return (
-          <div key={beer.id} style={{
-            display: "flex", gap: "16px", padding: "16px", marginBottom: "16px", borderRadius: "10px",
-            backgroundColor: `rgba(212,175,55,${intensity * 0.12 + 0.04})`,
-            border: "1px solid rgba(212,175,55,0.2)",
-          }}>
-            <div
-              onClick={() => setShowImage(beer.foto_url)}
-              style={{ width: "140px", height: "140px", cursor: "pointer", overflow: "hidden", borderRadius: "8px", flexShrink: 0 }}
-            >
-              <img src={beer.foto_url} alt={beer.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 4px" }}>
-                <h3 style={{ margin: 0, color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
-                {/* Colección toggle */}
-                <button
-                  onClick={() => handleToggleColeccion(beer, !beer.en_coleccion)}
-                  title={beer.en_coleccion ? "En tu colección — click para quitar" : "Añadir a colección"}
-                  style={{
-                    background: beer.en_coleccion ? "rgba(212,175,55,0.15)" : "none",
-                    border: beer.en_coleccion ? "1px solid rgba(212,175,55,0.4)" : "none",
-                    color: beer.en_coleccion ? "#d4af37" : "#3a2e20",
-                    fontSize: 15, cursor: "pointer", padding: "2px 6px",
-                    borderRadius: 6, lineHeight: 1, flexShrink: 0,
-                    transition: "all 0.15s",
-                  }}>
-                  💎
-                </button>
-                <button onClick={() => setInfoModal(beer)} title={t("beerInfo.btnTitle")} style={infoBtnStyle}>ⓘ</button>
-              </div>
-
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-                {beer.rareza && beer.rareza !== "comun" && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#a366e8", background: "rgba(163,102,232,0.12)", borderRadius: 5, padding: "2px 7px", border: "1px solid rgba(163,102,232,0.25)" }}>
-                    {RAREZA_LABEL[beer.rareza] || beer.rareza}
-                  </span>
-                )}
-                {beer.user_photo_url?.trim() ? (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#2a6b3a", background: "#0f2a18", borderRadius: 5, padding: "2px 7px" }}>
-                    📸 {t("beerform.verified")}
-                  </span>
-                ) : (
-                  <span style={{ fontSize: 11, color: "#5a4535", background: "#2a1e0f", borderRadius: 5, padding: "2px 7px" }}>
-                    {t("notebook.noPhoto")}
-                  </span>
-                )}
-                {beer.location?.name && (
-                  beer.place_id && beer.location.isPublic
-                    ? <Link to={`/lugar/${beer.place_id}`} style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px", textDecoration: "none" }}>
-                        📍 {beer.location.name}
-                      </Link>
-                    : <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
-                        📍 {beer.location.name}{!beer.location.isPublic && ` · ${t("location.private")}`}
-                      </span>
-                )}
-              </div>
-
-              <div style={rowStyle}>
-                <label style={labelStyle}>{t("beerform.timesLabel")}</label>
-                <input type="number" min="0" value={beer.times}
-                  onChange={(e) => handleChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
-                  style={{ width: "70px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
-                />
-              </div>
-
-              <div style={rowStyle}>
-                <label style={labelStyle}>{t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} /></label>
-                <select value={beer.Rating ?? ""} onChange={(e) => handleChange(beer.id, "Rating", e.target.value)}
-                  style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}>
-                  {RATING_OPTIONS.map((v) => (
-                    <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={rowStyle}>
-                <label style={labelStyle}>{t("notebook.commercializedLabel")}</label>
-                <select value={beer.commercialized ? "yes" : "no"}
-                  onChange={(e) => handleChange(beer.id, "commercialized", e.target.value === "yes")}
-                  style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}>
-                  <option value="yes">{t("notebook.yes")}</option>
-                  <option value="no">{t("notebook.no")}</option>
-                </select>
-              </div>
-
-              <div style={{ marginBottom: "8px" }}>
-                <label style={labelStyle}>{t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} /></label>
-                <textarea value={beer.comment} onChange={(e) => handleChange(beer.id, "comment", e.target.value)}
-                  rows={3} placeholder={t("notebook.commentPlaceholder")}
-                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", resize: "vertical", boxSizing: "border-box" }}
-                />
-              </div>
-
-              <div style={{ marginBottom: "8px" }}>
-                <label style={labelStyle}>{t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} /></label>
-                <input type="text" placeholder="https://..." value={beer.user_photo_url}
-                  onChange={(e) => handleChange(beer.id, "user_photo_url", e.target.value)}
-                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}
-                />
-                {beer.user_photo_url && (
-                  <img src={beer.user_photo_url} alt="Prueba"
-                    style={{ marginTop: "6px", width: "80px", borderRadius: "6px", cursor: "pointer" }}
-                    onClick={() => setShowImage(beer.user_photo_url)}
-                  />
-                )}
-              </div>
-
-              <LocationPicker value={beer.location} onChange={(loc) => handleChange(beer.id, "location", loc)} />
-
-              {isComplete && (
-                <div style={bonusBannerStyle}>🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}</div>
-              )}
-
-              <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-                <button onClick={() => handleSave(beer)} style={saveBtnStyle}>
-                  💾 {t("notebook.saveBtn", { xp: xpPreview })}
-                </button>
-                <button onClick={() => handleDelete(beer.id)} style={deleteBtnStyle}>
-                  🗑️ {t("notebook.deleteBtn")}
-                </button>
-              </div>
-            </div>
+      {activeTab === "cuaderno" && (
+        <>
+          {/* Buscador */}
+          <div style={{ position: "relative", marginBottom: 16 }}>
+            <span style={{
+              position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)",
+              fontSize: 14, color: "#5a4535", pointerEvents: "none",
+            }}>
+              🔍
+            </span>
+            <input
+              type="text"
+              value={notebookSearch}
+              onChange={(e) => setNotebookSearch(e.target.value)}
+              placeholder="Buscar en mi cuaderno…"
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "9px 12px 9px 34px",
+                background: "#1c1409", border: "1px solid #2e2215",
+                borderRadius: 8, color: "#f0e4cc", fontSize: 14, outline: "none",
+              }}
+            />
+            {notebookSearch && (
+              <button onClick={() => setNotebookSearch("")}
+                style={{
+                  position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                  background: "none", border: "none", color: "#5a4535", fontSize: 16,
+                  cursor: "pointer", lineHeight: 1,
+                }}>
+                ✕
+              </button>
+            )}
           </div>
-        );
-      })}
+
+          {searchQuery && (
+            <p style={{ fontSize: 12, color: "#5a4535", margin: "-8px 0 14px" }}>
+              {visibleBeers.length} resultado{visibleBeers.length !== 1 ? "s" : ""} para &ldquo;{notebookSearch.trim()}&rdquo;
+            </p>
+          )}
+
+          {/* Lista de entradas */}
+          {visibleBeers.map((beer) => {
+            const xpPreview = computeEntryXP({ rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
+            const isComplete =
+              beer.Rating !== "" && Number(beer.Rating) > 0 &&
+              beer.comment.trim().length > 0 &&
+              beer.user_photo_url.trim().length > 0;
+            const intensity = Math.min(beer.times / 100, 1);
+            const coleccionable = puedeColeccionar(beer);
+
+            return (
+              <div key={beer.id} style={{
+                display: "flex", gap: "16px", padding: "16px", marginBottom: "16px",
+                borderRadius: "10px",
+                backgroundColor: `rgba(212,175,55,${intensity * 0.12 + 0.04})`,
+                border: "1px solid rgba(212,175,55,0.2)",
+              }}>
+                <div
+                  onClick={() => setShowImage(beer.foto_url)}
+                  style={{ width: "140px", height: "140px", cursor: "pointer", overflow: "hidden", borderRadius: "8px", flexShrink: 0 }}
+                >
+                  <img src={beer.foto_url} alt={beer.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 4px" }}>
+                    <h3 style={{ margin: 0, color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
+
+                    {/* Botón 💎: activo si coleccionable, fantasma si no */}
+                    {coleccionable ? (
+                      <button
+                        onClick={() => handleToggleColeccion(beer, !beer.en_coleccion)}
+                        title={beer.en_coleccion ? "En tu colección — click para quitar" : "Añadir a colección"}
+                        style={{
+                          background: beer.en_coleccion ? "rgba(212,175,55,0.15)" : "none",
+                          border: beer.en_coleccion ? "1px solid rgba(212,175,55,0.4)" : "none",
+                          color: beer.en_coleccion ? "#d4af37" : "#3a2e20",
+                          fontSize: 15, cursor: "pointer", padding: "2px 6px",
+                          borderRadius: 6, lineHeight: 1, flexShrink: 0, transition: "all 0.15s",
+                        }}>
+                        💎
+                      </button>
+                    ) : (
+                      <span
+                        title="Solo raras, épicas, legendarias, míticas o edición especial pueden ser coleccionadas"
+                        style={{
+                          fontSize: 15, padding: "2px 6px", lineHeight: 1,
+                          flexShrink: 0, opacity: 0.18, cursor: "default", userSelect: "none",
+                        }}>
+                        💎
+                      </span>
+                    )}
+
+                    <button onClick={() => setInfoModal(beer)} title={t("beerInfo.btnTitle")} style={infoBtnStyle}>
+                      ⓘ
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                    {beer.rareza && beer.rareza !== "comun" && (
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, color: "#a366e8",
+                        background: "rgba(163,102,232,0.12)", borderRadius: 5, padding: "2px 7px",
+                        border: "1px solid rgba(163,102,232,0.25)",
+                      }}>
+                        {RAREZA_LABEL[beer.rareza] || beer.rareza}
+                      </span>
+                    )}
+                    {beer.es_edicion_especial && (
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, color: "#f0d060",
+                        background: "rgba(240,208,96,0.1)", borderRadius: 5, padding: "2px 7px",
+                        border: "1px solid rgba(240,208,96,0.3)",
+                      }}>
+                        ✨ Ed. Especial
+                      </span>
+                    )}
+                    {beer.user_photo_url?.trim() ? (
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#2a6b3a", background: "#0f2a18", borderRadius: 5, padding: "2px 7px" }}>
+                        📸 {t("beerform.verified")}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 11, color: "#5a4535", background: "#2a1e0f", borderRadius: 5, padding: "2px 7px" }}>
+                        {t("notebook.noPhoto")}
+                      </span>
+                    )}
+                    {beer.location?.name && (
+                      beer.place_id && beer.location.isPublic
+                        ? <Link
+                            to={`/lugar/${beer.place_id}`}
+                            style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px", textDecoration: "none" }}
+                          >
+                            📍 {beer.location.name}
+                          </Link>
+                        : <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
+                            📍 {beer.location.name}{!beer.location.isPublic && ` · ${t("location.private")}`}
+                          </span>
+                    )}
+                  </div>
+
+                  <div style={rowStyle}>
+                    <label style={labelStyle}>{t("beerform.timesLabel")}</label>
+                    <input type="number" min="0" value={beer.times}
+                      onChange={(e) => handleChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
+                      style={{ width: "70px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
+                    />
+                  </div>
+
+                  <div style={rowStyle}>
+                    <label style={labelStyle}>{t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} /></label>
+                    <select value={beer.Rating ?? ""} onChange={(e) => handleChange(beer.id, "Rating", e.target.value)}
+                      style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}>
+                      {RATING_OPTIONS.map((v) => (
+                        <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={rowStyle}>
+                    <label style={labelStyle}>{t("notebook.commercializedLabel")}</label>
+                    <select value={beer.commercialized ? "yes" : "no"}
+                      onChange={(e) => handleChange(beer.id, "commercialized", e.target.value === "yes")}
+                      style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}>
+                      <option value="yes">{t("notebook.yes")}</option>
+                      <option value="no">{t("notebook.no")}</option>
+                    </select>
+                  </div>
+
+                  <div style={{ marginBottom: "8px" }}>
+                    <label style={labelStyle}>{t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} /></label>
+                    <textarea value={beer.comment} onChange={(e) => handleChange(beer.id, "comment", e.target.value)}
+                      rows={3} placeholder={t("notebook.commentPlaceholder")}
+                      style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", resize: "vertical", boxSizing: "border-box" }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "8px" }}>
+                    <label style={labelStyle}>{t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} /></label>
+                    <input type="text" placeholder="https://..." value={beer.user_photo_url}
+                      onChange={(e) => handleChange(beer.id, "user_photo_url", e.target.value)}
+                      style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}
+                    />
+                    {beer.user_photo_url && (
+                      <img src={beer.user_photo_url} alt="Prueba"
+                        style={{ marginTop: "6px", width: "80px", borderRadius: "6px", cursor: "pointer" }}
+                        onClick={() => setShowImage(beer.user_photo_url)}
+                      />
+                    )}
+                  </div>
+
+                  <LocationPicker value={beer.location} onChange={(loc) => handleChange(beer.id, "location", loc)} />
+
+                  {isComplete && (
+                    <div style={bonusBannerStyle}>
+                      🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                    <button onClick={() => handleSave(beer)} style={saveBtnStyle}>
+                      💾 {t("notebook.saveBtn", { xp: xpPreview })}
+                    </button>
+                    <button onClick={() => handleDelete(beer.id)} style={deleteBtnStyle}>
+                      🗑️ {t("notebook.deleteBtn")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {/* ── COLECCIÓN TAB ── */}
       {activeTab === "coleccion" && (
@@ -518,11 +626,11 @@ const XpBadge = ({ xp }) => (
   <span style={{ fontSize: "10px", color: "#d4af37", fontWeight: 700, marginLeft: "4px" }}>+{xp} XP</span>
 );
 
-const infoBtnStyle    = { background: "none", border: "none", color: "#8b6b2e", fontSize: 16, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 };
-const rowStyle        = { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" };
-const labelStyle      = { fontSize: "12px", fontWeight: "600", color: "#9a7d62", minWidth: "120px", textTransform: "uppercase", letterSpacing: "0.4px" };
+const infoBtnStyle     = { background: "none", border: "none", color: "#8b6b2e", fontSize: 16, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 };
+const rowStyle         = { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" };
+const labelStyle       = { fontSize: "12px", fontWeight: "600", color: "#9a7d62", minWidth: "120px", textTransform: "uppercase", letterSpacing: "0.4px" };
 const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
-const saveBtnStyle    = { padding: "8px 14px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
-const deleteBtnStyle  = { padding: "8px 14px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
+const saveBtnStyle     = { padding: "8px 14px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
+const deleteBtnStyle   = { padding: "8px 14px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
 
 export default MiCuaderno;

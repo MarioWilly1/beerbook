@@ -142,6 +142,9 @@ const Dashboard = () => {
                  : vw >= 360  ? 3
                  : 2;
 
+  // DEBUG TEMPORAL — borrar tras confirmar el valor
+  useEffect(() => { alert(`DEBUG viewport: window.innerWidth = ${window.innerWidth}px  →  gridCols = ${vw >= 1100 ? "auto" : vw >= 700 ? 5 : vw >= 500 ? 4 : vw >= 360 ? 3 : 2}`); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [refresh, setRefresh] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
   const [showMap, setShowMap] = useState(false);

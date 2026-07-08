@@ -139,7 +139,7 @@ const Dashboard = () => {
   const gridCols = vw >= 1100 ? Math.min(8, Math.floor((vw - 56) / 140))
                  : vw >= 700  ? 5
                  : vw >= 500  ? 4
-                 : vw >= 390  ? 3
+                 : vw >= 360  ? 3
                  : 2;
 
   const [refresh, setRefresh] = useState(false);

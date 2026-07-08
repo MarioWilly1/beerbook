@@ -16,7 +16,7 @@ const Logros = () => {
 
   // Para Logros (maxWidth 760): en móvil usa columnas explícitas, en tablet/desktop auto-fill
   const logrosGridCols = vw >= 600 ? "repeat(auto-fill, minmax(130px, 1fr))"
-                       : vw >= 390 ? "repeat(3, 1fr)"
+                       : vw >= 360 ? "repeat(3, 1fr)"
                        : "repeat(2, 1fr)";
 
   useEffect(() => {

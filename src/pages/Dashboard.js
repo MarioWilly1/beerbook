@@ -7,7 +7,7 @@ import BeerFilters from "../components/BeerFilters";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
 import OriginMapPanel from "../components/OriginMapPanel";
-import { useWindowWidth } from "../hooks/useWindowWidth";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const STYLE_KEYWORDS = ["IPA", "Lager", "Stout", "Ale", "Porter", "Saison", "Sour", "Dubbel", "Tripel"];
 
@@ -132,15 +132,7 @@ const Dashboard = () => {
   const { beers, loading, error } = useBeers();
   const { userBeers, refetch } = useUserBeers();
   const { stats, refetch: refetchStats } = useUserStats();
-  const vw = useWindowWidth();
-
-  // Columnas explícitas basadas en viewport real:
-  // <390px → 2 (iPhone pequeño), <500px → 3 (Xiaomi/iPhone grande), <700px → 4, luego escala libre
-  const gridCols = vw >= 1100 ? Math.min(8, Math.floor((vw - 56) / 140))
-                 : vw >= 700  ? 5
-                 : vw >= 500  ? 4
-                 : vw >= 360  ? 3
-                 : 2;
+  const isMobile = useIsMobile();
 
   const [refresh, setRefresh] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
@@ -268,7 +260,7 @@ const Dashboard = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
+          gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(180px, 1fr))",
           gap: "10px",
         }}
       >

@@ -143,42 +143,53 @@ const LockedCard = ({ beer, onClick }) => {
       onClick={() => onClick(beer)}
       style={{
         borderRadius: 14, overflow: "hidden", cursor: "pointer",
-        border: rs.border, boxShadow: rs.glow,
-        background: "#09080a", opacity: 0.8,
+        border: rs.border, background: "#1c1409", opacity: 0.7,
         transition: "opacity 0.15s, transform 0.15s",
       }}
       onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1.02)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.8"; e.currentTarget.style.transform = "scale(1)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.7"; e.currentTarget.style.transform = "scale(1)"; }}
     >
-      {/* Mystery photo area */}
-      <div style={{
-        position: "relative", aspectRatio: "3/4",
-        background: "linear-gradient(160deg, #0f0c12, #090608)",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10,
-      }}>
-        <span style={{ fontSize: 38, filter: "grayscale(1) brightness(0.15)" }}>🍺</span>
-        <span style={{ fontSize: 26 }}>🔒</span>
+      {/* Foto real desaturada + 🔒 overlay */}
+      <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden" }}>
+        <img
+          src={beer.foto_url}
+          alt={beer.nombre}
+          style={{
+            width: "100%", height: "100%", objectFit: "cover",
+            filter: "grayscale(1) brightness(0.55)",
+            display: "block",
+          }}
+        />
+
+        {/* 🔒 centrado */}
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: "rgba(0,0,0,0.25)",
+        }}>
+          <span style={{ fontSize: 32, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))" }}>🔒</span>
+        </div>
 
         {/* Rareza badge */}
         <div style={{
           position: "absolute", top: 8, right: 8, padding: "3px 9px", borderRadius: 20,
-          fontSize: 10, fontWeight: 800, background: "rgba(0,0,0,0.7)",
-          color: "#4a3a3a", border: "1px solid rgba(80,60,60,0.3)",
+          fontSize: 10, fontWeight: 800, background: "rgba(0,0,0,0.65)",
+          color: "#5a4535", border: "1px solid rgba(80,60,60,0.35)",
         }}>
           {label}
         </div>
       </div>
 
-      {/* Info */}
-      <div style={{ padding: "10px 12px 12px", background: "#0c0a0e" }}>
+      {/* Info atenuada */}
+      <div style={{ padding: "10px 12px 12px", background: "#160f07" }}>
         <p style={{
-          margin: "0 0 2px", fontWeight: 700, fontSize: 12, color: "#3d3040",
+          margin: "0 0 2px", fontWeight: 700, fontSize: 12, color: "#5a4535",
           fontFamily: "'Playfair Display', serif", lineHeight: 1.3,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>
           {beer.nombre}
         </p>
-        <p style={{ margin: 0, fontSize: 10, color: "#2a1e2e" }}>
+        <p style={{ margin: 0, fontSize: 10, color: "#3a2e20" }}>
           {beer.estilo || "—"}
         </p>
       </div>

@@ -32,22 +32,23 @@ const RAREZA_BADGE = {
 
 const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
   const { t, i18n } = useTranslation();
-  const [times, setTimes]     = useState(myBeerData?.times || 0);
-  const [comment, setComment] = useState(myBeerData?.comment || "");
-  const [rating, setRating]   = useState(myBeerData?.Rating ?? "");
-  const [photoUrl, setPhotoUrl] = useState(myBeerData?.user_photo_url || "");
-  const [location, setLocation] = useState(
+  const [expanded,  setExpanded]  = useState(false);
+  const [times,     setTimes]     = useState(myBeerData?.times || 0);
+  const [comment,   setComment]   = useState(myBeerData?.comment || "");
+  const [rating,    setRating]    = useState(myBeerData?.Rating ?? "");
+  const [photoUrl,  setPhotoUrl]  = useState(myBeerData?.user_photo_url || "");
+  const [location,  setLocation]  = useState(
     myBeerData?.location_lat
       ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true }
       : null
   );
-  const [saving, setSaving]   = useState(false);
+  const [saving,     setSaving]    = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
-  const [infoOpen, setInfoOpen] = useState(false);
+  const [infoOpen,   setInfoOpen]  = useState(false);
 
   const isColeccionable = beer.es_edicion_especial || RAREZA_COLECCIONABLE.has(beer.rareza);
   const collectionBonus = (!isInMyBeers && isColeccionable) ? 20 : 0;
-  const xpPreview = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
+  const xpPreview  = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
   const isComplete =
     rating !== "" && Number(rating) > 0 &&
     comment.trim().length > 0 &&
@@ -62,19 +63,19 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
 
     const { data: xpRows } = await supabase
       .from("user_beers").select('"XP"').eq("user_id", session.user.id);
-    const prevTotal = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
-    const newTotal  = prevTotal - (myBeerData?.XP || 0) + xp;
+    const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
+    const newTotal   = prevTotal - (myBeerData?.XP || 0) + xp;
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
     const newLevelName = getLevelInfo(newTotal).levelName;
 
     const { error } = await supabase.from("user_beers").upsert({
-      user_id: session.user.id,
-      beer_id: beer.id,
+      user_id:         session.user.id,
+      beer_id:         beer.id,
       times,
       comment,
-      Rating: rating !== "" ? Number(rating) : null,
-      user_photo_url: photoUrl || null,
-      XP: xp,
+      Rating:          rating !== "" ? Number(rating) : null,
+      user_photo_url:  photoUrl || null,
+      XP:              xp,
       location_lat:    location?.lat    ?? null,
       location_lng:    location?.lng    ?? null,
       location_name:   location?.name   ?? null,
@@ -89,7 +90,6 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
       updateStreak(session.user.id),
       fetchAchievementStats(session.user.id),
     ]);
-
     const [newAchievements, newBadges] = await Promise.all([
       achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
       achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
@@ -117,136 +117,165 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
     }
   };
 
+  const rb = beer.rareza ? (RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun) : null;
+
   return (
     <div style={cardStyle}>
-      <div style={{ position: "relative" }}>
-        <img
-          src={beer.foto_url}
-          alt={beer.nombre}
-          onClick={() => beer.foto_url && setLightboxSrc(beer.foto_url)}
-          style={{ width: "100%", height: "140px", objectFit: "cover", borderRadius: "10px", cursor: beer.foto_url ? "zoom-in" : "default", display: "block" }}
-        />
-        {photoUrl?.trim() && (
-          <span style={{
-            position: "absolute", bottom: 6, right: 6,
-            background: "rgba(0,0,0,0.7)", color: "#d4af37",
-            fontSize: 10, fontWeight: 700,
-            padding: "2px 6px", borderRadius: 5,
-          }}>
-            📸 {t("beerform.verified")}
-          </span>
-        )}
-        <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
-      </div>
-
-      <div style={{ padding: "10px 4px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 2px" }}>
-          <h3 style={{ margin: 0, fontSize: "15px", color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
-          {onVerMapa && (
-            <button onClick={onVerMapa} title="Ver en el mapa de origen" style={infoBtnStyle}>
-              🗺️
-            </button>
-          )}
-          <button
-            onClick={() => setInfoOpen(true)}
-            title={t("beerInfo.btnTitle")}
-            style={infoBtnStyle}
-          >
-            ⓘ
-          </button>
-        </div>
-        <p style={metaStyle}>{beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%</p>
-        {beer.rareza && (() => {
-          const rb = RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun;
-          return (
+      {/* ── Sección siempre visible — click para expandir ── */}
+      <div onClick={() => setExpanded((v) => !v)} style={{ cursor: "pointer" }}>
+        {/* Foto */}
+        <div style={{ position: "relative" }}>
+          <img
+            src={beer.foto_url}
+            alt={beer.nombre}
+            onClick={(e) => { e.stopPropagation(); beer.foto_url && setLightboxSrc(beer.foto_url); }}
+            style={{
+              width: "100%", height: "140px", objectFit: "cover",
+              borderRadius: "10px", cursor: beer.foto_url ? "zoom-in" : "default", display: "block",
+            }}
+          />
+          {photoUrl?.trim() && (
             <span style={{
-              display: "inline-block", marginBottom: 6,
+              position: "absolute", bottom: 6, right: 6,
+              background: "rgba(0,0,0,0.7)", color: "#d4af37",
+              fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
+              pointerEvents: "none",
+            }}>
+              📸 {t("beerform.verified")}
+            </span>
+          )}
+          <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
+        </div>
+
+        {/* Nombre + íconos + meta */}
+        <div style={{ padding: "10px 4px 6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+            <h3 style={{ margin: 0, fontSize: "15px", color: "#f0e4cc", flex: 1, lineHeight: 1.3 }}>
+              {beer.nombre}
+            </h3>
+            {onVerMapa && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onVerMapa(); }}
+                title="Ver en el mapa de origen"
+                style={infoBtnStyle}
+              >
+                🗺️
+              </button>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); setInfoOpen(true); }}
+              title={t("beerInfo.btnTitle")}
+              style={infoBtnStyle}
+            >
+              ⓘ
+            </button>
+            <span style={{ fontSize: 11, color: "#5a4535", flexShrink: 0 }}>
+              {expanded ? "▲" : "▼"}
+            </span>
+          </div>
+
+          <p style={metaStyle}>
+            {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
+          </p>
+
+          {rb && (
+            <span style={{
+              display: "inline-block", marginBottom: 4,
               fontSize: 10, fontWeight: 700, color: rb.color,
               background: rb.bg, borderRadius: 5, padding: "2px 7px",
               border: `1px solid ${rb.border}`,
             }}>
               {RAREZA_LABEL[beer.rareza] || beer.rareza}
             </span>
-          );
-        })()}
-        {beer.sugerida_por_nombre && (
-          <p style={{ margin: "0 0 4px", fontSize: 11, color: "#8b6b2e", fontStyle: "italic" }}>
-            💡 {t("beercard.suggestedBy", { nombre: beer.sugerida_por_nombre })}
-          </p>
-        )}
+          )}
 
-        <div style={fieldStyle}>
-          <label style={labelStyle}>{t("beerform.timesLabel")}</label>
-          <input
-            type="number"
-            value={times}
-            min="0"
-            onChange={(e) => setTimes(Math.max(0, parseInt(e.target.value) || 0))}
-            style={inputStyle}
-          />
+          {beer.sugerida_por_nombre && (
+            <p style={{ margin: "2px 0 0", fontSize: 11, color: "#8b6b2e", fontStyle: "italic" }}>
+              💡 {t("beercard.suggestedBy", { nombre: beer.sugerida_por_nombre })}
+            </p>
+          )}
+
+          {isInMyBeers && (
+            <p style={{ margin: "4px 0 0", fontSize: 11, color: "#9a7d62" }}>
+              ✅ {t("beerform.inNotebook")}
+            </p>
+          )}
         </div>
-
-        <div style={fieldStyle}>
-          <label style={labelStyle}>
-            {t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} />
-          </label>
-          <select value={rating} onChange={(e) => setRating(e.target.value)} style={inputStyle}>
-            {RATING_OPTIONS.map((v) => (
-              <option key={v} value={v}>
-                {v === "" ? t("beerform.noRating") : `${v} / 5`}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={fieldStyle}>
-          <label style={labelStyle}>
-            {t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} />
-          </label>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={2}
-            placeholder={t("beerform.commentPlaceholder")}
-            style={{ ...inputStyle, resize: "none" }}
-          />
-        </div>
-
-        <div style={fieldStyle}>
-          <label style={labelStyle}>
-            {t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} />
-          </label>
-          <input
-            type="text"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            placeholder="https://..."
-            style={inputStyle}
-          />
-        </div>
-
-        <LocationPicker value={location} onChange={setLocation} />
-
-        {isComplete && (
-          <div style={bonusBannerStyle}>
-            🎯 {t("beerform.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
-          </div>
-        )}
-
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{ ...saveBtn, opacity: saving ? 0.6 : 1 }}
-        >
-          {saving ? t("beerform.saving") : `💾 ${t("beerform.saveBtn", { xp: xpPreview })}`}
-        </button>
-
-        {isInMyBeers && (
-          <p style={{ marginTop: "6px", fontSize: "12px", color: "#9a7d62", textAlign: "center" }}>
-            ✅ {t("beerform.inNotebook")}
-          </p>
-        )}
       </div>
+
+      {/* ── Acordeón: visible solo al expandir ── */}
+      {expanded && (
+        <div style={{
+          borderTop: "1px solid #2e2215", marginTop: 2, paddingTop: 12,
+          padding: "12px 4px 4px",
+        }}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>{t("beerform.timesLabel")}</label>
+            <input
+              type="number"
+              value={times}
+              min="0"
+              onChange={(e) => setTimes(Math.max(0, parseInt(e.target.value) || 0))}
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={fieldStyle}>
+            <label style={labelStyle}>
+              {t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} />
+            </label>
+            <select value={rating} onChange={(e) => setRating(e.target.value)} style={inputStyle}>
+              {RATING_OPTIONS.map((v) => (
+                <option key={v} value={v}>
+                  {v === "" ? t("beerform.noRating") : `${v} / 5`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={fieldStyle}>
+            <label style={labelStyle}>
+              {t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} />
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={2}
+              placeholder={t("beerform.commentPlaceholder")}
+              style={{ ...inputStyle, resize: "none" }}
+            />
+          </div>
+
+          <div style={fieldStyle}>
+            <label style={labelStyle}>
+              {t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} />
+            </label>
+            <input
+              type="text"
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+              placeholder="https://..."
+              style={inputStyle}
+            />
+          </div>
+
+          <LocationPicker value={location} onChange={setLocation} />
+
+          {isComplete && (
+            <div style={bonusBannerStyle}>
+              🎯 {t("beerform.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
+            </div>
+          )}
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{ ...saveBtn, opacity: saving ? 0.6 : 1 }}
+          >
+            {saving ? t("beerform.saving") : `💾 ${t("beerform.saveBtn", { xp: xpPreview })}`}
+          </button>
+        </div>
+      )}
 
       {infoOpen && <BeerInfoModal beer={beer} onClose={() => setInfoOpen(false)} onVerMapa={onVerMapa} />}
     </div>
@@ -259,13 +288,13 @@ const XpBadge = ({ xp }) => (
   </span>
 );
 
-const infoBtnStyle = { background: "none", border: "none", color: "#8b6b2e", fontSize: 15, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
-const cardStyle   = { border: "1px solid #2e2215", borderRadius: "12px", padding: "12px", background: "#1c1409", display: "flex", flexDirection: "column" };
-const metaStyle   = { margin: "0 0 10px", fontSize: "12px", color: "#9a7d62" };
-const fieldStyle  = { marginBottom: "8px" };
-const labelStyle  = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.4px" };
-const inputStyle  = { width: "100%", padding: "6px 8px", border: "1px solid #2e2215", borderRadius: "6px", fontSize: "13px", boxSizing: "border-box", background: "#2a1e0f", color: "#f0e4cc" };
+const infoBtnStyle     = { background: "none", border: "none", color: "#8b6b2e", fontSize: 15, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
+const cardStyle        = { border: "1px solid #2e2215", borderRadius: "12px", padding: "12px", background: "#1c1409", display: "flex", flexDirection: "column" };
+const metaStyle        = { margin: "0 0 6px", fontSize: "12px", color: "#9a7d62" };
+const fieldStyle       = { marginBottom: "8px" };
+const labelStyle       = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.4px" };
+const inputStyle       = { width: "100%", padding: "6px 8px", border: "1px solid #2e2215", borderRadius: "6px", fontSize: "13px", boxSizing: "border-box", background: "#2a1e0f", color: "#f0e4cc" };
 const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
-const saveBtn     = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
+const saveBtn          = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
 
 export default BeerCard;

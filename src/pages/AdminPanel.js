@@ -25,6 +25,7 @@ const CargarCerveza = () => {
   const [form, setForm] = useState({
     nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "",
     rareza: "comun", es_edicion_especial: false, motivo_edicion: "",
+    familia: "",
   });
   const [fotoFile, setFotoFile]       = useState(null);
   const [fotoPreview, setFotoPreview] = useState(null);
@@ -95,13 +96,14 @@ const CargarCerveza = () => {
       rareza:             form.rareza,
       es_edicion_especial: form.es_edicion_especial,
       motivo_edicion:     form.motivo_edicion.trim() || null,
+      familia:            form.familia.trim() || null,
     };
 
     const { error: dbErr } = await supabase.from("beers_new").insert(row);
     if (dbErr) { setError(`Error guardando: ${dbErr.message}`); setSaving(false); return; }
 
     setSuccess(`✓ "${form.nombre}" guardada correctamente.`);
-    setForm({ nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "", rareza: "comun", es_edicion_especial: false, motivo_edicion: "" });
+    setForm({ nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "", rareza: "comun", es_edicion_especial: false, motivo_edicion: "", familia: "" });
     setFotoFile(null); setFotoPreview(null);
     setCoordsRaw(""); setCoordsParsed(null);
     setSaving(false);
@@ -157,6 +159,14 @@ const CargarCerveza = () => {
               placeholder="Ej: Navidad 2024, 25º Aniversario…" style={input} />
           </Field>
         )}
+
+        <Field label="Familia / Serie (opcional)">
+          <input value={form.familia} onChange={set("familia")}
+            placeholder="Ej: 1906, Belgian Quad, Trappist…" style={input} />
+          <p style={{ margin: "4px 0 0", fontSize: 11, color: "#5a4535" }}>
+            Agrupa cervezas en una serie para habilitar logros de &quot;serie completa&quot;.
+          </p>
+        </Field>
 
         <Field label="Foto">
           <input type="file" accept="image/*" onChange={handleFoto}

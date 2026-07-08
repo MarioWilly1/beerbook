@@ -94,6 +94,9 @@ const SuggestBeerModal = ({ onClose, t }) => {
               placeholder={t("suggest.reasonPlaceholder")}
               rows={3}
               style={{ ...inputStyle, resize: "vertical", fontFamily: "Inter, sans-serif", marginBottom: 20 }}
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
             />
 
             <button

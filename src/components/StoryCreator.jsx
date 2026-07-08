@@ -146,6 +146,9 @@ const StoryCreator = ({ currentUserId, onClose, onSuccess }) => {
               style={textareaStyle}
               rows={3}
               autoFocus
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
             />
             <div style={{ fontSize: 11, color: "#5a4535", textAlign: "right", marginBottom: 12 }}>
               {textContent.length}/200

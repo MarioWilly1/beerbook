@@ -208,6 +208,9 @@ const Configuracion = ({ onProfileChange }) => {
               }}
               placeholder={t("settings.profile.usernamePlaceholder")}
               style={{ ...inputStyle, borderColor: nombreError ? "#8b2020" : "#2e2215" }}
+              autoCapitalize="words"
+              spellCheck="false"
+              autoCorrect="off"
             />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
               <span style={{ fontSize: 11, color: "#8b2020" }}>{nombreError}</span>
@@ -226,6 +229,9 @@ const Configuracion = ({ onProfileChange }) => {
               placeholder={t("settings.profile.bioPlaceholder")}
               rows={3}
               style={{ ...inputStyle, resize: "vertical" }}
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
             />
             <div style={{ fontSize: 11, color: bio.length >= 180 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
               {bio.length}/200
@@ -241,6 +247,9 @@ const Configuracion = ({ onProfileChange }) => {
               onChange={(e) => setPais(e.target.value)}
               placeholder={t("settings.profile.countryPlaceholder")}
               style={inputStyle}
+              autoCapitalize="words"
+              spellCheck="false"
+              autoCorrect="off"
             />
           </div>
 
@@ -493,6 +502,9 @@ const SupportTab = ({ session, t }) => {
             rows={4}
             style={{ ...inputStyle, resize: "vertical", fontFamily: "Inter, sans-serif" }}
             disabled={sending}
+            spellCheck="true"
+            autoCorrect="on"
+            autoCapitalize="sentences"
           />
           <div style={{ fontSize: 11, color: message.length > 900 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
             {message.length}/1000

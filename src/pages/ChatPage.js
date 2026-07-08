@@ -281,6 +281,9 @@ const ChatPage = () => {
           style={inputStyle}
           disabled={sending}
           autoComplete="off"
+          spellCheck="true"
+          autoCorrect="on"
+          autoCapitalize="sentences"
         />
         <button
           onClick={handleSend}

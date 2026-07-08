@@ -83,6 +83,9 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
             placeholder="Comentario o anécdota"
             rows={3}
             style={{ width: "100%", marginTop: "8px" }}
+            spellCheck="true"
+            autoCorrect="on"
+            autoCapitalize="sentences"
           />
 
           <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>

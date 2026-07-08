@@ -249,6 +249,9 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
               rows={2}
               placeholder={t("beerform.commentPlaceholder")}
               style={{ ...inputStyle, resize: "none" }}
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
             />
           </div>
 

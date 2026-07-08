@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "../hooks/useIsMobile";
+import { getCountryName } from "../utils/countryDisplay";
 import BeerInfoModal from "../components/BeerInfoModal";
 import CollectionCard from "../components/CollectionCard";
 import { useMyBeers } from "../hooks/useMyBeers";
@@ -18,6 +20,26 @@ import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../util
 import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 
+function compressImage(file, maxDimension = 1080, quality = 0.85) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > maxDimension || height > maxDimension) {
+        if (width >= height) { height = Math.round((height * maxDimension) / width); width = maxDimension; }
+        else                 { width  = Math.round((width  * maxDimension) / height); height = maxDimension; }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
+    };
+    img.src = objectUrl;
+  });
+}
+
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 const RAREZA_ORDER  = ["mitica", "legendaria", "epica", "rara", "poco_comun", "comun"];
@@ -33,7 +55,6 @@ const RAREZA_BADGE = {
   legendaria: { color: "#d4af37", bg: "rgba(212,175,55,0.12)",  border: "rgba(212,175,55,0.3)"   },
   mitica:     { color: "#e040fb", bg: "rgba(224,64,251,0.1)",   border: "rgba(224,64,251,0.25)"  },
 };
-// Rarity border/glow for locked cards
 const RAREZA_STYLE = {
   comun:      { border: "1px solid #2e2215",      glow: "none" },
   poco_comun: { border: "1.5px solid #2d6645",    glow: "none" },
@@ -51,6 +72,7 @@ const panelS = {
   background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
   padding: "24px 20px", width: "100%", maxWidth: 420, boxShadow: "0 8px 40px rgba(0,0,0,0.7)",
 };
+
 // ── LockedCard ─────────────────────────────────────────────────────────────────
 const LockedCard = ({ beer, onClick }) => {
   const rs = RAREZA_STYLE[beer.rareza] || RAREZA_STYLE.comun;
@@ -67,19 +89,15 @@ const LockedCard = ({ beer, onClick }) => {
       onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1.02)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.7"; e.currentTarget.style.transform = "scale(1)"; }}
     >
-      {/* Foto real desaturada + 🔒 overlay */}
       <div style={{ position: "relative", aspectRatio: "3/4", overflow: "hidden" }}>
         <img
           src={beer.foto_url}
           alt={beer.nombre}
           style={{
             width: "100%", height: "100%", objectFit: "cover",
-            filter: "grayscale(1) brightness(0.55)",
-            display: "block",
+            filter: "grayscale(1) brightness(0.55)", display: "block",
           }}
         />
-
-        {/* 🔒 centrado */}
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -87,8 +105,6 @@ const LockedCard = ({ beer, onClick }) => {
         }}>
           <span style={{ fontSize: 32, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.8))" }}>🔒</span>
         </div>
-
-        {/* Rareza badge */}
         <div style={{
           position: "absolute", top: 8, right: 8, padding: "3px 9px", borderRadius: 20,
           fontSize: 10, fontWeight: 800, background: "rgba(0,0,0,0.65)",
@@ -97,8 +113,6 @@ const LockedCard = ({ beer, onClick }) => {
           {label}
         </div>
       </div>
-
-      {/* Info atenuada */}
       <div style={{ padding: "10px 12px 12px", background: "#160f07" }}>
         <p style={{
           margin: "0 0 2px", fontWeight: 700, fontSize: 12, color: "#5a4535",
@@ -155,8 +169,8 @@ const ColeccionTab = () => {
   const { items, loading } = useCollectibleBeers();
   const [rarezaFilter,  setRarezaFilter]  = useState("all");
   const [familiaFilter, setFamiliaFilter] = useState("all");
-  const [showFilter,    setShowFilter]    = useState("all"); // all | owned | locked
-  const [lockedModal,   setLockedModal]   = useState(null);  // beer
+  const [showFilter,    setShowFilter]    = useState("all");
+  const [lockedModal,   setLockedModal]   = useState(null);
 
   if (loading) {
     return (
@@ -166,21 +180,16 @@ const ColeccionTab = () => {
     );
   }
 
-  // Unique families for filter
   const families = [...new Set(items.map((b) => b.familia).filter(Boolean))].sort();
 
-  // Filter + sort
   const visible = items
     .filter((b) => rarezaFilter  === "all" || b.rareza  === rarezaFilter)
     .filter((b) => familiaFilter === "all" || b.familia === familiaFilter)
     .filter((b) => showFilter === "all" || (showFilter === "owned" ? b.owned : !b.owned))
     .sort((a, b) => {
-      // 1. Rarest first
       const rd = RAREZA_ORDER.indexOf(a.rareza ?? "comun") - RAREZA_ORDER.indexOf(b.rareza ?? "comun");
       if (rd !== 0) return rd;
-      // 2. Owned before locked
       if (a.owned !== b.owned) return a.owned ? -1 : 1;
-      // 3. Alpha
       return (a.nombre || "").localeCompare(b.nombre || "");
     });
 
@@ -190,7 +199,6 @@ const ColeccionTab = () => {
 
   return (
     <div>
-      {/* ── Header Pokédex ── */}
       <div style={{
         background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12,
         padding: "16px 18px", marginBottom: 16,
@@ -204,8 +212,6 @@ const ColeccionTab = () => {
           </span>
           <span style={{ fontSize: 12, color: "#5a4535", marginLeft: "auto" }}>{pct}%</span>
         </div>
-
-        {/* Progress bar */}
         <div style={{ height: 6, background: "#2e2215", borderRadius: 10, overflow: "hidden" }}>
           <div style={{
             height: "100%", borderRadius: 10, width: `${pct}%`,
@@ -215,8 +221,6 @@ const ColeccionTab = () => {
             transition: "width 0.5s ease",
           }} />
         </div>
-
-        {/* Rareza stats */}
         {totalCount > 0 && (
           <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
             {RAREZA_ORDER.filter((r) => items.some((b) => b.rareza === r)).map((r) => {
@@ -236,7 +240,6 @@ const ColeccionTab = () => {
         )}
       </div>
 
-      {/* ── Filters ── */}
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
         <select value={rarezaFilter} onChange={(e) => setRarezaFilter(e.target.value)} style={ctrlS}>
           <option value="all">Todas las rarezas</option>
@@ -261,7 +264,6 @@ const ColeccionTab = () => {
         {visible.length} de {totalCount} cerveza{totalCount !== 1 ? "s" : ""}
       </p>
 
-      {/* ── Grid ── */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(148px, 1fr))",
@@ -269,16 +271,9 @@ const ColeccionTab = () => {
       }}>
         {visible.map((beer) =>
           beer.owned ? (
-            <CollectionCard
-              key={beer.id}
-              beer={beer}
-            />
+            <CollectionCard key={beer.id} beer={beer} />
           ) : (
-            <LockedCard
-              key={beer.id}
-              beer={beer}
-              onClick={(b) => setLockedModal(b)}
-            />
+            <LockedCard key={beer.id} beer={beer} onClick={(b) => setLockedModal(b)} />
           )
         )}
       </div>
@@ -299,16 +294,258 @@ const ctrlS = {
   background: "#1c1409", color: "#f0e4cc", fontSize: 12, cursor: "pointer",
 };
 
+// ── NotebookCard — accordion card for Mi Cuaderno ─────────────────────────────
+const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoModal }) => {
+  const { t, i18n } = useTranslation();
+  const [expanded,  setExpanded]  = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState("");
+  const fileInputRef = useRef(null);
+
+  const handlePhotoSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadErr("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Sin sesión");
+      const blob = await compressImage(file);
+      const path = `${session.user.id}/${beer.id}_${crypto.randomUUID()}.jpg`;
+      const { error: upErr } = await supabase.storage
+        .from("user-beers")
+        .upload(path, blob, { contentType: "image/jpeg" });
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage.from("user-beers").getPublicUrl(path);
+      onChange(beer.id, "user_photo_url", publicUrl);
+    } catch {
+      setUploadErr("Error al subir la foto. Intentá de nuevo.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const displayPhoto = beer.user_photo_url?.trim() || beer.foto_url;
+  const hasUserPhoto = !!beer.user_photo_url?.trim();
+  const xpPreview = computeEntryXP({ rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
+  const isComplete =
+    beer.Rating !== "" && Number(beer.Rating) > 0 &&
+    beer.comment.trim().length > 0 &&
+    beer.user_photo_url.trim().length > 0;
+  const rb = beer.rareza ? (RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun) : null;
+
+  return (
+    <div style={nbCardStyle}>
+      {/* Always-visible header — click to expand */}
+      <div onClick={() => setExpanded((v) => !v)} style={{ cursor: "pointer" }}>
+        {/* Photo: user photo if available, catalog photo as fallback */}
+        <div style={{ position: "relative" }}>
+          <img
+            src={displayPhoto}
+            alt={beer.nombre}
+            onClick={(e) => { e.stopPropagation(); onShowImage(displayPhoto); }}
+            style={{
+              width: "100%", height: "110px", objectFit: "cover",
+              borderRadius: "8px", cursor: "zoom-in", display: "block",
+            }}
+          />
+          {hasUserPhoto && (
+            <span style={{
+              position: "absolute", bottom: 6, right: 6,
+              background: "rgba(0,0,0,0.7)", color: "#d4af37",
+              fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
+              pointerEvents: "none",
+            }}>
+              📸 {t("beerform.verified")}
+            </span>
+          )}
+        </div>
+
+        {/* Name + meta + bottom row */}
+        <div style={{ padding: "6px 0 2px" }}>
+          <p style={{
+            margin: "0 0 2px", fontSize: 12, fontWeight: 700, color: "#f0e4cc",
+            lineHeight: 1.3, overflowWrap: "break-word", wordBreak: "break-word",
+          }}>
+            {beer.nombre}
+          </p>
+          <p style={{ margin: "0 0 4px", fontSize: "11px", color: "#9a7d62" }}>
+            {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 3, minWidth: 0 }}>
+            {rb && (
+              <span style={{
+                fontSize: 9, fontWeight: 700, color: rb.color,
+                background: rb.bg, borderRadius: 4, padding: "1px 5px",
+                border: `1px solid ${rb.border}`, flexShrink: 0,
+                maxWidth: "60%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              }}>
+                {RAREZA_LABEL[beer.rareza] || beer.rareza}
+              </span>
+            )}
+            <span style={{ flex: 1 }} />
+            <button
+              onClick={(e) => { e.stopPropagation(); onInfoModal(beer); }}
+              title={t("beerInfo.btnTitle")}
+              style={nbInfoBtnStyle}
+            >
+              ⓘ
+            </button>
+            <span style={{ fontSize: 9, color: "#5a4535", flexShrink: 0 }}>
+              {expanded ? "▲" : "▼"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Accordion: form fields */}
+      {expanded && (
+        <div style={{ borderTop: "1px solid #2e2215", marginTop: 2, padding: "12px 4px 4px" }}>
+          <div style={nbFieldStyle}>
+            <label style={nbLabelStyle}>{t("beerform.timesLabel")}</label>
+            <input
+              type="number" min="0" value={beer.times}
+              onChange={(e) => onChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
+              style={nbInputStyle}
+            />
+          </div>
+
+          <div style={nbFieldStyle}>
+            <label style={nbLabelStyle}>{t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} /></label>
+            <select
+              value={beer.Rating ?? ""}
+              onChange={(e) => onChange(beer.id, "Rating", e.target.value)}
+              style={nbInputStyle}
+            >
+              {RATING_OPTIONS.map((v) => (
+                <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={nbFieldStyle}>
+            <label style={nbLabelStyle}>{t("notebook.commercializedLabel")}</label>
+            <select
+              value={beer.commercialized ? "yes" : "no"}
+              onChange={(e) => onChange(beer.id, "commercialized", e.target.value === "yes")}
+              style={nbInputStyle}
+            >
+              <option value="yes">{t("notebook.yes")}</option>
+              <option value="no">{t("notebook.no")}</option>
+            </select>
+          </div>
+
+          <div style={nbFieldStyle}>
+            <label style={nbLabelStyle}>{t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} /></label>
+            <textarea
+              value={beer.comment}
+              onChange={(e) => onChange(beer.id, "comment", e.target.value)}
+              rows={3}
+              placeholder={t("notebook.commentPlaceholder")}
+              style={{ ...nbInputStyle, resize: "vertical" }}
+              spellCheck="true"
+              autoCorrect="on"
+              autoCapitalize="sentences"
+            />
+          </div>
+
+          <div style={nbFieldStyle}>
+            <label style={nbLabelStyle}>{t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} /></label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoSelect}
+              style={{ display: "none" }}
+            />
+            {uploadErr && (
+              <p style={{ margin: "0 0 6px", fontSize: 11, color: "#c07a3f" }}>{uploadErr}</p>
+            )}
+            {beer.user_photo_url ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <img
+                  src={beer.user_photo_url} alt="Tu foto"
+                  style={{ width: 72, height: 72, borderRadius: 8, objectFit: "cover", cursor: "pointer", flexShrink: 0 }}
+                  onClick={() => onShowImage(beer.user_photo_url)}
+                />
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    style={{ ...nbPhotoBtn, opacity: uploading ? 0.6 : 1 }}
+                  >
+                    {uploading ? "⏳ Subiendo…" : "📷 Cambiar foto"}
+                  </button>
+                  <button
+                    onClick={() => onChange(beer.id, "user_photo_url", "")}
+                    style={nbClearPhotoBtn}
+                  >
+                    🗑️ Quitar foto
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                style={{ ...nbPhotoBtn, width: "100%", opacity: uploading ? 0.6 : 1 }}
+              >
+                {uploading ? "⏳ Subiendo…" : "📷 Subir foto"}
+              </button>
+            )}
+          </div>
+
+          <LocationPicker value={beer.location} onChange={(loc) => onChange(beer.id, "location", loc)} />
+
+          {isComplete && (
+            <div style={nbBonusBannerStyle}>
+              🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+            <button onClick={() => onSave(beer)} style={nbSaveBtn}>
+              💾 {t("notebook.saveBtn", { xp: xpPreview })}
+            </button>
+            <button onClick={() => onDelete(beer.id)} style={nbDeleteBtn}>
+              🗑️
+            </button>
+          </div>
+
+          {beer.location?.name && (
+            <div style={{ marginTop: 8 }}>
+              {beer.place_id && beer.location.isPublic ? (
+                <Link
+                  to={`/lugar/${beer.place_id}`}
+                  style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px", textDecoration: "none" }}
+                >
+                  📍 {beer.location.name}
+                </Link>
+              ) : (
+                <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
+                  📍 {beer.location.name}{!beer.location.isPublic && ` · ${t("location.private")}`}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── MiCuaderno (main) ─────────────────────────────────────────────────────────
 const MiCuaderno = () => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const { beers, loading } = useMyBeers();
   const { refetch: refetchStats } = useUserStats();
   const [editableBeers, setEditableBeers] = useState([]);
   const [showImage, setShowImage]         = useState(null);
   const [infoModal, setInfoModal]         = useState(null);
   const [activeTab, setActiveTab]         = useState("cuaderno");
-  const [notebookSearch, setNotebookSearch]   = useState("");
+  const [notebookSearch, setNotebookSearch] = useState("");
 
   useEffect(() => {
     setEditableBeers(
@@ -383,9 +620,9 @@ const MiCuaderno = () => {
     refetchStats();
     soundClink();
     toastSave(xp, isComplete);
-    if (didLevelUp)              { celebrateLevel();      soundLevelUp();      toastLevelUp(newLevelName); }
-    if (newAchievements.length)  { celebrateAchievement(); soundAchievement(); toastAchievements(newAchievements); }
-    if (newBadges.length)        { toastBadges(newBadges); }
+    if (didLevelUp)             { celebrateLevel();       soundLevelUp();      toastLevelUp(newLevelName); }
+    if (newAchievements.length) { celebrateAchievement(); soundAchievement(); toastAchievements(newAchievements); }
+    if (newBadges.length)       { toastBadges(newBadges); }
   };
 
   const handleDelete = async (beerId) => {
@@ -401,8 +638,8 @@ const MiCuaderno = () => {
   if (editableBeers.length === 0)
     return <p style={{ color: "#9a7d62" }}>{t("notebook.empty")}</p>;
 
-  const searchQuery    = notebookSearch.trim().toLowerCase();
-  const visibleBeers   = searchQuery
+  const searchQuery  = notebookSearch.trim().toLowerCase();
+  const visibleBeers = searchQuery
     ? editableBeers.filter((b) => b.nombre?.toLowerCase().includes(searchQuery))
     : editableBeers;
 
@@ -469,153 +706,24 @@ const MiCuaderno = () => {
             </p>
           )}
 
-          {/* Entries */}
-          {visibleBeers.map((beer) => {
-            const xpPreview  = computeEntryXP({ rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
-            const isComplete =
-              beer.Rating !== "" && Number(beer.Rating) > 0 &&
-              beer.comment.trim().length > 0 &&
-              beer.user_photo_url.trim().length > 0;
-            const intensity    = Math.min(beer.times / 100, 1);
-
-            return (
-              <div key={beer.id} style={{
-                display: "flex", gap: "16px", padding: "16px", marginBottom: "16px",
-                borderRadius: "10px",
-                backgroundColor: `rgba(212,175,55,${intensity * 0.12 + 0.04})`,
-                border: "1px solid rgba(212,175,55,0.2)",
-              }}>
-                <div
-                  onClick={() => setShowImage(beer.foto_url)}
-                  style={{ width: "140px", height: "140px", cursor: "pointer", overflow: "hidden", borderRadius: "8px", flexShrink: 0 }}
-                >
-                  <img src={beer.foto_url} alt={beer.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                </div>
-
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 4px" }}>
-                    <h3 style={{ margin: 0, color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
-
-                    <button onClick={() => setInfoModal(beer)} title={t("beerInfo.btnTitle")} style={infoBtnStyle}>
-                      ⓘ
-                    </button>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-                    {beer.rareza && (() => {
-                      const rb = RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun;
-                      return (
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, color: rb.color,
-                          background: rb.bg, borderRadius: 5, padding: "2px 7px",
-                          border: `1px solid ${rb.border}`,
-                        }}>
-                          {RAREZA_LABEL[beer.rareza] || beer.rareza}
-                        </span>
-                      );
-                    })()}
-                    {beer.es_edicion_especial && (
-                      <span style={{
-                        fontSize: 11, fontWeight: 700, color: "#f0d060",
-                        background: "rgba(240,208,96,0.1)", borderRadius: 5, padding: "2px 7px",
-                        border: "1px solid rgba(240,208,96,0.3)",
-                      }}>
-                        ✨ Ed. Especial
-                      </span>
-                    )}
-                    {beer.user_photo_url?.trim() ? (
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "#2a6b3a", background: "#0f2a18", borderRadius: 5, padding: "2px 7px" }}>
-                        📸 {t("beerform.verified")}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: 11, color: "#5a4535", background: "#2a1e0f", borderRadius: 5, padding: "2px 7px" }}>
-                        {t("notebook.noPhoto")}
-                      </span>
-                    )}
-                    {beer.location?.name && (
-                      beer.place_id && beer.location.isPublic
-                        ? <Link
-                            to={`/lugar/${beer.place_id}`}
-                            style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px", textDecoration: "none" }}
-                          >
-                            📍 {beer.location.name}
-                          </Link>
-                        : <span style={{ fontSize: 11, color: "#d4af37", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 5, padding: "2px 7px" }}>
-                            📍 {beer.location.name}{!beer.location.isPublic && ` · ${t("location.private")}`}
-                          </span>
-                    )}
-                  </div>
-
-                  <div style={rowStyle}>
-                    <label style={labelStyle}>{t("beerform.timesLabel")}</label>
-                    <input type="number" min="0" value={beer.times}
-                      onChange={(e) => handleChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
-                      style={{ width: "80px", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc" }}
-                    />
-                  </div>
-
-                  <div style={rowStyle}>
-                    <label style={labelStyle}>{t("beerform.ratingLabel")} ⭐ <XpBadge xp={XP_VALUES.RATING} /></label>
-                    <select value={beer.Rating ?? ""} onChange={(e) => handleChange(beer.id, "Rating", e.target.value)}
-                      style={{ width: "100%", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}>
-                      {RATING_OPTIONS.map((v) => (
-                        <option key={v} value={v}>{v === "" ? t("beerform.noRating") : `${v} / 5`}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div style={rowStyle}>
-                    <label style={labelStyle}>{t("notebook.commercializedLabel")}</label>
-                    <select value={beer.commercialized ? "yes" : "no"}
-                      onChange={(e) => handleChange(beer.id, "commercialized", e.target.value === "yes")}
-                      style={{ width: "100%", padding: "4px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}>
-                      <option value="yes">{t("notebook.yes")}</option>
-                      <option value="no">{t("notebook.no")}</option>
-                    </select>
-                  </div>
-
-                  <div style={{ marginBottom: "8px" }}>
-                    <label style={labelStyle}>{t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} /></label>
-                    <textarea value={beer.comment} onChange={(e) => handleChange(beer.id, "comment", e.target.value)}
-                      rows={3} placeholder={t("notebook.commentPlaceholder")}
-                      style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", resize: "vertical", boxSizing: "border-box" }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: "8px" }}>
-                    <label style={labelStyle}>{t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} /></label>
-                    <input type="text" placeholder="https://..." value={beer.user_photo_url}
-                      onChange={(e) => handleChange(beer.id, "user_photo_url", e.target.value)}
-                      style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid #2e2215", background: "#2a1e0f", color: "#f0e4cc", boxSizing: "border-box" }}
-                    />
-                    {beer.user_photo_url && (
-                      <img src={beer.user_photo_url} alt="Prueba"
-                        style={{ marginTop: "6px", width: "80px", borderRadius: "6px", cursor: "pointer" }}
-                        onClick={() => setShowImage(beer.user_photo_url)}
-                      />
-                    )}
-                  </div>
-
-                  <LocationPicker value={beer.location} onChange={(loc) => handleChange(beer.id, "location", loc)} />
-
-                  {isComplete && (
-                    <div style={bonusBannerStyle}>
-                      🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
-                    </div>
-                  )}
-
-                  <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-                    <button onClick={() => handleSave(beer)} style={saveBtnStyle}>
-                      💾 {t("notebook.saveBtn", { xp: xpPreview })}
-                    </button>
-                    <button onClick={() => handleDelete(beer.id)} style={deleteBtnStyle}>
-                      🗑️ {t("notebook.deleteBtn")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {/* 2-column grid — same pattern as catalog */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(180px, 1fr))",
+            gap: "10px",
+          }}>
+            {visibleBeers.map((beer) => (
+              <NotebookCard
+                key={beer.id}
+                beer={beer}
+                onChange={handleChange}
+                onSave={handleSave}
+                onDelete={handleDelete}
+                onShowImage={setShowImage}
+                onInfoModal={setInfoModal}
+              />
+            ))}
+          </div>
         </>
       )}
 
@@ -632,11 +740,15 @@ const XpBadge = ({ xp }) => (
   <span style={{ fontSize: "10px", color: "#d4af37", fontWeight: 700, marginLeft: "4px" }}>+{xp} XP</span>
 );
 
-const infoBtnStyle     = { background: "none", border: "none", color: "#8b6b2e", fontSize: 16, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0 };
-const rowStyle         = { marginBottom: "8px" };
-const labelStyle       = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: "3px" };
-const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
-const saveBtnStyle     = { padding: "8px 14px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
-const deleteBtnStyle   = { padding: "8px 14px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px" };
+const nbCardStyle       = { border: "1px solid #2e2215", borderRadius: "10px", padding: "6px", background: "#1c1409", display: "flex", flexDirection: "column" };
+const nbInfoBtnStyle    = { background: "none", border: "none", color: "#8b6b2e", fontSize: 13, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
+const nbFieldStyle      = { marginBottom: "8px" };
+const nbLabelStyle      = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: "3px" };
+const nbInputStyle      = { width: "100%", padding: "6px 8px", border: "1px solid #2e2215", borderRadius: "6px", fontSize: "13px", boxSizing: "border-box", background: "#2a1e0f", color: "#f0e4cc" };
+const nbBonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
+const nbSaveBtn         = { flex: 1, padding: "8px 10px", background: "#d4af37", color: "#0d0a06", border: "none", borderRadius: "6px", fontWeight: "700", cursor: "pointer", fontSize: "12px" };
+const nbDeleteBtn       = { padding: "8px 10px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "12px" };
+const nbPhotoBtn        = { padding: "8px 12px", background: "#1c1409", border: "1.5px dashed #3a2e20", borderRadius: 8, fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600, textAlign: "center" };
+const nbClearPhotoBtn   = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
 
 export default MiCuaderno;

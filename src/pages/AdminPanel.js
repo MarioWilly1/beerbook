@@ -472,6 +472,156 @@ const SuggestionsPanel = ({ t }) => {
   );
 };
 
+// ── Sub-panel: Editar Cerveza ─────────────────────────────────────────────────
+const EditarCerveza = () => {
+  const [query,    setQuery]    = useState("");
+  const [results,  setResults]  = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [form,     setForm]     = useState(null);
+  const [saving,   setSaving]   = useState(false);
+  const [msg,      setMsg]      = useState("");
+
+  const handleSearch = async (q) => {
+    setQuery(q);
+    if (q.trim().length < 2) { setResults([]); return; }
+    const { data } = await supabase
+      .from("beers_new")
+      .select("id, nombre, estilo, pais, rareza, es_edicion_especial, motivo_edicion, familia")
+      .ilike("nombre", `%${q.trim()}%`)
+      .order("nombre")
+      .limit(20);
+    setResults(data || []);
+  };
+
+  const handleSelect = (beer) => {
+    setSelected(beer);
+    setForm({
+      rareza:             beer.rareza             || "comun",
+      es_edicion_especial: beer.es_edicion_especial ?? false,
+      motivo_edicion:     beer.motivo_edicion     || "",
+      familia:            beer.familia            || "",
+    });
+    setResults([]);
+    setQuery(beer.nombre);
+    setMsg("");
+  };
+
+  const handleSave = async () => {
+    if (!selected) return;
+    setSaving(true);
+    const { error } = await supabase.from("beers_new").update({
+      rareza:             form.rareza,
+      es_edicion_especial: form.es_edicion_especial,
+      motivo_edicion:     form.motivo_edicion.trim() || null,
+      familia:            form.familia.trim() || null,
+    }).eq("id", selected.id);
+    setSaving(false);
+    if (error) { setMsg(`❌ Error: ${error.message}`); return; }
+    setMsg(`✓ "${selected.nombre}" actualizada.`);
+    // Update local selected so re-opening shows correct values
+    setSelected((s) => ({ ...s, ...form }));
+  };
+
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  return (
+    <div style={{ maxWidth: 520 }}>
+      <p style={{ margin: "0 0 12px", color: "#9a7d62", fontSize: 13 }}>
+        Buscá una cerveza existente para editar su rareza, edición especial y familia.
+      </p>
+
+      {/* Buscador */}
+      <div style={{ position: "relative", marginBottom: 4 }}>
+        <input
+          value={query}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Buscar cerveza por nombre…"
+          style={input}
+        />
+        {results.length > 0 && (
+          <div style={{
+            position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+            background: "#1c1409", border: "1px solid #2e2215", borderRadius: "0 0 10px 10px",
+            maxHeight: 260, overflowY: "auto",
+          }}>
+            {results.map((b) => (
+              <div key={b.id} onClick={() => handleSelect(b)}
+                style={{
+                  padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid #2e2215",
+                  fontSize: 14, color: "#f0e4cc",
+                  transition: "background 0.1s",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = "#2a1e0f"}
+                onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+              >
+                <strong>{b.nombre}</strong>
+                {b.estilo && <span style={{ color: "#9a7d62", marginLeft: 8, fontSize: 12 }}>{b.estilo}</span>}
+                <span style={{ float: "right", fontSize: 11, color: "#5a4535" }}>{b.rareza}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Formulario de edición */}
+      {form && selected && (
+        <div style={{ ...sectionCard, marginTop: 14 }}>
+          <p style={{ ...sectionTitle, marginBottom: 16 }}>
+            Editando: <span style={{ color: "#d4af37" }}>{selected.nombre}</span>
+            {selected.estilo && <span style={{ color: "#5a4535", fontWeight: 400, fontSize: 12 }}> · {selected.estilo}</span>}
+          </p>
+
+          <Field label="Rareza">
+            <select value={form.rareza} onChange={set("rareza")} style={input}>
+              <option value="comun">⚪ Común</option>
+              <option value="poco_comun">🟢 Poco común</option>
+              <option value="rara">🔵 Rara</option>
+              <option value="epica">🟣 Épica</option>
+              <option value="legendaria">🟡 Legendaria</option>
+              <option value="mitica">🌈 Mítica</option>
+            </select>
+          </Field>
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={form.es_edicion_especial}
+                onChange={(e) => setForm((f) => ({ ...f, es_edicion_especial: e.target.checked }))}
+                style={{ width: 16, height: 16, accentColor: "#d4af37", cursor: "pointer" }}
+              />
+              <span style={{ fontSize: 13, color: "#f0e4cc", fontWeight: 600 }}>✨ Edición especial</span>
+            </label>
+          </div>
+
+          {form.es_edicion_especial && (
+            <Field label="Motivo / nombre de la edición">
+              <input value={form.motivo_edicion} onChange={set("motivo_edicion")}
+                placeholder="Ej: Navidad 2024, 25º Aniversario…" style={input} />
+            </Field>
+          )}
+
+          <Field label="Familia / Serie (opcional)">
+            <input value={form.familia} onChange={set("familia")}
+              placeholder="Ej: 1906, Belgian Quad, Trappist…" style={input} />
+          </Field>
+
+          {msg && (
+            <p style={{ margin: "0 0 10px", fontSize: 13, color: msg.startsWith("✓") ? "#4caf50" : "#c0392b" }}>
+              {msg}
+            </p>
+          )}
+
+          <button onClick={handleSave} disabled={saving}
+            style={{ ...approveBtn, width: "100%", padding: "11px 0", fontSize: 14, borderRadius: 10 }}>
+            {saving ? "Guardando…" : "💾 Guardar cambios"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Página principal AdminPanel ────────────────────────────────────────────────
 const AdminPanel = ({ profile }) => {
   const navigate = useNavigate();
@@ -497,6 +647,7 @@ const AdminPanel = ({ profile }) => {
           { key: "support",     label: t("admin.tabSupport"),     icon: "🆘" },
           { key: "suggestions", label: t("admin.tabSuggestions"), icon: "💡" },
           { key: "cargar",      label: "Cargar Cerveza",          icon: "🍺" },
+          { key: "editar",      label: "Editar Cerveza",          icon: "✏️" },
         ].map(({ key, label, icon }) => (
           <button
             key={key}
@@ -517,6 +668,7 @@ const AdminPanel = ({ profile }) => {
       {tab === "support"     && <SupportPanel     t={t} />}
       {tab === "suggestions" && <SuggestionsPanel t={t} />}
       {tab === "cargar"      && <CargarCerveza />}
+      {tab === "editar"      && <EditarCerveza />}
     </div>
   );
 };

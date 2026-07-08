@@ -52,7 +52,7 @@ const Logros = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
             gap: 10,
           }}
         >
@@ -75,7 +75,7 @@ const Logros = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(115px, 1fr))",
             gap: 10,
           }}
         >

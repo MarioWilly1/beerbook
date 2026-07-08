@@ -258,8 +258,8 @@ const Dashboard = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          gap: "12px",
+          gridTemplateColumns: "repeat(auto-fill, minmax(115px, 1fr))",
+          gap: "10px",
         }}
       >
         {filteredBeers.map((beer) => (

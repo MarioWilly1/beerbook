@@ -147,12 +147,34 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
           <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
         </div>
 
-        {/* Nombre + íconos + meta */}
-        <div style={{ padding: "6px 2px 4px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 4, marginBottom: 2 }}>
-            <h3 style={{ margin: 0, fontSize: "13px", color: "#f0e4cc", flex: 1, lineHeight: 1.3 }}>
-              {beer.nombre}
-            </h3>
+        {/* Nombre + meta + fila de íconos */}
+        <div style={{ padding: "6px 0 2px" }}>
+          {/* Nombre — ancho completo, puede wrappear */}
+          <p style={{
+            margin: "0 0 2px", fontSize: 12, fontWeight: 700, color: "#f0e4cc",
+            lineHeight: 1.3, overflowWrap: "break-word", wordBreak: "break-word",
+          }}>
+            {beer.nombre}
+          </p>
+
+          {/* Meta: estilo · país · % */}
+          <p style={metaStyle}>
+            {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
+          </p>
+
+          {/* Fila inferior: badge rareza + spacer + íconos + ▼ */}
+          <div style={{ display: "flex", alignItems: "center", gap: 3, minWidth: 0 }}>
+            {rb && (
+              <span style={{
+                fontSize: 9, fontWeight: 700, color: rb.color,
+                background: rb.bg, borderRadius: 4, padding: "1px 5px",
+                border: `1px solid ${rb.border}`, flexShrink: 0,
+                maxWidth: "60%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              }}>
+                {RAREZA_LABEL[beer.rareza] || beer.rareza}
+              </span>
+            )}
+            <span style={{ flex: 1 }} />
             {onVerMapa && (
               <button
                 onClick={(e) => { e.stopPropagation(); onVerMapa(); }}
@@ -169,35 +191,19 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
             >
               ⓘ
             </button>
-            <span style={{ fontSize: 10, color: "#5a4535", flexShrink: 0, lineHeight: "20px" }}>
+            <span style={{ fontSize: 9, color: "#5a4535", flexShrink: 0 }}>
               {expanded ? "▲" : "▼"}
             </span>
           </div>
 
-          <p style={metaStyle}>
-            {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
-          </p>
-
-          {rb && (
-            <span style={{
-              display: "inline-block", marginBottom: 2,
-              fontSize: 9, fontWeight: 700, color: rb.color,
-              background: rb.bg, borderRadius: 4, padding: "1px 5px",
-              border: `1px solid ${rb.border}`,
-            }}>
-              {RAREZA_LABEL[beer.rareza] || beer.rareza}
-            </span>
-          )}
-
-          {beer.sugerida_por_nombre && (
-            <p style={{ margin: "2px 0 0", fontSize: 10, color: "#8b6b2e", fontStyle: "italic" }}>
-              💡 {t("beercard.suggestedBy", { nombre: beer.sugerida_por_nombre })}
+          {isInMyBeers && (
+            <p style={{ margin: "2px 0 0", fontSize: 9, color: "#9a7d62" }}>
+              ✅ {t("beerform.inNotebook")}
             </p>
           )}
-
-          {isInMyBeers && (
-            <p style={{ margin: "2px 0 0", fontSize: 10, color: "#9a7d62" }}>
-              ✅ {t("beerform.inNotebook")}
+          {beer.sugerida_por_nombre && (
+            <p style={{ margin: "2px 0 0", fontSize: 9, color: "#8b6b2e", fontStyle: "italic" }}>
+              💡 {t("beercard.suggestedBy", { nombre: beer.sugerida_por_nombre })}
             </p>
           )}
         </div>
@@ -289,7 +295,7 @@ const XpBadge = ({ xp }) => (
 );
 
 const infoBtnStyle     = { background: "none", border: "none", color: "#8b6b2e", fontSize: 13, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
-const cardStyle        = { border: "1px solid #2e2215", borderRadius: "10px", padding: "8px", background: "#1c1409", display: "flex", flexDirection: "column" };
+const cardStyle        = { border: "1px solid #2e2215", borderRadius: "10px", padding: "6px", background: "#1c1409", display: "flex", flexDirection: "column" };
 const metaStyle        = { margin: "0 0 4px", fontSize: "11px", color: "#9a7d62" };
 const fieldStyle       = { marginBottom: "8px" };
 const labelStyle       = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.4px" };

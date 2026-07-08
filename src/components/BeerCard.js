@@ -20,6 +20,7 @@ const RAREZA_LABEL = {
   comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
   epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
 };
+const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
 const RAREZA_BADGE = {
   comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.2)"   },
   poco_comun: { color: "#4a9e6a", bg: "rgba(74,158,106,0.12)",  border: "rgba(74,158,106,0.3)"   },
@@ -44,7 +45,9 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const [infoOpen, setInfoOpen] = useState(false);
 
-  const xpPreview = computeEntryXP({ rating, comment, photo: photoUrl });
+  const isColeccionable = beer.es_edicion_especial || RAREZA_COLECCIONABLE.has(beer.rareza);
+  const collectionBonus = (!isInMyBeers && isColeccionable) ? 20 : 0;
+  const xpPreview = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
   const isComplete =
     rating !== "" && Number(rating) > 0 &&
     comment.trim().length > 0 &&
@@ -55,7 +58,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
     if (!session) return;
 
     setSaving(true);
-    const xp = computeEntryXP({ rating, comment, photo: photoUrl });
+    const xp = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
 
     const { data: xpRows } = await supabase
       .from("user_beers").select('"XP"').eq("user_id", session.user.id);
@@ -97,6 +100,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
 
     soundClink();
     toastSave(xp, isComplete);
+    if (collectionBonus > 0) toastAchievements([{ emoji: "💎", nombre: "¡Cerveza coleccionable!", descripcion: "Primera vez que la registrás", xpBonus: collectionBonus }]);
 
     if (didLevelUp) {
       celebrateLevel();

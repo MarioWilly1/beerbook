@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 // ── Keyframe CSS injected once ────────────────────────────────────────────────
 const STYLES = `
@@ -95,10 +95,9 @@ const RARITY = {
 };
 
 // ── CollectionCard ─────────────────────────────────────────────────────────────
-const CollectionCard = ({ beer, userBeer, onToggleColeccion, onEditColeccion }) => {
+const CollectionCard = ({ beer }) => {
   injectStyles();
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const rarity = RARITY[beer.rareza] || RARITY.comun;
   const isMitica = beer.rareza === "mitica";
   const hasShimmer = !!rarity.shimmer;
@@ -155,33 +154,12 @@ const CollectionCard = ({ beer, userBeer, onToggleColeccion, onEditColeccion }) 
           {rarity.glyph} {rarity.label}
         </div>
 
-        {/* Condición sellada */}
-        {userBeer?.condicion === "sellada" && (
-          <div style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.75)",
-            padding: "3px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "#a0c4ff",
-            border: "1px solid rgba(160,196,255,0.4)", zIndex: 3 }}>
-            🔒 Sellada
-          </div>
-        )}
-
-        {/* Menu button */}
-        <button onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
-          style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,0.7)",
-            border: "none", borderRadius: 20, color: "#f0e4cc", fontSize: 14, padding: "4px 8px",
-            cursor: "pointer", zIndex: 3 }}>
-          ···
-        </button>
-        {menuOpen && (
-          <div onClick={(e) => e.stopPropagation()}
-            style={{ position: "absolute", bottom: 36, right: 8, background: "#1c1409",
-              border: "1px solid #2e2215", borderRadius: 10, overflow: "hidden",
-              zIndex: 10, minWidth: 160, boxShadow: "0 4px 20px rgba(0,0,0,0.6)" }}>
-            <button onClick={() => { onEditColeccion(beer, userBeer); setMenuOpen(false); }}
-              style={menuItem}>✏️ Editar colección</button>
-            <button onClick={() => { onToggleColeccion(beer, false); setMenuOpen(false); }}
-              style={{ ...menuItem, color: "#c07a3f" }}>🗑️ Quitar de colección</button>
-          </div>
-        )}
+        {/* Badge "conseguida" */}
+        <div style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.7)",
+          padding: "3px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "#d4af37",
+          border: "1px solid rgba(212,175,55,0.4)", zIndex: 3 }}>
+          ✓ Conseguida
+        </div>
       </div>
 
       {/* Info */}
@@ -191,21 +169,10 @@ const CollectionCard = ({ beer, userBeer, onToggleColeccion, onEditColeccion }) 
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {beer.nombre}
         </p>
-        <p style={{ margin: "0 0 6px", fontSize: 11, color: "#9a7d62",
+        <p style={{ margin: 0, fontSize: 11, color: "#9a7d62",
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {[beer.estilo, beer.pais].filter(Boolean).join(" · ")}
         </p>
-        {userBeer?.fecha_adquisicion && (
-          <p style={{ margin: 0, fontSize: 10, color: "#5a4535" }}>
-            📅 {new Date(userBeer.fecha_adquisicion).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })}
-          </p>
-        )}
-        {userBeer?.notas_coleccion && (
-          <p style={{ margin: "4px 0 0", fontSize: 11, color: "#8b6b2e", fontStyle: "italic",
-            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            "{userBeer.notas_coleccion}"
-          </p>
-        )}
       </div>
     </div>
   );
@@ -225,12 +192,6 @@ const CollectionCard = ({ beer, userBeer, onToggleColeccion, onEditColeccion }) 
   }
 
   return <div style={cardStyle}>{innerContent}</div>;
-};
-
-const menuItem = {
-  display: "block", width: "100%", padding: "9px 14px", background: "none",
-  border: "none", color: "#f0e4cc", fontSize: 13, cursor: "pointer",
-  textAlign: "left", borderBottom: "1px solid #2e2215",
 };
 
 export default CollectionCard;

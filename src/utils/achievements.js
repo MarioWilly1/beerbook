@@ -374,15 +374,17 @@ export async function fetchAchievementStats(userId) {
     .from("user_beers")
     .select(`
       "XP", "Rating", comment, user_photo_url, location_lat,
-      en_coleccion, condicion,
       beers_new(pais, estilo, rareza, es_edicion_especial)
     `)
     .eq("user_id", userId);
 
   if (error || !data) return null;
 
+  const RAREZA_COL = new Set(["rara", "epica", "legendaria", "mitica"]);
   const verified  = data.filter((d) => d.user_photo_url?.trim());
-  const coleccion = data.filter((d) => d.en_coleccion);
+  const coleccion = data.filter(
+    (d) => RAREZA_COL.has(d.beers_new?.rareza) || d.beers_new?.es_edicion_especial === true
+  );
 
   return {
     totalBeers:               data.length,
@@ -467,8 +469,7 @@ export async function checkSeriesAchievements(userId) {
   const { data: userCol } = await supabase
     .from("user_beers")
     .select("beer_id")
-    .eq("user_id", userId)
-    .eq("en_coleccion", true);
+    .eq("user_id", userId);
 
   const collectedIds = new Set((userCol || []).map((r) => r.beer_id));
 

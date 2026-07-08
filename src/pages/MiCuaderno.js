@@ -1,16 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import BeerInfoModal from "../components/BeerInfoModal";
 import CollectionCard from "../components/CollectionCard";
-import DateInput from "../components/DateInput";
 import { useMyBeers } from "../hooks/useMyBeers";
 import { useCollectibleBeers } from "../hooks/useCollectibleBeers";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
 import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
-import { fetchAchievementStats, checkAndAwardAchievements, checkSeriesAchievements } from "../utils/achievements";
+import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { checkAndAwardBadges } from "../utils/badges";
 import { logActivity } from "../utils/activity";
 import Lightbox from "../components/Lightbox";
@@ -34,11 +33,6 @@ const RAREZA_BADGE = {
   legendaria: { color: "#d4af37", bg: "rgba(212,175,55,0.12)",  border: "rgba(212,175,55,0.3)"   },
   mitica:     { color: "#e040fb", bg: "rgba(224,64,251,0.1)",   border: "rgba(224,64,251,0.25)"  },
 };
-const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
-
-const puedeColeccionar = (beer) =>
-  beer.es_edicion_especial === true || RAREZA_COLECCIONABLE.has(beer.rareza);
-
 // Rarity border/glow for locked cards
 const RAREZA_STYLE = {
   comun:      { border: "1px solid #2e2215",      glow: "none" },
@@ -49,79 +43,6 @@ const RAREZA_STYLE = {
   mitica:     { border: "2px solid #9020d0",       glow: "0 0 12px 4px rgba(144,32,208,0.4)" },
 };
 
-// ── CollectionEditModal ────────────────────────────────────────────────────────
-const CollectionEditModal = ({ beer, userBeer, onClose, onSaved }) => {
-  const [condicion, setCondicion] = useState(userBeer?.condicion || "bebida");
-  const [fechaAdq,  setFechaAdq]  = useState(userBeer?.fecha_adquisicion || "");
-  const [notas,     setNotas]     = useState(userBeer?.notas_coleccion || "");
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    setSaving(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { setSaving(false); return; }
-
-    await supabase.from("user_beers").update({
-      en_coleccion:     true,
-      condicion,
-      fecha_adquisicion: fechaAdq || null,
-      notas_coleccion:  notas || null,
-    }).eq("user_id", session.user.id).eq("beer_id", beer.id);
-
-    // Check dynamic series achievements
-    const seriesWon = await checkSeriesAchievements(session.user.id);
-    if (seriesWon.length > 0) {
-      soundAchievement();
-      toastAchievements(seriesWon);
-    }
-
-    setSaving(false);
-    onSaved({ condicion, fecha_adquisicion: fechaAdq, notas_coleccion: notas });
-    onClose();
-  };
-
-  return (
-    <div style={overlayS} onClick={onClose}>
-      <div style={panelS} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 18 }}>
-          <h3 style={{ margin: 0, flex: 1, color: "#f0e4cc", fontFamily: "'Playfair Display', serif" }}>
-            💎 {beer.nombre}
-          </h3>
-          <button onClick={onClose} style={closeBtnS}>✕</button>
-        </div>
-
-        <label style={mLabelS}>Condición</label>
-        <select value={condicion} onChange={(e) => setCondicion(e.target.value)} style={mInputS}>
-          <option value="bebida">🍺 Bebida / Degustada</option>
-          <option value="sellada">🔒 Sellada (sin abrir)</option>
-          <option value="exhibicion">🖼️ Exhibición / Decoración</option>
-        </select>
-
-        <label style={mLabelS}>Fecha de adquisición</label>
-        <DateInput onChange={setFechaAdq} />
-
-        <label style={{ ...mLabelS, marginTop: 12 }}>Notas de colección</label>
-        <textarea
-          value={notas}
-          onChange={(e) => setNotas(e.target.value.slice(0, 300))}
-          rows={3}
-          placeholder="Dónde la conseguí, recuerdos, valor especial…"
-          style={{ ...mInputS, resize: "vertical", fontFamily: "Inter, sans-serif" }}
-        />
-
-        <button onClick={handleSave} disabled={saving}
-          style={{
-            width: "100%", marginTop: 18, padding: "11px 0", borderRadius: 8, border: "none",
-            background: saving ? "#2a1e0f" : "#d4af37", color: saving ? "#5a4535" : "#0d0a06",
-            fontWeight: 700, fontSize: 15, cursor: saving ? "not-allowed" : "pointer",
-          }}>
-          {saving ? "Guardando…" : "💾 Guardar en colección"}
-        </button>
-      </div>
-    </div>
-  );
-};
-
 const overlayS = {
   position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)",
   display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16,
@@ -130,17 +51,6 @@ const panelS = {
   background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
   padding: "24px 20px", width: "100%", maxWidth: 420, boxShadow: "0 8px 40px rgba(0,0,0,0.7)",
 };
-const closeBtnS = { background: "none", border: "none", color: "rgba(240,228,204,0.4)", fontSize: 20, cursor: "pointer" };
-const mLabelS = {
-  display: "block", fontSize: 11, fontWeight: 700, color: "#9a7d62",
-  textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 5,
-};
-const mInputS = {
-  width: "100%", padding: "9px 12px", marginBottom: 0, borderRadius: 8,
-  background: "#0d0a06", border: "1px solid #2e2215", color: "#f0e4cc",
-  fontSize: 14, outline: "none", boxSizing: "border-box",
-};
-
 // ── LockedCard ─────────────────────────────────────────────────────────────────
 const LockedCard = ({ beer, onClick }) => {
   const rs = RAREZA_STYLE[beer.rareza] || RAREZA_STYLE.comun;
@@ -227,7 +137,7 @@ const LockedInfoModal = ({ beer, onClose }) => (
         Todavía no la conseguiste.
       </p>
       <p style={{ color: "#5a4535", fontSize: 12, lineHeight: 1.6, margin: "0 0 24px" }}>
-        Conseguila y marcala como coleccionada desde la pestaña <strong style={{ color: "#8b6b2e" }}>📓 Mi Cuaderno</strong>.
+        Conseguila y registrala en tu cuaderno para desbloquearla en la colección.
       </p>
       <button onClick={onClose}
         style={{
@@ -242,27 +152,11 @@ const LockedInfoModal = ({ beer, onClose }) => (
 
 // ── ColeccionTab (Pokédex) ─────────────────────────────────────────────────────
 const ColeccionTab = () => {
-  const { items, loading, refetch } = useCollectibleBeers();
+  const { items, loading } = useCollectibleBeers();
   const [rarezaFilter,  setRarezaFilter]  = useState("all");
   const [familiaFilter, setFamiliaFilter] = useState("all");
   const [showFilter,    setShowFilter]    = useState("all"); // all | owned | locked
-  const [editModal,     setEditModal]     = useState(null);  // { beer, userBeer }
   const [lockedModal,   setLockedModal]   = useState(null);  // beer
-
-  const handleToggleOff = useCallback(async (beer) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    await supabase.from("user_beers")
-      .update({ en_coleccion: false })
-      .eq("user_id", session.user.id)
-      .eq("beer_id", beer.id);
-    refetch();
-  }, [refetch]);
-
-  const handleEditSaved = useCallback(() => {
-    refetch();
-    setEditModal(null);
-  }, [refetch]);
 
   if (loading) {
     return (
@@ -378,9 +272,6 @@ const ColeccionTab = () => {
             <CollectionCard
               key={beer.id}
               beer={beer}
-              userBeer={beer.userBeer}
-              onToggleColeccion={() => handleToggleOff(beer)}
-              onEditColeccion={(b, ub) => setEditModal({ beer: b, userBeer: ub })}
             />
           ) : (
             <LockedCard
@@ -398,15 +289,6 @@ const ColeccionTab = () => {
         </div>
       )}
 
-      {/* Modals */}
-      {editModal && (
-        <CollectionEditModal
-          beer={editModal.beer}
-          userBeer={editModal.userBeer}
-          onClose={() => setEditModal(null)}
-          onSaved={handleEditSaved}
-        />
-      )}
       {lockedModal && <LockedInfoModal beer={lockedModal} onClose={() => setLockedModal(null)} />}
     </div>
   );
@@ -426,7 +308,6 @@ const MiCuaderno = () => {
   const [showImage, setShowImage]         = useState(null);
   const [infoModal, setInfoModal]         = useState(null);
   const [activeTab, setActiveTab]         = useState("cuaderno");
-  const [collectionModal, setCollectionModal] = useState(null);
   const [notebookSearch, setNotebookSearch]   = useState("");
 
   useEffect(() => {
@@ -516,34 +397,10 @@ const MiCuaderno = () => {
     refetchStats();
   };
 
-  const handleToggleColeccion = useCallback(async (beer, addToCollection) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    if (addToCollection) {
-      setCollectionModal({
-        beer,
-        userBeer: { condicion: beer.condicion, fecha_adquisicion: beer.fecha_adquisicion, notas_coleccion: beer.notas_coleccion },
-      });
-    } else {
-      await supabase.from("user_beers")
-        .update({ en_coleccion: false })
-        .eq("user_id", session.user.id)
-        .eq("beer_id", beer.id);
-      setEditableBeers((prev) => prev.map((b) => b.id === beer.id ? { ...b, en_coleccion: false } : b));
-    }
-  }, []);
-
-  const handleCollectionSaved = useCallback((beerData, updates) => {
-    setEditableBeers((prev) =>
-      prev.map((b) => b.id === beerData.id ? { ...b, en_coleccion: true, ...updates } : b)
-    );
-  }, []);
-
   if (loading) return <p style={{ color: "#9a7d62" }}>{t("notebook.loading")}</p>;
   if (editableBeers.length === 0)
     return <p style={{ color: "#9a7d62" }}>{t("notebook.empty")}</p>;
 
-  const coleccionCount = editableBeers.filter((b) => b.en_coleccion).length;
   const searchQuery    = notebookSearch.trim().toLowerCase();
   const visibleBeers   = searchQuery
     ? editableBeers.filter((b) => b.nombre?.toLowerCase().includes(searchQuery))
@@ -555,7 +412,7 @@ const MiCuaderno = () => {
       <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215" }}>
         {[
           { id: "cuaderno",  label: `📓 ${t("notebook.title")}` },
-          { id: "coleccion", label: `💎 Colección${coleccionCount > 0 ? ` (${coleccionCount})` : ""}` },
+          { id: "coleccion", label: "💎 Colección" },
         ].map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             style={{
@@ -620,7 +477,6 @@ const MiCuaderno = () => {
               beer.comment.trim().length > 0 &&
               beer.user_photo_url.trim().length > 0;
             const intensity    = Math.min(beer.times / 100, 1);
-            const coleccionable = puedeColeccionar(beer);
 
             return (
               <div key={beer.id} style={{
@@ -639,31 +495,6 @@ const MiCuaderno = () => {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 4px" }}>
                     <h3 style={{ margin: 0, color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
-
-                    {/* 💎 button — activo solo si coleccionable */}
-                    {coleccionable ? (
-                      <button
-                        onClick={() => handleToggleColeccion(beer, !beer.en_coleccion)}
-                        title={beer.en_coleccion ? "En tu colección — click para quitar" : "Añadir a colección"}
-                        style={{
-                          background:   beer.en_coleccion ? "rgba(212,175,55,0.15)" : "none",
-                          border:       beer.en_coleccion ? "1px solid rgba(212,175,55,0.4)" : "none",
-                          color:        beer.en_coleccion ? "#d4af37" : "#3a2e20",
-                          fontSize: 15, cursor: "pointer", padding: "2px 6px",
-                          borderRadius: 6, lineHeight: 1, flexShrink: 0, transition: "all 0.15s",
-                        }}>
-                        💎
-                      </button>
-                    ) : (
-                      <span
-                        title="Solo raras, épicas, legendarias, míticas o edición especial pueden ser coleccionadas"
-                        style={{
-                          fontSize: 15, padding: "2px 6px", lineHeight: 1,
-                          flexShrink: 0, opacity: 0.18, cursor: "default", userSelect: "none",
-                        }}>
-                        💎
-                      </span>
-                    )}
 
                     <button onClick={() => setInfoModal(beer)} title={t("beerInfo.btnTitle")} style={infoBtnStyle}>
                       ⓘ
@@ -793,19 +624,6 @@ const MiCuaderno = () => {
 
       <Lightbox src={showImage} onClose={() => setShowImage(null)} />
       {infoModal && <BeerInfoModal beer={infoModal} onClose={() => setInfoModal(null)} />}
-
-      {/* Modal para añadir a colección desde el cuaderno */}
-      {collectionModal && (
-        <CollectionEditModal
-          beer={collectionModal.beer}
-          userBeer={collectionModal.userBeer}
-          onClose={() => setCollectionModal(null)}
-          onSaved={(updates) => {
-            handleCollectionSaved(collectionModal.beer, updates);
-            setCollectionModal(null);
-          }}
-        />
-      )}
     </div>
   );
 };

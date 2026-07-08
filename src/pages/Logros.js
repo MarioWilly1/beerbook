@@ -4,6 +4,7 @@ import { supabase } from "../services/supabase";
 import { ACHIEVEMENTS } from "../utils/achievements";
 import { useBadges } from "../hooks/useBadges";
 import BadgeCard from "../components/BadgeCard";
+import { useWindowWidth } from "../hooks/useWindowWidth";
 
 const Logros = () => {
   const { t, i18n } = useTranslation();
@@ -11,6 +12,12 @@ const Logros = () => {
   const [unlockedData, setUnlockedData] = useState({});
   const [loading, setLoading]         = useState(true);
   const { badges, totalBadgeXP, loading: badgesLoading } = useBadges();
+  const vw = useWindowWidth();
+
+  // Para Logros (maxWidth 760): en móvil usa columnas explícitas, en tablet/desktop auto-fill
+  const logrosGridCols = vw >= 600 ? "repeat(auto-fill, minmax(130px, 1fr))"
+                       : vw >= 390 ? "repeat(3, 1fr)"
+                       : "repeat(2, 1fr)";
 
   useEffect(() => {
     const load = async () => {
@@ -52,7 +59,7 @@ const Logros = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+            gridTemplateColumns: logrosGridCols,
             gap: 10,
           }}
         >
@@ -75,7 +82,7 @@ const Logros = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(115px, 1fr))",
+            gridTemplateColumns: logrosGridCols,
             gap: 10,
           }}
         >

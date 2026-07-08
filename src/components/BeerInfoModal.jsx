@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
 
-const BeerInfoModal = ({ beer, onClose }) => {
+const BeerInfoModal = ({ beer, onClose, onVerMapa }) => {
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -42,6 +42,18 @@ const BeerInfoModal = ({ beer, onClose }) => {
         <p style={bodyStyle}>
           {beer.info_detallada || t("beerInfo.unavailable")}
         </p>
+
+        {onVerMapa && beer.origen_lat != null && (
+          <>
+            <div style={dividerStyle} />
+            <button
+              onClick={() => { onClose(); onVerMapa(); }}
+              style={mapBtnStyle}
+            >
+              🗺️ Ver en el mapa de origen
+            </button>
+          </>
+        )}
 
       </div>
     </div>,
@@ -122,6 +134,22 @@ const bodyStyle = {
   fontSize:   14,
   color:      "#d4c4a8",
   lineHeight: 1.7,
+};
+
+const mapBtnStyle = {
+  display:      "flex",
+  alignItems:   "center",
+  gap:          6,
+  padding:      "9px 14px",
+  background:   "rgba(212,175,55,0.08)",
+  border:       "1px solid rgba(212,175,55,0.25)",
+  borderRadius: 10,
+  color:        "#d4af37",
+  fontSize:     13,
+  fontWeight:   600,
+  cursor:       "pointer",
+  width:        "100%",
+  marginTop:    4,
 };
 
 export default BeerInfoModal;

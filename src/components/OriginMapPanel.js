@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useTranslation } from "react-i18next";
@@ -29,6 +29,20 @@ function makeIcon(count, selected = false) {
     iconAnchor: [size / 2, size / 2],
   });
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const normalizeStr = (s = "") =>
+  s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+// Moves the map to a target coordinate pair; must live inside MapContainer
+const MapController = ({ target }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!target) return;
+    map.flyTo([target.lat, target.lng], 6, { animate: true, duration: 0.8 });
+  }, [target, map]);
+  return null;
+};
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 const BeerRow = ({ beer, isSelected, onClick }) => (
@@ -76,14 +90,17 @@ const UserChip = ({ ub }) => (
 );
 
 // ── Main panel ────────────────────────────────────────────────────────────────
-const OriginMapPanel = ({ beers }) => {
+const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const [expanded,    setExpanded]    = useState(false);
-  const [selectedLoc, setSelectedLoc] = useState(null);
+  const [expanded,     setExpanded]    = useState(false);
+  const [selectedLoc,  setSelectedLoc] = useState(null);
   const [selectedBeer, setSelectedBeer] = useState(null);
-  const [triedBy,     setTriedBy]     = useState([]);
+  const [triedBy,      setTriedBy]     = useState([]);
   const [triedLoading, setTriedLoading] = useState(false);
+  const [searchQuery,  setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [mapTarget,    setMapTarget]   = useState(null);
 
   // Group beers by exact origin coordinate pair
   const locationGroups = useMemo(() => {
@@ -121,6 +138,38 @@ const OriginMapPanel = ({ beers }) => {
 
   useEffect(() => { loadTriedBy(selectedBeer); }, [selectedBeer, loadTriedBy]);
 
+  // Prop-driven focus: when Dashboard passes a beer to highlight
+  useEffect(() => {
+    if (!focusBeer) return;
+    const loc = locationGroups.find((l) => l.beers.some((b) => b.id === focusBeer.id));
+    if (loc) {
+      setSelectedLoc(loc);
+      setSelectedBeer(focusBeer);
+      setMapTarget({ lat: loc.lat, lng: loc.lng, key: Date.now() });
+    }
+    onFocusConsumed?.();
+  }, [focusBeer]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearch = (val) => {
+    setSearchQuery(val);
+    if (!val.trim()) { setSearchResults([]); return; }
+    const norm = normalizeStr(val);
+    setSearchResults(
+      beers.filter((b) => b.origen_lat != null && normalizeStr(b.nombre).includes(norm)).slice(0, 8)
+    );
+  };
+
+  const handleSearchSelect = (beer) => {
+    const loc = locationGroups.find((l) => l.beers.some((b) => b.id === beer.id));
+    if (loc) {
+      setSelectedLoc(loc);
+      setSelectedBeer(beer);
+      setMapTarget({ lat: loc.lat, lng: loc.lng, key: Date.now() });
+    }
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
   const handleMarkerClick = (loc) => {
     const same = selectedLoc?.lat === loc.lat && selectedLoc?.lng === loc.lng;
     setSelectedLoc(same ? null : loc);
@@ -137,6 +186,33 @@ const OriginMapPanel = ({ beers }) => {
   const selectedLabel = selectedLoc
     ? ` · 📍 ${selectedLoc.pais} (${selectedLoc.beers.length === 1 ? "1 cerveza" : `${selectedLoc.beers.length} cervezas`})`
     : "";
+
+  // ── Search panel (shared between inline and fullscreen) ───────────────────
+  const searchPanel = (
+    <div style={{ padding: "10px 14px 6px", position: "relative" }}>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => handleSearch(e.target.value)}
+        placeholder="🔍 Buscar cerveza en el mapa..."
+        style={{ width: "100%", padding: "8px 12px", background: "#0d0a06", border: "1px solid #2e2215", borderRadius: 8, color: "#f0e4cc", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+      />
+      {searchResults.length > 0 && (
+        <div style={{ position: "absolute", left: 14, right: 14, top: "calc(100% - 4px)", background: "#1c1409", border: "1px solid #2e2215", borderRadius: 8, zIndex: 10000, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.6)" }}>
+          {searchResults.map((beer) => (
+            <div
+              key={beer.id}
+              onClick={() => handleSearchSelect(beer)}
+              style={{ padding: "9px 14px", cursor: "pointer", borderBottom: "1px solid #2e2215", display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <span style={{ fontWeight: 600, fontSize: 13, color: "#f0e4cc", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{beer.nombre}</span>
+              <span style={{ fontSize: 11, color: "#9a7d62", flexShrink: 0 }}>{beer.pais}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   // ── Shared marker layer ────────────────────────────────────────────────────
   const markers = locationGroups.map((loc) => {
@@ -225,6 +301,7 @@ const OriginMapPanel = ({ beers }) => {
               scrollWheelZoom>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
+              <MapController target={mapTarget} />
               {markers}
             </MapContainer>
           </div>
@@ -238,8 +315,9 @@ const OriginMapPanel = ({ beers }) => {
             borderLeft: isMobile ? "none" : "1px solid #2e2215",
             background: "#0d0a06",
           }}>
+            {searchPanel}
             {!selectedLoc ? (
-              <p style={{ color: "#5a4535", fontSize: 13, padding: 20, textAlign: "center" }}>
+              <p style={{ color: "#5a4535", fontSize: 13, padding: "8px 20px 20px", textAlign: "center" }}>
                 {t("map.hint")}
               </p>
             ) : (
@@ -261,14 +339,21 @@ const OriginMapPanel = ({ beers }) => {
 
   // ── Inline panel ───────────────────────────────────────────────────────────
   return (
-    <div style={{ margin: "0 0 24px", borderRadius: 14, overflow: "hidden", border: "1px solid #2e2215" }}>
-      <MapContainer center={[46, 10]} zoom={4}
-        style={{ height: 400, width: "100%", background: "#0d0a06" }}
-        scrollWheelZoom>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
-        {markers}
-      </MapContainer>
+    <div style={{ margin: "0 0 24px", borderRadius: 14, border: "1px solid #2e2215", overflow: "visible" }}>
+      <div style={{ borderRadius: "14px 14px 0 0", overflow: "hidden" }}>
+        <MapContainer center={[46, 10]} zoom={4}
+          style={{ height: 400, width: "100%", background: "#0d0a06" }}
+          scrollWheelZoom>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
+          <MapController target={mapTarget} />
+          {markers}
+        </MapContainer>
+      </div>
+
+      <div style={{ background: "#0d0a06", borderTop: "1px solid #2e2215" }}>
+        {searchPanel}
+      </div>
 
       {statsStrip}
 

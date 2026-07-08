@@ -8,6 +8,251 @@ function fmtDate(ts) {
   return new Date(ts).toLocaleDateString([], { day: "2-digit", month: "short", year: "numeric" });
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const parseCoords = (raw) => {
+  if (!raw || !raw.trim()) return null;
+  const nums = raw.match(/-?\d+\.?\d*/g);
+  if (!nums || nums.length < 2) return null;
+  const lat = parseFloat(nums[0]);
+  const lng = parseFloat(nums[1]);
+  if (isNaN(lat) || isNaN(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return { lat, lng };
+};
+
+// ── Sub-panel: Cargar Cerveza ─────────────────────────────────────────────────
+const CargarCerveza = () => {
+  const [form, setForm] = useState({
+    nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "",
+    rareza: "comun", es_edicion_especial: false, motivo_edicion: "",
+  });
+  const [fotoFile, setFotoFile]       = useState(null);
+  const [fotoPreview, setFotoPreview] = useState(null);
+  const [coordsRaw, setCoordsRaw]     = useState("");
+  const [coordsParsed, setCoordsParsed] = useState(null);
+  const [coordsError, setCoordsError]   = useState("");
+  const [saving, setSaving]   = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError]     = useState("");
+
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const handleFoto = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFotoFile(file);
+    setFotoPreview(URL.createObjectURL(file));
+  };
+
+  const handleCoords = (e) => {
+    const raw = e.target.value;
+    setCoordsRaw(raw);
+    if (!raw.trim()) { setCoordsParsed(null); setCoordsError(""); return; }
+    const parsed = parseCoords(raw);
+    if (parsed) { setCoordsParsed(parsed); setCoordsError(""); }
+    else { setCoordsParsed(null); setCoordsError("No se pudo extraer lat/lng válidos. Revisá el formato."); }
+  };
+
+  const handleCopyPrompt = () => {
+    const { nombre, estilo, pais } = form;
+    const prompt =
+      `Necesito la descripción técnica y las coordenadas de origen para: ${nombre || "[nombre]"}, ` +
+      `estilo ${estilo || "[estilo]"}, país/región ${pais || "[país]"}. ` +
+      `Devolvé:\n` +
+      `1) Un párrafo breve técnico de la cerveza (sabor, aroma, color, maridaje).\n` +
+      `2) Las coordenadas de origen en formato: lat, lng (solo los dos números con signo negativo si corresponde, separados por coma).`;
+    navigator.clipboard.writeText(prompt).catch(() => {});
+  };
+
+  const handleSave = async () => {
+    if (!form.nombre.trim()) { setError("El nombre es obligatorio."); return; }
+    setError(""); setSuccess(""); setSaving(true);
+
+    let foto_url = null;
+
+    // 1. Upload foto si hay archivo
+    if (fotoFile) {
+      const ext  = fotoFile.name.split(".").pop();
+      const path = `${form.nombre.trim()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("Cervezas")
+        .upload(path, fotoFile, { upsert: true, contentType: fotoFile.type });
+      if (upErr) { setError(`Error subiendo foto: ${upErr.message}`); setSaving(false); return; }
+      const { data: urlData } = supabase.storage.from("Cervezas").getPublicUrl(path);
+      foto_url = urlData.publicUrl;
+    }
+
+    // 2. Insert en beers_new
+    const row = {
+      nombre:             form.nombre.trim() || null,
+      estilo:             form.estilo.trim() || null,
+      pais:               form.pais.trim() || null,
+      alcohol:            form.alcohol !== "" ? parseFloat(form.alcohol) : null,
+      info_detallada:     form.info_detallada.trim() || null,
+      foto_url,
+      origen_lat:         coordsParsed?.lat ?? null,
+      origen_lng:         coordsParsed?.lng ?? null,
+      rareza:             form.rareza,
+      es_edicion_especial: form.es_edicion_especial,
+      motivo_edicion:     form.motivo_edicion.trim() || null,
+    };
+
+    const { error: dbErr } = await supabase.from("beers_new").insert(row);
+    if (dbErr) { setError(`Error guardando: ${dbErr.message}`); setSaving(false); return; }
+
+    setSuccess(`✓ "${form.nombre}" guardada correctamente.`);
+    setForm({ nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "", rareza: "comun", es_edicion_especial: false, motivo_edicion: "" });
+    setFotoFile(null); setFotoPreview(null);
+    setCoordsRaw(""); setCoordsParsed(null);
+    setSaving(false);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 580 }}>
+
+      {/* ── Básicos ── */}
+      <div style={sectionCard}>
+        <p style={sectionTitle}>Datos básicos</p>
+
+        <Field label="Nombre *">
+          <input value={form.nombre} onChange={set("nombre")} placeholder="Ej: Tripel Karmeliet" style={input} />
+        </Field>
+        <Field label="Estilo">
+          <input value={form.estilo} onChange={set("estilo")} placeholder="Ej: Belgian Tripel" style={input} />
+        </Field>
+        <Field label="País / Región">
+          <input value={form.pais} onChange={set("pais")} placeholder="Ej: España (A Coruña)" style={input} />
+        </Field>
+        <Field label="Graduación (%)">
+          <input value={form.alcohol} onChange={set("alcohol")} type="number" min="0" max="30" step="0.1"
+            placeholder="Ej: 8.4" style={{ ...input, width: 120 }} />
+        </Field>
+
+        <Field label="Rareza">
+          <select value={form.rareza} onChange={set("rareza")} style={input}>
+            <option value="comun">⚪ Común</option>
+            <option value="poco_comun">🟢 Poco común</option>
+            <option value="rara">🔵 Rara</option>
+            <option value="epica">🟣 Épica</option>
+            <option value="legendaria">🟡 Legendaria</option>
+            <option value="mitica">🌈 Mítica</option>
+          </select>
+        </Field>
+
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={form.es_edicion_especial}
+              onChange={(e) => setForm((f) => ({ ...f, es_edicion_especial: e.target.checked }))}
+              style={{ width: 16, height: 16, accentColor: "#d4af37", cursor: "pointer" }}
+            />
+            <span style={{ fontSize: 13, color: "#f0e4cc", fontWeight: 600 }}>✨ Edición especial</span>
+          </label>
+        </div>
+
+        {form.es_edicion_especial && (
+          <Field label="Motivo / nombre de la edición">
+            <input value={form.motivo_edicion} onChange={set("motivo_edicion")}
+              placeholder="Ej: Navidad 2024, 25º Aniversario…" style={input} />
+          </Field>
+        )}
+
+        <Field label="Foto">
+          <input type="file" accept="image/*" onChange={handleFoto}
+            style={{ color: "#f0e4cc", fontSize: 13 }} />
+          {fotoPreview && (
+            <img src={fotoPreview} alt="preview"
+              style={{ marginTop: 10, height: 100, borderRadius: 8, objectFit: "cover", border: "1px solid #2e2215" }} />
+          )}
+        </Field>
+      </div>
+
+      {/* ── Prompt Claude ── */}
+      <div style={sectionCard}>
+        <p style={sectionTitle}>Asistente Claude</p>
+
+        <button onClick={handleCopyPrompt} style={copyBtn}>
+          📋 Copiar prompt para Claude
+        </button>
+        <p style={{ margin: "8px 0 16px", color: "#5a4535", fontSize: 12 }}>
+          Pegá los datos básicos primero, luego copiá el prompt y pegalo en Claude.
+        </p>
+
+        <Field label="Descripción técnica (pegar respuesta de Claude)">
+          <textarea
+            value={form.info_detallada}
+            onChange={set("info_detallada")}
+            rows={4}
+            placeholder="Pegar aquí el párrafo de descripción..."
+            style={textarea}
+          />
+        </Field>
+
+        <Field label="Coordenadas de origen (pegar respuesta de Claude)">
+          <textarea
+            value={coordsRaw}
+            onChange={handleCoords}
+            rows={2}
+            placeholder="Ej: -34.6037, -58.3816"
+            style={{ ...textarea, marginBottom: 6 }}
+          />
+          {coordsParsed && (
+            <p style={{ margin: 0, fontSize: 13, color: "#4caf50" }}>
+              ✓ Lat: {coordsParsed.lat} · Lng: {coordsParsed.lng}
+            </p>
+          )}
+          {coordsError && (
+            <p style={{ margin: 0, fontSize: 13, color: "#c07a3f" }}>{coordsError}</p>
+          )}
+        </Field>
+      </div>
+
+      {/* ── Guardar ── */}
+      {error   && <p style={{ margin: 0, color: "#c0392b", fontSize: 14 }}>{error}</p>}
+      {success && <p style={{ margin: 0, color: "#4caf50", fontSize: 14 }}>{success}</p>}
+
+      <button onClick={handleSave} disabled={saving} style={{ ...approveBtn, padding: "13px 0", fontSize: 15, borderRadius: 10 }}>
+        {saving ? "Guardando..." : "💾 Guardar cerveza"}
+      </button>
+    </div>
+  );
+};
+
+const Field = ({ label, children, style }) => (
+  <div style={{ marginBottom: 14, ...style }}>
+    <label style={labelStyle}>{label}</label>
+    {children}
+  </div>
+);
+
+const input = {
+  width: "100%", padding: "9px 12px", background: "#0d0a06",
+  border: "1px solid #2e2215", borderRadius: 8, color: "#f0e4cc",
+  fontSize: 14, outline: "none", boxSizing: "border-box",
+};
+
+const sectionCard = {
+  background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: "16px 18px",
+};
+
+const sectionTitle = {
+  margin: "0 0 14px", fontSize: 12, fontWeight: 700, color: "#9a7d62",
+  textTransform: "uppercase", letterSpacing: "0.5px",
+};
+
+const copyBtn = {
+  padding: "9px 18px", background: "rgba(212,175,55,0.1)", border: "1px solid #d4af37",
+  borderRadius: 8, color: "#d4af37", fontWeight: 700, fontSize: 13, cursor: "pointer",
+};
+
+const textarea = {
+  width: "100%", padding: "8px 10px", background: "#0d0a06",
+  border: "1px solid #2e2215", borderRadius: 8, color: "#f0e4cc",
+  fontSize: 13, resize: "vertical", outline: "none",
+  boxSizing: "border-box", marginBottom: 0, fontFamily: "Inter, sans-serif",
+};
+
 // ── Sub-panel: Soporte ────────────────────────────────────────────────────────
 const SupportPanel = ({ t }) => {
   const [tickets, setTickets]   = useState([]);
@@ -237,17 +482,18 @@ const AdminPanel = ({ profile }) => {
       <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 24px" }}>{t("admin.subtitle")}</p>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "2px solid #2e2215" }}>
+      <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "2px solid #2e2215", overflowX: "auto" }}>
         {[
           { key: "support",     label: t("admin.tabSupport"),     icon: "🆘" },
           { key: "suggestions", label: t("admin.tabSuggestions"), icon: "💡" },
+          { key: "cargar",      label: "Cargar Cerveza",          icon: "🍺" },
         ].map(({ key, label, icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
             style={{
               padding: "10px 22px", border: "none", background: "none",
-              cursor: "pointer", fontWeight: 700, fontSize: 14,
+              cursor: "pointer", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap",
               color: tab === key ? "#d4af37" : "#5a4535",
               borderBottom: tab === key ? "3px solid #d4af37" : "3px solid transparent",
               marginBottom: -2, transition: "all 0.15s",
@@ -260,6 +506,7 @@ const AdminPanel = ({ profile }) => {
 
       {tab === "support"     && <SupportPanel     t={t} />}
       {tab === "suggestions" && <SuggestionsPanel t={t} />}
+      {tab === "cargar"      && <CargarCerveza />}
     </div>
   );
 };

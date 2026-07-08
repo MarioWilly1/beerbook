@@ -135,6 +135,7 @@ const Dashboard = () => {
   const [refresh, setRefresh] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [focusBeer, setFocusBeer] = useState(null);
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState(null);
   const [countryFilter, setCountryFilter] = useState(null);
@@ -228,7 +229,13 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {showMap && <OriginMapPanel beers={beers} />}
+      {showMap && (
+        <OriginMapPanel
+          beers={beers}
+          focusBeer={focusBeer}
+          onFocusConsumed={() => setFocusBeer(null)}
+        />
+      )}
       {showSuggest && <SuggestBeerModal onClose={() => setShowSuggest(false)} t={t} />}
 
       <BeerFilters
@@ -263,6 +270,7 @@ const Dashboard = () => {
             onSaved={() => setRefresh(true)}
             isInMyBeers={!!userBeers.find((b) => b.beer_id === beer.id)}
             inCuaderno={false}
+            onVerMapa={beer.origen_lat != null ? () => { setFocusBeer(beer); setShowMap(true); } : null}
           />
         ))}
       </div>

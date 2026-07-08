@@ -29,6 +29,10 @@ export const useMyBeers = () => {
           location_name,
           location_public,
           place_id,
+          en_coleccion,
+          condicion,
+          fecha_adquisicion,
+          notas_coleccion,
           beers_new (
             id,
             nombre,
@@ -37,7 +41,12 @@ export const useMyBeers = () => {
             alcohol,
             descripcion,
             foto_url,
-            info_detallada
+            info_detallada,
+            rareza,
+            es_edicion_especial,
+            motivo_edicion,
+            origen_lat,
+            origen_lng
           )
         `)
         .eq("user_id", session.user.id);
@@ -56,6 +65,10 @@ export const useMyBeers = () => {
           location_name: row.location_name,
           location_public: row.location_public,
           place_id: row.place_id,
+          en_coleccion: row.en_coleccion ?? false,
+          condicion: row.condicion ?? null,
+          fecha_adquisicion: row.fecha_adquisicion ?? null,
+          notas_coleccion: row.notas_coleccion ?? null,
         }));
         setBeers(mapped);
       }

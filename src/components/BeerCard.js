@@ -16,7 +16,7 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
-const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
+const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
   const { t, i18n } = useTranslation();
   const [times, setTimes]     = useState(myBeerData?.times || 0);
   const [comment, setComment] = useState(myBeerData?.comment || "");
@@ -125,6 +125,11 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
       <div style={{ padding: "10px 4px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 2px" }}>
           <h3 style={{ margin: 0, fontSize: "15px", color: "#f0e4cc", flex: 1 }}>{beer.nombre}</h3>
+          {onVerMapa && (
+            <button onClick={onVerMapa} title="Ver en el mapa de origen" style={infoBtnStyle}>
+              🗺️
+            </button>
+          )}
           <button
             onClick={() => setInfoOpen(true)}
             title={t("beerInfo.btnTitle")}
@@ -213,7 +218,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers }) => {
         )}
       </div>
 
-      {infoOpen && <BeerInfoModal beer={beer} onClose={() => setInfoOpen(false)} />}
+      {infoOpen && <BeerInfoModal beer={beer} onClose={() => setInfoOpen(false)} onVerMapa={onVerMapa} />}
     </div>
   );
 };

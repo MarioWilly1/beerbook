@@ -26,6 +26,14 @@ const RAREZA_LABEL  = {
   comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
   epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
 };
+const RAREZA_BADGE = {
+  comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.25)"  },
+  poco_comun: { color: "#4a9e6a", bg: "rgba(74,158,106,0.12)",  border: "rgba(74,158,106,0.3)"   },
+  rara:       { color: "#4a90d9", bg: "rgba(74,144,217,0.12)",  border: "rgba(74,144,217,0.3)"   },
+  epica:      { color: "#a366e8", bg: "rgba(163,102,232,0.12)", border: "rgba(163,102,232,0.25)" },
+  legendaria: { color: "#d4af37", bg: "rgba(212,175,55,0.12)",  border: "rgba(212,175,55,0.3)"   },
+  mitica:     { color: "#e040fb", bg: "rgba(224,64,251,0.1)",   border: "rgba(224,64,251,0.25)"  },
+};
 const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
 
 const puedeColeccionar = (beer) =>
@@ -663,15 +671,18 @@ const MiCuaderno = () => {
                   </div>
 
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-                    {beer.rareza && beer.rareza !== "comun" && (
-                      <span style={{
-                        fontSize: 11, fontWeight: 700, color: "#a366e8",
-                        background: "rgba(163,102,232,0.12)", borderRadius: 5, padding: "2px 7px",
-                        border: "1px solid rgba(163,102,232,0.25)",
-                      }}>
-                        {RAREZA_LABEL[beer.rareza] || beer.rareza}
-                      </span>
-                    )}
+                    {beer.rareza && (() => {
+                      const rb = RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun;
+                      return (
+                        <span style={{
+                          fontSize: 11, fontWeight: 700, color: rb.color,
+                          background: rb.bg, borderRadius: 5, padding: "2px 7px",
+                          border: `1px solid ${rb.border}`,
+                        }}>
+                          {RAREZA_LABEL[beer.rareza] || beer.rareza}
+                        </span>
+                      );
+                    })()}
                     {beer.es_edicion_especial && (
                       <span style={{
                         fontSize: 11, fontWeight: 700, color: "#f0d060",

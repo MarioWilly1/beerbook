@@ -16,6 +16,19 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
+const RAREZA_LABEL = {
+  comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
+  epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
+};
+const RAREZA_BADGE = {
+  comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.2)"   },
+  poco_comun: { color: "#4a9e6a", bg: "rgba(74,158,106,0.12)",  border: "rgba(74,158,106,0.3)"   },
+  rara:       { color: "#4a90d9", bg: "rgba(74,144,217,0.12)",  border: "rgba(74,144,217,0.3)"   },
+  epica:      { color: "#a366e8", bg: "rgba(163,102,232,0.12)", border: "rgba(163,102,232,0.3)"  },
+  legendaria: { color: "#d4af37", bg: "rgba(212,175,55,0.12)",  border: "rgba(212,175,55,0.3)"   },
+  mitica:     { color: "#e040fb", bg: "rgba(224,64,251,0.1)",   border: "rgba(224,64,251,0.25)"  },
+};
+
 const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
   const { t, i18n } = useTranslation();
   const [times, setTimes]     = useState(myBeerData?.times || 0);
@@ -139,6 +152,19 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
           </button>
         </div>
         <p style={metaStyle}>{beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%</p>
+        {beer.rareza && (() => {
+          const rb = RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun;
+          return (
+            <span style={{
+              display: "inline-block", marginBottom: 6,
+              fontSize: 10, fontWeight: 700, color: rb.color,
+              background: rb.bg, borderRadius: 5, padding: "2px 7px",
+              border: `1px solid ${rb.border}`,
+            }}>
+              {RAREZA_LABEL[beer.rareza] || beer.rareza}
+            </span>
+          );
+        })()}
         {beer.sugerida_por_nombre && (
           <p style={{ margin: "0 0 4px", fontSize: 11, color: "#8b6b2e", fontStyle: "italic" }}>
             💡 {t("beercard.suggestedBy", { nombre: beer.sugerida_por_nombre })}

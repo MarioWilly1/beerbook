@@ -93,26 +93,29 @@ const Logros = () => {
                 key={ach.slug}
                 style={{
                   borderRadius: 14,
-                  padding: "18px 16px",
+                  padding: "16px 14px",
                   background: "#1c1409",
                   border: isUnlocked ? "2px solid #d4af37" : "2px solid #2e2215",
                   opacity: isUnlocked ? 1 : 0.6,
                   position: "relative",
+                  minWidth: 0,
+                  overflow: "hidden",
                 }}
               >
                 <div
                   style={{
-                    fontSize: 34,
+                    fontSize: 32,
                     marginBottom: 8,
                     filter: isUnlocked ? "none" : "grayscale(1)",
+                    lineHeight: 1,
                   }}
                 >
                   {ach.emoji}
                 </div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc", marginBottom: 4 }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: "#f0e4cc", marginBottom: 4, overflowWrap: "break-word", wordBreak: "break-word", lineHeight: 1.3 }}>
                   {t(`achievement.${ach.slug}.name`)}
                 </div>
-                <div style={{ fontSize: 12, color: "#9a7d62", lineHeight: 1.4, marginBottom: 8 }}>
+                <div style={{ fontSize: 11, color: "#9a7d62", lineHeight: 1.4, marginBottom: 8, overflowWrap: "break-word", wordBreak: "break-word" }}>
                   {t(`achievement.${ach.slug}.desc`)}
                 </div>
                 <div

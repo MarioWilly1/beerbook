@@ -20,6 +20,16 @@ import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../util
 import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 
+function slugify(str) {
+  return String(str)
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()
+    .slice(0, 60);
+}
+
 function compressImage(file, maxDimension = 1080, quality = 0.85) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -311,7 +321,8 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Sin sesión");
       const blob = await compressImage(file);
-      const path = `${session.user.id}/${beer.id}_${crypto.randomUUID()}.jpg`;
+      const safeName = slugify(beer.nombre) || String(beer.id);
+      const path = `${session.user.id}/${safeName}_${crypto.randomUUID()}.jpg`;
       const { error: upErr } = await supabase.storage
         .from("user-beers")
         .upload(path, blob, { contentType: "image/jpeg" });

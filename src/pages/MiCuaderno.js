@@ -19,16 +19,7 @@ import LocationPicker from "../components/LocationPicker";
 import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
 import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
-
-function slugify(str) {
-  return String(str)
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase()
-    .slice(0, 60);
-}
+import { slugify } from "../utils/slugify";
 
 function compressImage(file, maxDimension = 1080, quality = 0.85) {
   return new Promise((resolve) => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
+import { slugify } from "../utils/slugify";
 
 function fmtDate(ts) {
   if (!ts) return "—";
@@ -73,8 +74,9 @@ const CargarCerveza = () => {
 
     // 1. Upload foto si hay archivo
     if (fotoFile) {
-      const ext  = fotoFile.name.split(".").pop();
-      const path = `${form.nombre.trim()}.${ext}`;
+      const rawExt = fotoFile.name.split(".").pop() || "jpg";
+      const ext    = /^[a-zA-Z0-9]+$/.test(rawExt) ? rawExt.toLowerCase() : "jpg";
+      const path   = `${slugify(form.nombre.trim())}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("Cervezas")
         .upload(path, fotoFile, { upsert: true, contentType: fotoFile.type });

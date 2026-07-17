@@ -480,5 +480,12 @@
     "storyReplyLabel":       "Historia de {{nombre}}",
     "replyTo":               "Responder a {{nombre}}...",
     "replySent":             "Enviado ✓"
+  },
+  "prestige": {
+    "cta":         "✨ Hacer Prestigio",
+    "confirmBody": "Tu nivel vuelve a 1, pero conservás todo tu XP histórico, tus logros e insignias. Vas a sumar el Prestigio {{n}}.",
+    "confirmYes":  "Sí, prestigiar",
+    "confirmNo":   "Cancelar",
+    "success":     "¡Prestigio {{n}} conseguido! 🎉"
   }
 }

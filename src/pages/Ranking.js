@@ -5,6 +5,7 @@ import { useRanking } from "../hooks/useRanking";
 import { supabase } from "../services/supabase";
 import { getLevelInfo } from "../utils/xp";
 import Avatar from "../components/Avatar";
+import PrestigeBadge from "../components/PrestigeBadge";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
@@ -29,9 +30,10 @@ const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
       </span>
       <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc" }}>
+        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           {entry.nombre || "Usuario"}
-          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e", marginLeft: 8 }}>{selfLabel}</span>}
+          <PrestigeBadge prestige={entry.prestige} size="sm" />
+          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
         <div style={{ fontSize: 12, color: isSelf ? "#3a2a10" : "#9a7d62" }}>{levelName}</div>
       </div>
@@ -54,9 +56,10 @@ const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) =
       </span>
       <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc" }}>
+        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           {entry.nombre || "Usuario"}
-          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e", marginLeft: 8 }}>{selfLabel}</span>}
+          <PrestigeBadge prestige={entry.prestige} size="sm" />
+          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
       </div>
       <div style={{ textAlign: "right" }}>

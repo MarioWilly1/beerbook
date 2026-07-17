@@ -480,5 +480,12 @@
     "storyReplyLabel":       "Story von {{nombre}}",
     "replyTo":               "An {{nombre}} antworten...",
     "replySent":             "Gesendet ✓"
+  },
+  "prestige": {
+    "cta":         "✨ Prestige aktivieren",
+    "confirmBody": "Dein Level wird auf 1 zurückgesetzt, aber dein gesamter XP-Verlauf, deine Erfolge und Abzeichen bleiben erhalten. Du erreichst Prestige {{n}}.",
+    "confirmYes":  "Ja, Prestige",
+    "confirmNo":   "Abbrechen",
+    "success":     "Prestige {{n}} erreicht! 🎉"
   }
 }

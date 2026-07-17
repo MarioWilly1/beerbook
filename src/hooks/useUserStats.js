@@ -4,43 +4,56 @@ import { getLevelInfo } from "../utils/xp";
 
 export const useUserStats = () => {
   const [stats, setStats] = useState({
-    xp: 0, level: 1, beers: 0, verifiedBeers: 0,
+    xp: 0, lifetimeXP: 0, level: 1, beers: 0, verifiedBeers: 0,
     currentStreak: 0, longestStreak: 0,
+    prestige: 0, prestigeThreshold: null, canPrestige: false,
   });
 
   const fetchStats = async (session) => {
     if (!session) {
-      setStats({ xp: 0, level: 1, beers: 0, verifiedBeers: 0, currentStreak: 0, longestStreak: 0 });
+      setStats({
+        xp: 0, lifetimeXP: 0, level: 1, beers: 0, verifiedBeers: 0,
+        currentStreak: 0, longestStreak: 0,
+        prestige: 0, prestigeThreshold: null, canPrestige: false,
+      });
       return;
     }
 
     const uid = session.user.id;
 
-    const [beersRes, achRes, badgesRes, profileRes] = await Promise.all([
+    const [beersRes, achRes, badgesRes, profileRes, thresholdRes] = await Promise.all([
       supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", uid),
       supabase.from("user_achievements").select("xp_awarded").eq("user_id", uid),
       supabase.from("user_badges").select("xp_awarded").eq("user_id", uid),
       supabase.from("profiles")
-        .select("current_streak, longest_streak")
+        .select("current_streak, longest_streak, prestige, prestige_xp_baseline")
         .eq("id", uid)
         .single(),
+      supabase.rpc("get_prestige_threshold"),
     ]);
 
     const beerData     = beersRes.data || [];
     const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);
     const achXP        = (achRes.data    || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
     const badgeXP      = (badgesRes.data || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
-    const totalXP      = beerXP + achXP + badgeXP;
-    const { level }    = getLevelInfo(totalXP);
+    const lifetimeXP   = beerXP + achXP + badgeXP;
+    const baseline     = profileRes.data?.prestige_xp_baseline || 0;
+    const cycleXP       = Math.max(0, lifetimeXP - baseline);
+    const { level }    = getLevelInfo(cycleXP);
     const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;
+    const prestigeThreshold = thresholdRes.data ?? null;
 
     setStats({
-      xp: totalXP,
+      xp: cycleXP,
+      lifetimeXP,
       beers: beerData.length,
       verifiedBeers,
       level,
       currentStreak: profileRes.data?.current_streak || 0,
       longestStreak: profileRes.data?.longest_streak || 0,
+      prestige: profileRes.data?.prestige || 0,
+      prestigeThreshold,
+      canPrestige: prestigeThreshold != null && level >= prestigeThreshold,
     });
   };
 

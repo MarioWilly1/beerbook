@@ -1,16 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { supabase } from "../services/supabase";
 import { useUserStats } from "../hooks/useUserStats";
 import { getLevelInfo } from "../utils/xp";
+import { toastPrestige } from "../utils/toast";
+import { celebrateLevel } from "../utils/celebrate";
+import PrestigeBadge from "./PrestigeBadge";
 
 const UserLevelCard = () => {
-  const { stats } = useUserStats();
+  const { t } = useTranslation();
+  const { stats, refetch } = useUserStats();
   const { level, levelName, xpIntoLevel, xpNeeded, progressPct } = getLevelInfo(stats.xp);
+  const [confirming, setConfirming] = useState(false);
+  const [prestiging, setPrestiging] = useState(false);
+
+  const handlePrestige = async () => {
+    setPrestiging(true);
+    const { data, error } = await supabase.rpc("do_prestige");
+    setPrestiging(false);
+    setConfirming(false);
+    if (error) return;
+    const newPrestige = data?.[0]?.new_prestige;
+    if (newPrestige != null) {
+      toastPrestige(newPrestige);
+      celebrateLevel();
+    }
+    refetch();
+  };
 
   return (
     <div style={cardStyle}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "4px" }}>
-        <span style={{ fontSize: "13px", fontWeight: "700", color: "#d4af37" }}>
+        <span style={{ fontSize: "13px", fontWeight: "700", color: "#d4af37", display: "flex", alignItems: "center", gap: 6 }}>
           Nv. {level} · {levelName}
+          <PrestigeBadge prestige={stats.prestige} size="sm" />
         </span>
         <span style={{ fontSize: "11px", color: "#9a7d62" }}>🍺 {stats.beers}</span>
       </div>
@@ -40,6 +63,28 @@ const UserLevelCard = () => {
           )}
         </div>
       )}
+
+      {stats.canPrestige && !confirming && (
+        <button onClick={() => setConfirming(true)} style={prestigeBtnStyle}>
+          {t("prestige.cta")}
+        </button>
+      )}
+
+      {confirming && (
+        <div style={confirmBoxStyle}>
+          <p style={{ margin: "0 0 8px", fontSize: 11, color: "#f0e4cc", lineHeight: 1.5 }}>
+            {t("prestige.confirmBody", { n: stats.prestige + 1 })}
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={handlePrestige} disabled={prestiging} style={confirmYesStyle}>
+              {prestiging ? "…" : t("prestige.confirmYes")}
+            </button>
+            <button onClick={() => setConfirming(false)} disabled={prestiging} style={confirmNoStyle}>
+              {t("prestige.confirmNo")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -59,6 +104,51 @@ const streakStyle = {
   fontWeight: "600",
   borderTop: "1px solid rgba(255,255,255,0.06)",
   paddingTop: "6px",
+};
+
+const prestigeBtnStyle = {
+  width: "100%",
+  marginTop: "10px",
+  padding: "8px 0",
+  borderRadius: "8px",
+  border: "1px solid rgba(212,175,55,0.55)",
+  background: "linear-gradient(90deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))",
+  color: "#d4af37",
+  fontSize: "12px",
+  fontWeight: "700",
+  cursor: "pointer",
+};
+
+const confirmBoxStyle = {
+  marginTop: "10px",
+  padding: "10px",
+  borderRadius: "8px",
+  background: "rgba(0,0,0,0.25)",
+  border: "1px solid rgba(212,175,55,0.3)",
+};
+
+const confirmYesStyle = {
+  flex: 1,
+  padding: "7px 0",
+  borderRadius: "7px",
+  border: "none",
+  background: "#d4af37",
+  color: "#0d0a06",
+  fontSize: "11px",
+  fontWeight: "700",
+  cursor: "pointer",
+};
+
+const confirmNoStyle = {
+  flex: 1,
+  padding: "7px 0",
+  borderRadius: "7px",
+  border: "1px solid #2e2215",
+  background: "transparent",
+  color: "#9a7d62",
+  fontSize: "11px",
+  fontWeight: "600",
+  cursor: "pointer",
 };
 
 export default UserLevelCard;

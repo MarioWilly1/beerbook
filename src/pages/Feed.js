@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useFeed } from "../hooks/useFeed";
 import { useFeedReactions } from "../hooks/useFeedReactions";
 import Avatar from "../components/Avatar";
+import PrestigeBadge from "../components/PrestigeBadge";
 import Lightbox from "../components/Lightbox";
 import ReactionBar from "../components/ReactionBar";
 import StoryBar from "../components/StoryBar";
@@ -41,6 +42,8 @@ const FeedEntry = ({ entry, reactionData, currentUserId, onToggle }) => {
           <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
           <div style={{ flex: 1 }}>
             <span style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc" }}>{entry.nombre}</span>
+            {" "}
+            <PrestigeBadge prestige={entry.prestige} size="sm" />
             {" "}
             <span style={{ fontSize: 14, color: "#9a7d62" }}>{emoji} {label}</span>
             {" "}

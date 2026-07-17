@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
 import Avatar from "./Avatar";
+import PrestigeBadge from "./PrestigeBadge";
 import AvatarSelector from "./AvatarSelector";
 import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
@@ -139,8 +140,9 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
                 ✏️
               </span>
             </div>
-            <p style={{ textAlign: "center", fontSize: "13px", opacity: 0.75, margin: "8px 0 0", color: "#f0e4cc" }}>
+            <p style={{ textAlign: "center", fontSize: "13px", opacity: 0.75, margin: "8px 0 0", color: "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
               {username}
+              <PrestigeBadge prestige={profile?.prestige} size="sm" />
             </p>
           </div>
 

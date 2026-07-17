@@ -5,6 +5,7 @@ import { supabase } from "../services/supabase";
 import { BADGE_DEFS, TIER_META, TIERS } from "../utils/badges";
 import { getLevelInfo } from "../utils/xp";
 import Avatar from "../components/Avatar";
+import PrestigeBadge from "../components/PrestigeBadge";
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -31,7 +32,7 @@ const ProfilePage = () => {
 
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak")
+        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, prestige, prestige_xp_baseline")
         .eq("id", userId)
         .single();
 
@@ -74,11 +75,12 @@ const ProfilePage = () => {
         const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);
         const achXP        = (achRes.data  || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
         const badgeXP      = (badgesRes.data || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
-        const totalXP      = beerXP + achXP + badgeXP;
+        const lifetimeXP  = beerXP + achXP + badgeXP;
+        const cycleXP      = Math.max(0, lifetimeXP - (prof.prestige_xp_baseline || 0));
         const totalBeers   = beerData.length;
         const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;
 
-        setStats({ totalXP, totalBeers, verifiedBeers, ...getLevelInfo(totalXP) });
+        setStats({ totalXP: lifetimeXP, totalBeers, verifiedBeers, ...getLevelInfo(cycleXP) });
 
         const slugs = prof.featured_badges || [];
         if (slugs.length > 0) {
@@ -130,7 +132,10 @@ const ProfilePage = () => {
       <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24, padding: 24, background: "#1c1409", borderRadius: 16, border: "1px solid #2e2215" }}>
         <Avatar avatarUrl={profileData.avatar_url} nombre={profileData.nombre} size={72} />
         <div style={{ flex: 1 }}>
-          <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{profileData.nombre}</h2>
+          <h2 style={{ margin: "0 0 4px", fontSize: 22, display: "flex", alignItems: "center", gap: 8 }}>
+            {profileData.nombre}
+            <PrestigeBadge prestige={profileData.prestige} size="md" />
+          </h2>
           {profileData.pais_origen && (
             <p style={{ margin: "0 0 6px", fontSize: 13, color: "#9a7d62" }}>
               📍 {profileData.pais_origen}

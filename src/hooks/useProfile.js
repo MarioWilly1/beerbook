@@ -16,7 +16,7 @@ export const useProfile = (session) => {
     setLoading(true);
     supabase
       .from("profiles")
-      .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking, ranking_consent_shown, current_streak, longest_streak, preferred_language, is_admin")
+      .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking, ranking_consent_shown, current_streak, longest_streak, preferred_language, is_admin, prestige, prestige_xp_baseline")
       .eq("id", userId)
       .single()
       .then(({ data }) => {

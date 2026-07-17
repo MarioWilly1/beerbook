@@ -480,5 +480,12 @@
     "storyReplyLabel":       "Story by {{nombre}}",
     "replyTo":               "Reply to {{nombre}}...",
     "replySent":             "Sent ✓"
+  },
+  "prestige": {
+    "cta":         "✨ Prestige",
+    "confirmBody": "Your level resets to 1, but you keep all your lifetime XP, achievements and badges. You'll earn Prestige {{n}}.",
+    "confirmYes":  "Yes, prestige",
+    "confirmNo":   "Cancel",
+    "success":     "Prestige {{n}} unlocked! 🎉"
   }
 }

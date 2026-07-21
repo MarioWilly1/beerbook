@@ -444,6 +444,7 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
               value={beer.comment}
               onChange={(e) => onChange(beer.id, "comment", e.target.value)}
               rows={3}
+              maxLength={500}
               placeholder={t("notebook.commentPlaceholder")}
               style={{ ...nbInputStyle, resize: "vertical" }}
               spellCheck="true"

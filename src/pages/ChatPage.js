@@ -280,6 +280,7 @@ const ChatPage = () => {
           placeholder={t("chat.typeMessage")}
           style={inputStyle}
           disabled={sending}
+          maxLength={1000}
           autoComplete="off"
           spellCheck="true"
           autoCorrect="on"

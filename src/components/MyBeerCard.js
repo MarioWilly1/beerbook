@@ -81,6 +81,7 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Comentario o anécdota"
+            maxLength={500}
             rows={3}
             style={{ width: "100%", marginTop: "8px" }}
             spellCheck="true"

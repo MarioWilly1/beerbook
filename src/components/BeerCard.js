@@ -247,6 +247,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={2}
+              maxLength={500}
               placeholder={t("beerform.commentPlaceholder")}
               style={{ ...inputStyle, resize: "none" }}
               spellCheck="true"

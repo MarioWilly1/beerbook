@@ -21,7 +21,7 @@ export const useUserStats = () => {
 
     const uid = session.user.id;
 
-    const [beersRes, achRes, badgesRes, profileRes, thresholdRes] = await Promise.all([
+    const [beersRes, achRes, badgesRes, profileRes] = await Promise.all([
       supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", uid),
       supabase.from("user_achievements").select("xp_awarded").eq("user_id", uid),
       supabase.from("user_badges").select("xp_awarded").eq("user_id", uid),
@@ -29,8 +29,13 @@ export const useUserStats = () => {
         .select("current_streak, longest_streak, prestige, prestige_xp_baseline")
         .eq("id", uid)
         .single(),
-      supabase.rpc("get_prestige_threshold"),
     ]);
+
+    // El umbral depende del prestige actual del usuario (cada Prestigio
+    // siguiente pide más nivel) — necesita el valor recién resuelto arriba.
+    const thresholdRes = await supabase.rpc("get_prestige_threshold", {
+      p_current_prestige: profileRes.data?.prestige || 0,
+    });
 
     const beerData     = beersRes.data || [];
     const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);

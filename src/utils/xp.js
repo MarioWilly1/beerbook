@@ -6,19 +6,6 @@ export const XP_VALUES = {
   COMPLETE_BONUS: 10,
 };
 
-const LEVEL_NAMES = [
-  'Curioso',
-  'Aficionado',
-  'Catador',
-  'Entendido',
-  'Sommelier',
-  'Maestro',
-  'Experto',
-  'Gurú cervecero',
-  'Leyenda',
-  'Gran Maestro',
-];
-
 export function computeEntryXP({ rating, comment, photo }) {
   const hasRating = rating != null && rating !== '' && Number(rating) > 0;
   const hasComment = comment != null && comment.trim().length > 0;
@@ -50,6 +37,5 @@ export function getLevelInfo(totalXP) {
   const xpIntoLevel = totalXP - currentLevelXP;
   const xpNeeded = nextLevelXP - currentLevelXP;
   const progressPct = Math.min(Math.round((xpIntoLevel / xpNeeded) * 100), 100);
-  const levelName = LEVEL_NAMES[Math.min(level - 1, LEVEL_NAMES.length - 1)];
-  return { level, xpIntoLevel, xpNeeded, progressPct, levelName };
+  return { level, xpIntoLevel, xpNeeded, progressPct };
 }

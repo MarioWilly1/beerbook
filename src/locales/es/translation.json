@@ -20,7 +20,7 @@
   "toast": {
     "saved":         "Guardado · +{{xp}} XP",
     "savedComplete": "Guardado · +{{xp}} XP  ·  entrada completa",
-    "levelUp":       "Nivel desbloqueado — {{levelName}}"
+    "levelUp":       "Nivel {{level}} desbloqueado"
   },
   "settings": {
     "pageTitle": "Configuración",
@@ -54,7 +54,7 @@
       "bioLabel":             "Biografía",
       "bioPlaceholder":       "Cuenta algo sobre ti como amante de la cerveza...",
       "countryLabel":         "País de origen",
-      "countryPlaceholder":   "Ej: Argentina, España...",
+      "countryPlaceholder":   "Seleccioná un país...",
       "featuredBadgesLabel":  "Insignias destacadas",
       "featuredBadgesCount":  "({{count}}/3 seleccionadas)",
       "noBadgesHint":         "Desbloquea insignias en Logros para poder destacarlas aquí.",
@@ -497,6 +497,26 @@
     "ascensionTitle":    "PRESTIGIO {{n}}",
     "ascensionSubtitle": "Tu nivel vuelve a 1 — el XP histórico, los logros y las insignias siguen intactos.",
     "continue":          "Continuar",
-    "replay":            "🔄 Volver a ver la animación"
+    "replay":            "🔄 Volver a ver la animación",
+    "tierNames": {
+      "1": "Barro",
+      "2": "Vidrio",
+      "3": "Peltre",
+      "4": "Cristal",
+      "5": "Dorada",
+      "6": "Gemas"
+    },
+    "tierLore": {
+      "1": "Toda gran cata empieza en tierra: humilde, honesta, real.",
+      "2": "La curiosidad se volvió costumbre. Ya ves el mundo a través del vidrio de tu copa.",
+      "3": "El peltre no brilla solo — lo pule cada cerveza que probaste.",
+      "4": "Tu paladar ya distingue matices que otros ni notan. Bienvenido al cristal.",
+      "5": "Pocos llegan tan lejos. Tu copa brilla ahora como el mejor lager al sol.",
+      "6": "Ya no coleccionás cervezas: coleccionás leyendas. Esta copa es de otro nivel."
+    },
+    "closeup": {
+      "percentile": "🏆 Solo el {{pct}}% de la comunidad alcanzó esta liga o una superior",
+      "close": "Cerrar"
+    }
   }
 }

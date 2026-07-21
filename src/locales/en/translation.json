@@ -20,7 +20,7 @@
   "toast": {
     "saved":         "Saved · +{{xp}} XP",
     "savedComplete": "Saved · +{{xp}} XP  ·  complete entry",
-    "levelUp":       "Level unlocked — {{levelName}}"
+    "levelUp":       "Level {{level}} unlocked"
   },
   "settings": {
     "pageTitle": "Settings",
@@ -54,7 +54,7 @@
       "bioLabel":             "Bio",
       "bioPlaceholder":       "Tell us something about you as a beer drinker...",
       "countryLabel":         "Country of origin",
-      "countryPlaceholder":   "E.g.: Argentina, Spain...",
+      "countryPlaceholder":   "Select a country...",
       "featuredBadgesLabel":  "Featured badges",
       "featuredBadgesCount":  "({{count}}/3 selected)",
       "noBadgesHint":         "Unlock badges in Achievements to feature them here.",
@@ -497,6 +497,26 @@
     "ascensionTitle":    "PRESTIGE {{n}}",
     "ascensionSubtitle": "Your level resets to 1 — lifetime XP, achievements and badges stay untouched.",
     "continue":          "Continue",
-    "replay":            "🔄 Watch the animation again"
+    "replay":            "🔄 Watch the animation again",
+    "tierNames": {
+      "1": "Clay",
+      "2": "Glass",
+      "3": "Pewter",
+      "4": "Crystal",
+      "5": "Golden",
+      "6": "Gems"
+    },
+    "tierLore": {
+      "1": "Every great tasting begins in the earth: humble, honest, real.",
+      "2": "Curiosity became a habit. You now see the world through the glass of your cup.",
+      "3": "Pewter doesn't shine on its own — it's polished by every beer you've tried.",
+      "4": "Your palate already distinguishes nuances others don't even notice. Welcome to crystal.",
+      "5": "Few make it this far. Your cup now shines like the finest lager in the sun.",
+      "6": "You no longer collect beers — you collect legends. This cup is on another level."
+    },
+    "closeup": {
+      "percentile": "🏆 Only {{pct}}% of the community has reached this league or higher",
+      "close": "Close"
+    }
   }
 }

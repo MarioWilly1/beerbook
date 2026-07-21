@@ -592,7 +592,7 @@ const MiCuaderno = () => {
     const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
     const newTotal   = prevTotal - (beer.XP || 0) + xp;
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
-    const newLevelName = getLevelInfo(newTotal).levelName;
+    const newLevel = getLevelInfo(newTotal).level;
 
     const { error } = await supabase.from("user_beers").update({
       times:           beer.times,
@@ -623,7 +623,7 @@ const MiCuaderno = () => {
     refetchStats();
     soundClink();
     toastSave(xp, isComplete);
-    if (didLevelUp)             { celebrateLevel();       soundLevelUp();      toastLevelUp(newLevelName); }
+    if (didLevelUp)             { celebrateLevel();       soundLevelUp();      toastLevelUp(newLevel); }
     if (newAchievements.length) { celebrateAchievement(); soundAchievement(); toastAchievements(newAchievements); }
     if (newBadges.length)       { toastBadges(newBadges); }
   };

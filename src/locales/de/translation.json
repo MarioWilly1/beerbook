@@ -20,7 +20,7 @@
   "toast": {
     "saved":         "Gespeichert · +{{xp}} XP",
     "savedComplete": "Gespeichert · +{{xp}} XP  ·  vollständiger Eintrag",
-    "levelUp":       "Stufe freigeschaltet — {{levelName}}"
+    "levelUp":       "Stufe {{level}} freigeschaltet"
   },
   "settings": {
     "pageTitle": "Einstellungen",
@@ -54,7 +54,7 @@
       "bioLabel":             "Biografie",
       "bioPlaceholder":       "Erzähl etwas über dich als Biertrinker...",
       "countryLabel":         "Herkunftsland",
-      "countryPlaceholder":   "Bsp.: Argentinien, Deutschland...",
+      "countryPlaceholder":   "Land auswählen...",
       "featuredBadgesLabel":  "Hervorgehobene Abzeichen",
       "featuredBadgesCount":  "({{count}}/3 ausgewählt)",
       "noBadgesHint":         "Schalte Abzeichen in Erfolge frei, um sie hier hervorzuheben.",
@@ -497,6 +497,26 @@
     "ascensionTitle":    "PRESTIGE {{n}}",
     "ascensionSubtitle": "Dein Level wird auf 1 zurückgesetzt — XP-Verlauf, Erfolge und Abzeichen bleiben erhalten.",
     "continue":          "Weiter",
-    "replay":            "🔄 Animation erneut ansehen"
+    "replay":            "🔄 Animation erneut ansehen",
+    "tierNames": {
+      "1": "Ton",
+      "2": "Glas",
+      "3": "Zinn",
+      "4": "Kristall",
+      "5": "Golden",
+      "6": "Edelsteine"
+    },
+    "tierLore": {
+      "1": "Jede große Verkostung beginnt in der Erde: bescheiden, ehrlich, echt.",
+      "2": "Neugier wurde zur Gewohnheit. Du siehst die Welt jetzt durch das Glas deines Bechers.",
+      "3": "Zinn glänzt nicht von allein — jedes probierte Bier poliert es.",
+      "4": "Dein Gaumen unterscheidet längst Nuancen, die andere gar nicht bemerken. Willkommen im Kristall.",
+      "5": "Nur wenige kommen so weit. Dein Pokal glänzt jetzt wie das beste Lager in der Sonne.",
+      "6": "Du sammelst keine Biere mehr — du sammelst Legenden. Dieser Pokal ist eine andere Liga."
+    },
+    "closeup": {
+      "percentile": "🏆 Nur {{pct}}% der Community haben diese Liga oder höher erreicht",
+      "close": "Schließen"
+    }
   }
 }

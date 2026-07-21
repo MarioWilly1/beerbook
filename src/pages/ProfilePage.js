@@ -8,6 +8,7 @@ import { getLevelInfo } from "../utils/xp";
 import Avatar from "../components/Avatar";
 import PrestigeBadge from "../components/PrestigeBadge";
 import PrestigeAscensionModal from "../components/PrestigeAscensionModal";
+import PrestigeCloseupModal from "../components/PrestigeCloseupModal";
 
 const ACH_BY_SLUG = new Map(ACHIEVEMENTS.map((a) => [a.slug, a]));
 
@@ -26,6 +27,7 @@ const ProfilePage = () => {
   const [loading, setLoading]             = useState(true);
   const [reqLoading, setReqLoading]       = useState(false);
   const [ascension, setAscension]         = useState(null); // número de prestigio a repetir en el modal, o null
+  const [prestigeCloseup, setPrestigeCloseup] = useState(null); // número de prestigio para la vista de cerca, o null
 
   useEffect(() => {
     const load = async () => {
@@ -172,7 +174,12 @@ const ProfilePage = () => {
 
         {profileData.prestige > 0 && (
           <div style={{ marginTop: 18, paddingTop: 18, borderTop: "1px solid #2e2215" }}>
-            <PrestigeBadge prestige={profileData.prestige} size="hero" cupSize={128} />
+            <div
+              onClick={() => setPrestigeCloseup(profileData.prestige)}
+              style={{ display: "inline-block", cursor: "pointer" }}
+            >
+              <PrestigeBadge prestige={profileData.prestige} size="hero" cupSize={128} />
+            </div>
             {isSelf && (
               <button onClick={() => setAscension(profileData.prestige)} style={replayBtnStyle}>
                 {t("prestige.replay")}
@@ -186,12 +193,16 @@ const ProfilePage = () => {
         <PrestigeAscensionModal toPrestige={ascension} onClose={() => setAscension(null)} />
       )}
 
+      {prestigeCloseup != null && (
+        <PrestigeCloseupModal prestige={prestigeCloseup} onClose={() => setPrestigeCloseup(null)} />
+      )}
+
       {/* Nivel + barra de XP — vive solo acá, no en el uso general de la app */}
       {canSeeStats && stats && (
         <div style={{ marginBottom: 20, padding: "16px 20px", background: "#1c1409", borderRadius: 14, border: "1px solid #2e2215" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: "#d4af37" }}>
-              Nv. {stats.level} · {stats.levelName}
+              Nv. {stats.level}
             </span>
             <span style={{ fontSize: 13, color: "#9a7d62" }}>⭐ {stats.totalXP.toLocaleString()} XP</span>
           </div>

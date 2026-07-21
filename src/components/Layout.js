@@ -5,6 +5,7 @@ import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
 import Avatar from "./Avatar";
 import PrestigeBadge from "./PrestigeBadge";
+import PrestigeCloseupModal from "./PrestigeCloseupModal";
 import AvatarSelector from "./AvatarSelector";
 import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
@@ -15,6 +16,7 @@ import { useUserStats } from "../hooks/useUserStats";
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [prestigeCloseup, setPrestigeCloseup] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -167,7 +169,10 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           </div>
 
           {stats.prestige > 0 && (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+            <div
+              onClick={() => setPrestigeCloseup(stats.prestige)}
+              style={{ display: "flex", justifyContent: "center", marginBottom: 16, cursor: "pointer" }}
+            >
               <PrestigeBadge prestige={stats.prestige} size="row" cupSize={36} />
             </div>
           )}
@@ -255,6 +260,10 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           onSave={onAvatarChange}
           onClose={() => setShowAvatarSelector(false)}
         />
+      )}
+
+      {prestigeCloseup != null && (
+        <PrestigeCloseupModal prestige={prestigeCloseup} onClose={() => setPrestigeCloseup(null)} />
       )}
     </div>
   );

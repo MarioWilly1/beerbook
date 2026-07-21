@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { useBadges } from "../hooks/useBadges";
@@ -6,6 +6,7 @@ import { TIER_META } from "../utils/badges";
 import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
 import HiddenStoriesManager from "../components/HiddenStoriesManager";
+import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
 
 const TABS = [
   { key: "perfil",       icon: "👤", tKey: "settings.tabs.profile"     },
@@ -67,6 +68,12 @@ const Configuracion = ({ onProfileChange }) => {
 
   const { badges } = useBadges();
   const unlockedBadges = badges.filter((b) => b.currentTier);
+
+  const countryOptions = useMemo(() => getWorldCountries(i18n.language), [i18n.language]);
+  // Si el valor ya guardado (texto libre histórico) no matchea ningún país
+  // de la lista actual, se agrega como opción extra para no perderlo ni
+  // mostrar el select vacío — queda seleccionada hasta que el usuario elija otra.
+  const unmatchedPais = pais && !findCountryByName(pais, i18n.language) ? pais : null;
 
   useEffect(() => {
     const load = async () => {
@@ -241,16 +248,17 @@ const Configuracion = ({ onProfileChange }) => {
           {/* País */}
           <div style={{ marginBottom: 28 }}>
             <label style={labelStyle}>{t("settings.profile.countryLabel")}</label>
-            <input
-              type="text"
+            <select
               value={pais}
               onChange={(e) => setPais(e.target.value)}
-              placeholder={t("settings.profile.countryPlaceholder")}
               style={inputStyle}
-              autoCapitalize="words"
-              spellCheck="false"
-              autoCorrect="off"
-            />
+            >
+              <option value="">{t("settings.profile.countryPlaceholder")}</option>
+              {unmatchedPais && <option value={unmatchedPais}>{unmatchedPais}</option>}
+              {countryOptions.map((c) => (
+                <option key={c.code} value={c.name}>{c.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Insignias destacadas */}

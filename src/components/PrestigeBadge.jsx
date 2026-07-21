@@ -35,7 +35,9 @@ const PrestigeChip = ({ prestige, tier }) => (
 // Copa estática (usada dentro del showcase grande de abajo). Sin flotación
 // ni glow pulsante — solo tilt al pasar el mouse/inclinar el dispositivo,
 // y una sombra fija debajo para dar profundidad.
-const PrestigeCup = ({ tier, dims }) => {
+// intensity: multiplicador del rango de inclinación (1 = el de siempre,
+// >1 = tilt potenciado para la vista de cerca del modal).
+const PrestigeCup = ({ tier, dims, intensity = 1 }) => {
   const wrapRef = useRef(null);
   const imgRef  = useRef(null);
 
@@ -44,6 +46,7 @@ const PrestigeCup = ({ tier, dims }) => {
     const img  = imgRef.current;
     if (!wrap || !img) return;
 
+    const maxDeg = 12 * intensity;
     const applyTilt = (rx, ry) => {
       img.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg)`;
     };
@@ -53,7 +56,7 @@ const PrestigeCup = ({ tier, dims }) => {
       const rect = wrap.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      applyTilt((py * -12).toFixed(2), (px * 12).toFixed(2));
+      applyTilt((py * -maxDeg).toFixed(2), (px * maxDeg).toFixed(2));
     };
 
     wrap.addEventListener("mousemove", onMouseMove);
@@ -66,8 +69,8 @@ const PrestigeCup = ({ tier, dims }) => {
     if (window.DeviceOrientationEvent && typeof window.DeviceOrientationEvent.requestPermission !== "function") {
       onOrientation = (e) => {
         if (e.beta == null || e.gamma == null) return;
-        const rx = Math.max(-12, Math.min(12, (e.beta - 45) / 4));
-        const ry = Math.max(-12, Math.min(12, e.gamma / 4));
+        const rx = Math.max(-maxDeg, Math.min(maxDeg, (e.beta - 45) / 4));
+        const ry = Math.max(-maxDeg, Math.min(maxDeg, e.gamma / 4));
         applyTilt(rx.toFixed(2), ry.toFixed(2));
       };
       window.addEventListener("deviceorientation", onOrientation);
@@ -78,7 +81,7 @@ const PrestigeCup = ({ tier, dims }) => {
       wrap.removeEventListener("mouseleave", resetTilt);
       if (onOrientation) window.removeEventListener("deviceorientation", onOrientation);
     };
-  }, []);
+  }, [intensity]);
 
   return (
     <span
@@ -176,3 +179,4 @@ const PrestigeBadge = ({ prestige = 0, size = "sm", cupSize }) => {
 };
 
 export default PrestigeBadge;
+export { PrestigeCup };

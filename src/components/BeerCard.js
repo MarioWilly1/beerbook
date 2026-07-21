@@ -66,7 +66,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
     const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
     const newTotal   = prevTotal - (myBeerData?.XP || 0) + xp;
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
-    const newLevelName = getLevelInfo(newTotal).levelName;
+    const newLevel = getLevelInfo(newTotal).level;
 
     const { error } = await supabase.from("user_beers").upsert({
       user_id:         session.user.id,
@@ -105,7 +105,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
     if (didLevelUp) {
       celebrateLevel();
       soundLevelUp();
-      toastLevelUp(newLevelName);
+      toastLevelUp(newLevel);
     }
     if (newAchievements.length > 0) {
       celebrateAchievement();

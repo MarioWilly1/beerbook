@@ -106,7 +106,7 @@ const ES_NAME_TO_CODE = {
 // se recorta SIEMPRE a uno de los 3 idiomas soportados antes de usarlo.
 const SUPPORTED_LOCALES = ["es", "en", "de"];
 
-function resolveSupportedLocale(locale) {
+export function resolveSupportedLocale(locale) {
   const base = (locale || "").slice(0, 2).toLowerCase();
   return SUPPORTED_LOCALES.includes(base) ? base : "es";
 }

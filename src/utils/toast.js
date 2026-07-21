@@ -51,8 +51,8 @@ export const toastBadges = (list) => {
   });
 };
 
-export const toastLevelUp = (levelName) => {
-  toast(i18n.t("toast.levelUp", { levelName }), {
+export const toastLevelUp = (level) => {
+  toast(i18n.t("toast.levelUp", { level }), {
     style: {
       ...base,
       background: "#1f1500",

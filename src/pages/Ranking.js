@@ -108,7 +108,7 @@ const LeagueSelect = ({ leagues, league, onChange }) => {
 
 const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
   const pos = Number(entry.rank_pos);
-  const { levelName } = getLevelInfo(Number(entry.total_xp));
+  const { level } = getLevelInfo(Number(entry.total_xp));
   return (
     <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
@@ -121,7 +121,7 @@ const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
           {entry.nombre || "Usuario"}
           {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
-        <div style={{ fontSize: 12, color: isSelf ? "#3a2a10" : "#9a7d62" }}>{levelName}</div>
+        <div style={{ fontSize: 12, color: isSelf ? "#3a2a10" : "#9a7d62" }}>Nivel {level}</div>
       </div>
       <div style={{ textAlign: "right" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: isSelf ? "#8b6b2e" : "#d4af37" }}>

@@ -3,9 +3,13 @@ import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import { BADGE_DEFS, TIER_META, TIERS } from "../utils/badges";
+import { ACHIEVEMENTS } from "../utils/achievements";
 import { getLevelInfo } from "../utils/xp";
 import Avatar from "../components/Avatar";
 import PrestigeBadge from "../components/PrestigeBadge";
+import PrestigeAscensionModal from "../components/PrestigeAscensionModal";
+
+const ACH_BY_SLUG = new Map(ACHIEVEMENTS.map((a) => [a.slug, a]));
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -18,8 +22,10 @@ const ProfilePage = () => {
   const [hasSentReq, setHasSentReq]       = useState(false);
   const [stats, setStats]                 = useState(null);
   const [featuredDetails, setFeaturedDetails] = useState([]);
+  const [achievements, setAchievements]   = useState({ total: 0, recent: [] });
   const [loading, setLoading]             = useState(true);
   const [reqLoading, setReqLoading]       = useState(false);
+  const [ascension, setAscension]         = useState(null); // número de prestigio a repetir en el modal, o null
 
   useEffect(() => {
     const load = async () => {
@@ -67,13 +73,17 @@ const ProfilePage = () => {
       if (canSeeStats) {
         const [beersRes, achRes, badgesRes] = await Promise.all([
           supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", userId),
-          supabase.from("user_achievements").select("xp_awarded").eq("user_id", userId),
+          supabase.from("user_achievements")
+            .select("slug, nombre, unlocked_at, xp_awarded")
+            .eq("user_id", userId)
+            .order("unlocked_at", { ascending: false }),
           supabase.from("user_badges").select("badge_slug, tier, xp_awarded").eq("user_id", userId),
         ]);
 
         const beerData     = beersRes.data || [];
+        const achData      = achRes.data || [];
         const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);
-        const achXP        = (achRes.data  || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
+        const achXP        = achData.reduce((s, a) => s + (a.xp_awarded || 0), 0);
         const badgeXP      = (badgesRes.data || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
         const lifetimeXP  = beerXP + achXP + badgeXP;
         const cycleXP      = Math.max(0, lifetimeXP - (prof.prestige_xp_baseline || 0));
@@ -81,6 +91,19 @@ const ProfilePage = () => {
         const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;
 
         setStats({ totalXP: lifetimeXP, totalBeers, verifiedBeers, ...getLevelInfo(cycleXP) });
+
+        setAchievements({
+          total: achData.length,
+          recent: achData.slice(0, 5).map((row) => {
+            const def = ACH_BY_SLUG.get(row.slug);
+            return {
+              slug: row.slug,
+              emoji: def?.emoji || "🎖️",
+              nombre: def?.nombre || row.nombre || row.slug,
+              unlockedAt: row.unlocked_at,
+            };
+          }),
+        });
 
         const slugs = prof.featured_badges || [];
         if (slugs.length > 0) {
@@ -129,34 +152,73 @@ const ProfilePage = () => {
     <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 24, padding: 24, background: "#1c1409", borderRadius: 16, border: "1px solid #2e2215" }}>
-        <Avatar avatarUrl={profileData.avatar_url} nombre={profileData.nombre} size={72} />
-        <div style={{ flex: 1 }}>
-          <h2 style={{ margin: "0 0 4px", fontSize: 22, display: "flex", alignItems: "center", gap: 8 }}>
-            {profileData.nombre}
-            <PrestigeBadge prestige={profileData.prestige} size="md" />
-          </h2>
-          {profileData.pais_origen && (
-            <p style={{ margin: "0 0 6px", fontSize: 13, color: "#9a7d62" }}>
-              📍 {profileData.pais_origen}
-            </p>
-          )}
-          {profileData.bio && (
-            <p style={{ margin: 0, fontSize: 14, color: "#9a7d62", lineHeight: 1.5 }}>
-              {profileData.bio}
-            </p>
-          )}
+      <div style={{ marginBottom: 20, padding: 24, background: "#1c1409", borderRadius: 16, border: "1px solid #2e2215" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <Avatar avatarUrl={profileData.avatar_url} nombre={profileData.nombre} size={72} />
+          <div style={{ flex: 1 }}>
+            <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{profileData.nombre}</h2>
+            {profileData.pais_origen && (
+              <p style={{ margin: "0 0 6px", fontSize: 13, color: "#9a7d62" }}>
+                📍 {profileData.pais_origen}
+              </p>
+            )}
+            {profileData.bio && (
+              <p style={{ margin: 0, fontSize: 14, color: "#9a7d62", lineHeight: 1.5 }}>
+                {profileData.bio}
+              </p>
+            )}
+          </div>
         </div>
+
+        {profileData.prestige > 0 && (
+          <div style={{ marginTop: 18, paddingTop: 18, borderTop: "1px solid #2e2215" }}>
+            <PrestigeBadge prestige={profileData.prestige} size="hero" cupSize={128} />
+            {isSelf && (
+              <button onClick={() => setAscension(profileData.prestige)} style={replayBtnStyle}>
+                {t("prestige.replay")}
+              </button>
+            )}
+          </div>
+        )}
       </div>
+
+      {ascension != null && (
+        <PrestigeAscensionModal toPrestige={ascension} onClose={() => setAscension(null)} />
+      )}
+
+      {/* Nivel + barra de XP — vive solo acá, no en el uso general de la app */}
+      {canSeeStats && stats && (
+        <div style={{ marginBottom: 20, padding: "16px 20px", background: "#1c1409", borderRadius: 14, border: "1px solid #2e2215" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#d4af37" }}>
+              Nv. {stats.level} · {stats.levelName}
+            </span>
+            <span style={{ fontSize: 13, color: "#9a7d62" }}>⭐ {stats.totalXP.toLocaleString()} XP</span>
+          </div>
+          <div style={{ height: 7, background: "rgba(255,255,255,0.08)", borderRadius: 10, overflow: "hidden", margin: "8px 0 6px" }}>
+            <div style={{
+              width: `${stats.progressPct}%`, height: "100%",
+              background: "linear-gradient(90deg, #8b6b2e, #d4af37)",
+              borderRadius: 10, transition: "width 0.6s ease",
+            }} />
+          </div>
+          <div style={{ fontSize: 12, color: "#5a4535", textAlign: "right" }}>
+            {t("profile.xpToNextLevel", { current: stats.xpIntoLevel, needed: stats.xpNeeded, next: stats.level + 1 })}
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       {canSeeStats && stats && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 12, marginBottom: 20 }}>
-            <StatCard label={t("profile.statLevel")} value={`⚡ ${stats.level}`} sub={stats.levelName} />
-            <StatCard label={t("profile.statXP")} value={`⭐ ${stats.totalXP.toLocaleString()}`} />
             <StatCard label={t("profile.statBeers")} value={`🍺 ${stats.totalBeers}`} sub={t("profile.statVerified", { count: stats.verifiedBeers })} />
-            <StatCard label={t("profile.statStreak")} value={`🔥 ${profileData.current_streak ?? 0}`} sub={t("profile.statStreakSub")} />
+            <StatCard
+              label={t("profile.statStreak")}
+              value={`🔥 ${profileData.longest_streak ?? 0}`}
+              sub={profileData.current_streak > 0 ? t("profile.statStreakActive", { count: profileData.current_streak }) : t("profile.statStreakSub")}
+            />
+            <StatCard label={t("profile.statAchievements")} value={`🏆 ${achievements.total}`} sub={t("profile.statAchievementsSub")} />
           </div>
 
           {featuredDetails.length > 0 && (
@@ -188,6 +250,27 @@ const ProfilePage = () => {
               </div>
             </div>
           )}
+
+          <div style={{ background: "#1c1409", borderRadius: 14, border: "1px solid #2e2215", padding: "18px 20px", marginBottom: 20 }}>
+            <p style={{ margin: "0 0 14px", fontSize: 12, fontWeight: 700, color: "#5a4535", textTransform: "uppercase", letterSpacing: "0.4px" }}>
+              {t("profile.recentAchievementsLabel")}
+            </p>
+            {achievements.recent.length === 0 ? (
+              <p style={{ margin: 0, fontSize: 13, color: "#5a4535" }}>{t("profile.noAchievementsYet")}</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {achievements.recent.map((a) => (
+                  <div key={a.slug} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 18, flexShrink: 0 }}>{a.emoji}</span>
+                    <span style={{ fontSize: 13, color: "#f0e4cc", flex: 1 }}>{a.nombre}</span>
+                    <span style={{ fontSize: 11, color: "#5a4535", flexShrink: 0 }}>
+                      {new Date(a.unlockedAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
 
@@ -256,6 +339,19 @@ const ProfilePage = () => {
       </div>
     </div>
   );
+};
+
+const replayBtnStyle = {
+  display: "block",
+  margin: "14px auto 0",
+  padding: "6px 16px",
+  borderRadius: 999,
+  border: "1px solid #2e2215",
+  background: "transparent",
+  color: "#5a4535",
+  fontSize: 11,
+  fontWeight: 600,
+  cursor: "pointer",
 };
 
 const StatCard = ({ label, value, sub }) => (

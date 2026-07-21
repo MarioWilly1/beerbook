@@ -14,7 +14,8 @@
     "map":          "Mapa mundial"
   },
   "sidebar": {
-    "changeAvatar": "Cambiar avatar →"
+    "changeAvatar": "Cambiar avatar →",
+    "viewProfile":  "Ver mi perfil"
   },
   "toast": {
     "saved":         "Guardado · +{{xp}} XP",
@@ -155,12 +156,16 @@
   "profile": {
     "loading":              "Cargando perfil...",
     "notFound":             "Perfil no encontrado.",
-    "statLevel":            "Nivel",
-    "statXP":               "XP Total",
     "statBeers":            "Cervezas",
     "statVerified":         "{{count}} verificadas",
-    "statStreak":           "Racha",
-    "statStreakSub":        "días seguidos",
+    "statStreak":           "Racha máxima",
+    "statStreakSub":        "récord de días seguidos",
+    "statStreakActive":     "activa: {{count}} días",
+    "statAchievements":     "Logros",
+    "statAchievementsSub":  "desbloqueados",
+    "xpToNextLevel":        "{{current}}/{{needed}} XP → Nv. {{next}}",
+    "recentAchievementsLabel": "Logros recientes",
+    "noAchievementsYet":    "Todavía no hay logros desbloqueados.",
     "featuredBadgesLabel":  "Insignias destacadas",
     "privateTitle":         "Perfil privado",
     "privateBody":          "Solo los amigos de {{nombre}} pueden ver sus estadísticas.",
@@ -174,9 +179,7 @@
   "dashboard": {
     "title":        "Catálogo de Cervezas",
     "loading":      "Cargando cervezas...",
-    "statsBar":     "🏆 Nivel: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} cervezas ({{verified}} verificadas)",
-    "found_one":    "{{count}} cerveza encontrada",
-    "found_other":  "{{count}} cervezas encontradas",
+    "collectionProgressShort": "{{count}}/{{total}} cervezas probadas",
     "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →",
     "mapBtn":       "Ver mapa de origen"
   },
@@ -275,6 +278,10 @@
     "notInRankingBeers":   "Aún no apareces — sube fotos de tus cervezas para entrar.",
     "notInRankingXP":      "Aún no apareces en el ranking — registra tu primera cerveza para entrar.",
     "onlyYou":             "Solo apareces tú. Invita amigos para tener más competencia.",
+    "leagueBase":          "Liga Base",
+    "leagueN":             "Liga {{n}}",
+    "leagueMembers_one":   "{{count}} jugador",
+    "leagueMembers_other": "{{count}} jugadores",
     "scope": {
       "total":   "Total histórico",
       "weekly":  "Esta semana",
@@ -482,10 +489,14 @@
     "replySent":             "Enviado ✓"
   },
   "prestige": {
-    "cta":         "✨ Hacer Prestigio",
-    "confirmBody": "Tu nivel vuelve a 1, pero conservás todo tu XP histórico, tus logros e insignias. Vas a sumar el Prestigio {{n}}.",
-    "confirmYes":  "Sí, prestigiar",
-    "confirmNo":   "Cancelar",
-    "success":     "¡Prestigio {{n}} conseguido! 🎉"
+    "label":             "Prestigio",
+    "cta":               "✨ Hacer Prestigio",
+    "confirmBody":       "Tu nivel vuelve a 1, pero conservás todo tu XP histórico, tus logros e insignias. Vas a sumar el Prestigio {{n}}.",
+    "confirmYes":        "Sí, prestigiar",
+    "confirmNo":         "Cancelar",
+    "ascensionTitle":    "PRESTIGIO {{n}}",
+    "ascensionSubtitle": "Tu nivel vuelve a 1 — el XP histórico, los logros y las insignias siguen intactos.",
+    "continue":          "Continuar",
+    "replay":            "🔄 Volver a ver la animación"
   }
 }

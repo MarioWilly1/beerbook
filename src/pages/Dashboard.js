@@ -192,20 +192,6 @@ const Dashboard = () => {
     <div>
       <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>
 
-      <div
-        style={{
-          padding: "10px 14px",
-          marginBottom: "15px",
-          background: "#1c1409",
-          border: "1px solid #2e2215",
-          borderRadius: "10px",
-          fontSize: "14px",
-          color: "#9a7d62",
-        }}
-      >
-        {t("dashboard.statsBar", { level: stats.level, xp: stats.xp, beers: stats.beers, verified: stats.verifiedBeers })}
-      </div>
-
       {/* Map toggle + suggest row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
         <button
@@ -257,7 +243,7 @@ const Dashboard = () => {
       />
 
       <p style={{ color: "#5a4535", fontSize: 13, margin: "0 0 14px" }}>
-        {t("dashboard.found", { count: filteredBeers.length })}
+        {t("dashboard.collectionProgressShort", { count: stats.beers, total: beers.length })}
       </p>
 
       <div

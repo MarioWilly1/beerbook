@@ -86,6 +86,62 @@ export function soundLevelUp() {
   } catch (_) {}
 }
 
+// Prestigio: impacto grave + acorde ascendente (C4-E4-G4-C5-E5) con brillo
+// final — más grande y triunfal que soundLevelUp, para el momento de mayor
+// peso del sistema de progresión.
+export function soundPrestige() {
+  if (!isSoundEnabled()) return;
+  try {
+    const c = ctx();
+    const now = c.currentTime;
+
+    // Impacto grave inicial
+    const sub = c.createOscillator();
+    const subGain = c.createGain();
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(90, now);
+    sub.frequency.exponentialRampToValueAtTime(45, now + 0.35);
+    subGain.gain.setValueAtTime(0.28, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    sub.connect(subGain);
+    subGain.connect(c.destination);
+    sub.start(now);
+    sub.stop(now + 0.4);
+
+    // Arpegio ascendente triunfal
+    [261.63, 329.63, 392.0, 523.25, 659.25].forEach((freq, i) => {
+      const t = now + 0.12 + i * 0.09;
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.16, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+      osc.connect(g);
+      g.connect(c.destination);
+      osc.start(t);
+      osc.stop(t + 0.7);
+    });
+
+    // Brillo final sostenido (acorde completo)
+    const chordAt = now + 0.65;
+    [523.25, 659.25, 784.0, 1046.5].forEach((freq, i) => {
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, chordAt);
+      g.gain.setValueAtTime(0, chordAt);
+      g.gain.linearRampToValueAtTime(0.1, chordAt + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, chordAt + 1.1);
+      osc.connect(g);
+      g.connect(c.destination);
+      osc.start(chordAt + i * 0.015);
+      osc.stop(chordAt + 1.1);
+    });
+  } catch (_) {}
+}
+
 // Achievement: A major chord (A5 C#6 E6), brief and warm
 export function soundAchievement() {
   if (!isSoundEnabled()) return;

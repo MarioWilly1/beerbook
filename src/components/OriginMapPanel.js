@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { getCountryName } from "../utils/countryDisplay";
 
 // ── Marker icons ───────────────────────────────────────────────────────────────
 function makeIcon(count, selected = false) {
@@ -91,7 +92,7 @@ const UserChip = ({ ub }) => (
 
 // ── Main panel ────────────────────────────────────────────────────────────────
 const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
   const [expanded,     setExpanded]    = useState(false);
   const [selectedLoc,  setSelectedLoc] = useState(null);
@@ -184,7 +185,7 @@ const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
   const locCount      = locationGroups.length;
   const statsText     = `🍺 ${withCoords} ${t("map.beerCount_other", { count: withCoords }).replace(/^\d+ /, "")} · ${locCount} ${t("map.locations")}`;
   const selectedLabel = selectedLoc
-    ? ` · 📍 ${selectedLoc.pais} (${selectedLoc.beers.length === 1 ? "1 cerveza" : `${selectedLoc.beers.length} cervezas`})`
+    ? ` · 📍 ${getCountryName(selectedLoc.pais, i18n.language)} (${selectedLoc.beers.length === 1 ? "1 cerveza" : `${selectedLoc.beers.length} cervezas`})`
     : "";
 
   // ── Search panel (shared between inline and fullscreen) ───────────────────
@@ -206,7 +207,7 @@ const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
               style={{ padding: "9px 14px", cursor: "pointer", borderBottom: "1px solid #2e2215", display: "flex", alignItems: "center", gap: 8 }}
             >
               <span style={{ fontWeight: 600, fontSize: 13, color: "#f0e4cc", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{beer.nombre}</span>
-              <span style={{ fontSize: 11, color: "#9a7d62", flexShrink: 0 }}>{beer.pais}</span>
+              <span style={{ fontSize: 11, color: "#9a7d62", flexShrink: 0 }}>{getCountryName(beer.pais, i18n.language)}</span>
             </div>
           ))}
         </div>

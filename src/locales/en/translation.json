@@ -14,7 +14,8 @@
     "map":          "World map"
   },
   "sidebar": {
-    "changeAvatar": "Change avatar →"
+    "changeAvatar": "Change avatar →",
+    "viewProfile":  "View my profile"
   },
   "toast": {
     "saved":         "Saved · +{{xp}} XP",
@@ -155,12 +156,16 @@
   "profile": {
     "loading":             "Loading profile...",
     "notFound":            "Profile not found.",
-    "statLevel":           "Level",
-    "statXP":              "Total XP",
     "statBeers":           "Beers",
     "statVerified":        "{{count}} verified",
-    "statStreak":          "Streak",
-    "statStreakSub":       "days in a row",
+    "statStreak":          "Longest streak",
+    "statStreakSub":       "days in a row record",
+    "statStreakActive":    "active: {{count}} days",
+    "statAchievements":    "Achievements",
+    "statAchievementsSub": "unlocked",
+    "xpToNextLevel":       "{{current}}/{{needed}} XP → Lv. {{next}}",
+    "recentAchievementsLabel": "Recent achievements",
+    "noAchievementsYet":   "No achievements unlocked yet.",
     "featuredBadgesLabel": "Featured badges",
     "privateTitle":        "Private profile",
     "privateBody":         "Only {{nombre}}'s friends can see their stats.",
@@ -174,9 +179,7 @@
   "dashboard": {
     "title":        "Beer Catalog",
     "loading":      "Loading beers...",
-    "statsBar":     "🏆 Level: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} beers ({{verified}} verified)",
-    "found_one":    "{{count}} beer found",
-    "found_other":  "{{count}} beers found",
+    "collectionProgressShort": "{{count}}/{{total}} beers tried",
     "suggestBeer":  "Can't find your beer? Suggest it →",
     "mapBtn":       "View origin map"
   },
@@ -275,6 +278,10 @@
     "notInRankingBeers":   "Not in yet — upload photos of your beers to enter.",
     "notInRankingXP":      "Not in the ranking yet — log your first beer to enter.",
     "onlyYou":             "Only you appear. Invite friends for more competition.",
+    "leagueBase":          "Base League",
+    "leagueN":             "League {{n}}",
+    "leagueMembers_one":   "{{count}} player",
+    "leagueMembers_other": "{{count}} players",
     "scope": {
       "total":   "All time",
       "weekly":  "This week",
@@ -482,10 +489,14 @@
     "replySent":             "Sent ✓"
   },
   "prestige": {
-    "cta":         "✨ Prestige",
-    "confirmBody": "Your level resets to 1, but you keep all your lifetime XP, achievements and badges. You'll earn Prestige {{n}}.",
-    "confirmYes":  "Yes, prestige",
-    "confirmNo":   "Cancel",
-    "success":     "Prestige {{n}} unlocked! 🎉"
+    "label":             "Prestige",
+    "cta":               "✨ Prestige",
+    "confirmBody":       "Your level resets to 1, but you keep all your lifetime XP, achievements and badges. You'll earn Prestige {{n}}.",
+    "confirmYes":        "Yes, prestige",
+    "confirmNo":         "Cancel",
+    "ascensionTitle":    "PRESTIGE {{n}}",
+    "ascensionSubtitle": "Your level resets to 1 — lifetime XP, achievements and badges stay untouched.",
+    "continue":          "Continue",
+    "replay":            "🔄 Watch the animation again"
   }
 }

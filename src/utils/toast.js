@@ -51,21 +51,6 @@ export const toastBadges = (list) => {
   });
 };
 
-export const toastPrestige = (n) => {
-  toast(i18n.t("prestige.success", { n }), {
-    style: {
-      ...base,
-      background: "#1f1500",
-      border: "1px solid rgba(212,175,55,0.8)",
-      fontWeight: "700",
-      fontSize: "14px",
-      color: "#d4af37",
-    },
-    icon: "⭐",
-    duration: 5000,
-  });
-};
-
 export const toastLevelUp = (levelName) => {
   toast(i18n.t("toast.levelUp", { levelName }), {
     style: {

@@ -14,7 +14,8 @@
     "map":          "Weltkarte"
   },
   "sidebar": {
-    "changeAvatar": "Avatar ändern →"
+    "changeAvatar": "Avatar ändern →",
+    "viewProfile":  "Mein Profil ansehen"
   },
   "toast": {
     "saved":         "Gespeichert · +{{xp}} XP",
@@ -155,12 +156,16 @@
   "profile": {
     "loading":             "Profil wird geladen...",
     "notFound":            "Profil nicht gefunden.",
-    "statLevel":           "Stufe",
-    "statXP":              "Gesamt-XP",
     "statBeers":           "Biere",
     "statVerified":        "{{count}} verifiziert",
-    "statStreak":          "Serie",
-    "statStreakSub":       "Tage in Folge",
+    "statStreak":          "Längste Serie",
+    "statStreakSub":       "Rekord in Folge",
+    "statStreakActive":    "aktiv: {{count}} Tage",
+    "statAchievements":    "Erfolge",
+    "statAchievementsSub": "freigeschaltet",
+    "xpToNextLevel":       "{{current}}/{{needed}} XP → Stufe {{next}}",
+    "recentAchievementsLabel": "Neueste Erfolge",
+    "noAchievementsYet":   "Noch keine Erfolge freigeschaltet.",
     "featuredBadgesLabel": "Hervorgehobene Abzeichen",
     "privateTitle":        "Privates Profil",
     "privateBody":         "Nur {{nombre}}s Freunde können ihre Statistiken sehen.",
@@ -174,9 +179,7 @@
   "dashboard": {
     "title":        "Bierkatalog",
     "loading":      "Biere werden geladen...",
-    "statsBar":     "🏆 Stufe: {{level}} | ⭐ XP: {{xp}} | 🍺 {{beers}} Biere ({{verified}} verifiziert)",
-    "found_one":    "{{count}} Bier gefunden",
-    "found_other":  "{{count}} Biere gefunden",
+    "collectionProgressShort": "{{count}}/{{total}} Biere probiert",
     "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →",
     "mapBtn":       "Herkunftskarte anzeigen"
   },
@@ -275,6 +278,10 @@
     "notInRankingBeers":   "Noch nicht dabei — lade Fotos deiner Biere hoch, um einzusteigen.",
     "notInRankingXP":      "Noch nicht in der Rangliste — registriere dein erstes Bier.",
     "onlyYou":             "Nur du erscheinst. Lade Freunde ein für mehr Wettbewerb.",
+    "leagueBase":          "Basisliga",
+    "leagueN":             "Liga {{n}}",
+    "leagueMembers_one":   "{{count}} Spieler",
+    "leagueMembers_other": "{{count}} Spieler",
     "scope": {
       "total":   "Gesamt",
       "weekly":  "Diese Woche",
@@ -482,10 +489,14 @@
     "replySent":             "Gesendet ✓"
   },
   "prestige": {
-    "cta":         "✨ Prestige aktivieren",
-    "confirmBody": "Dein Level wird auf 1 zurückgesetzt, aber dein gesamter XP-Verlauf, deine Erfolge und Abzeichen bleiben erhalten. Du erreichst Prestige {{n}}.",
-    "confirmYes":  "Ja, Prestige",
-    "confirmNo":   "Abbrechen",
-    "success":     "Prestige {{n}} erreicht! 🎉"
+    "label":             "Prestige",
+    "cta":               "✨ Prestige aktivieren",
+    "confirmBody":       "Dein Level wird auf 1 zurückgesetzt, aber dein gesamter XP-Verlauf, deine Erfolge und Abzeichen bleiben erhalten. Du erreichst Prestige {{n}}.",
+    "confirmYes":        "Ja, Prestige",
+    "confirmNo":         "Abbrechen",
+    "ascensionTitle":    "PRESTIGE {{n}}",
+    "ascensionSubtitle": "Dein Level wird auf 1 zurückgesetzt — XP-Verlauf, Erfolge und Abzeichen bleiben erhalten.",
+    "continue":          "Weiter",
+    "replay":            "🔄 Animation erneut ansehen"
   }
 }

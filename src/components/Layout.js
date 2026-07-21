@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
@@ -10,15 +10,18 @@ import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
 import { useTotalUnread } from "../hooks/useTotalUnread";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { useUserStats } from "../hooks/useUserStats";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { badges } = useBadges();
   const totalUnread = useTotalUnread();
   const isMobile = useIsMobile();
+  const { stats, refetch: refetchStats } = useUserStats();
 
   const username =
     profile?.nombre ||
@@ -119,34 +122,57 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             </h1>
           )}
 
-          {/* Avatar + username */}
-          <div
-            onClick={() => { setShowAvatarSelector(true); closeDrawer(); }}
-            title={t("sidebar.changeAvatar")}
-            style={{
-              display: "flex", flexDirection: "column", alignItems: "center",
-              marginBottom: 16, cursor: "pointer",
-            }}
-          >
-            <div style={{ position: "relative" }}>
+          {/* Avatar + username — tocar la foto o el nombre va al perfil propio;
+              el lápiz ✏️ es la única acción que abre el selector de avatar. */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 16 }}>
+            <div
+              onClick={() => { navigate(`/perfil/${session?.user?.id}`); closeDrawer(); }}
+              title={t("sidebar.viewProfile")}
+              style={{ position: "relative", cursor: "pointer" }}
+            >
               <Avatar avatarUrl={profile?.avatar_url} nombre={username} size={60} />
-              <span style={{
-                position: "absolute", bottom: 0, right: 0,
-                background: "#d4af37", borderRadius: "50%",
-                width: 18, height: 18,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 10, lineHeight: 1,
-              }}>
+              <span
+                onClick={(e) => { e.stopPropagation(); setShowAvatarSelector(true); closeDrawer(); }}
+                title={t("sidebar.changeAvatar")}
+                style={{
+                  position: "absolute", top: -2, right: -2,
+                  background: "#d4af37", borderRadius: "50%",
+                  width: 18, height: 18,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 10, lineHeight: 1, cursor: "pointer",
+                }}
+              >
                 ✏️
               </span>
+              {stats.currentStreak > 0 && (
+                <span style={{
+                  position: "absolute", bottom: -3, right: -3,
+                  background: "#c07a3f", border: "2px solid #1c1409", borderRadius: "50%",
+                  minWidth: 22, height: 22, padding: "0 3px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 10, fontWeight: 800, color: "#fff8ec", lineHeight: 1,
+                  pointerEvents: "none",
+                }}>
+                  🔥{stats.currentStreak}
+                </span>
+              )}
             </div>
-            <p style={{ textAlign: "center", fontSize: "13px", opacity: 0.75, margin: "8px 0 0", color: "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
+            <p
+              onClick={() => { navigate(`/perfil/${session?.user?.id}`); closeDrawer(); }}
+              title={t("sidebar.viewProfile")}
+              style={{ textAlign: "center", fontSize: "13px", opacity: 0.85, margin: "8px 0 0", color: "#f0e4cc", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer" }}
+            >
               {username}
-              <PrestigeBadge prestige={profile?.prestige} size="sm" />
             </p>
           </div>
 
-          <UserLevelCard />
+          {stats.prestige > 0 && (
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+              <PrestigeBadge prestige={stats.prestige} size="row" cupSize={36} />
+            </div>
+          )}
+
+          <UserLevelCard stats={stats} refetch={refetchStats} />
 
           {/* Badge strip */}
           {badges.length > 0 && (

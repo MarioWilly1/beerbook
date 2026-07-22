@@ -8,6 +8,7 @@ import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
 import OriginMapPanel from "../components/OriginMapPanel";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { useTrendingBeers } from "../hooks/useTrendingBeers";
 
 const STYLE_KEYWORDS = ["IPA", "Lager", "Stout", "Ale", "Porter", "Saison", "Sour", "Dubbel", "Tripel"];
 
@@ -135,6 +136,7 @@ const Dashboard = () => {
   const { beers, loading, error } = useBeers();
   const { userBeers, refetch } = useUserBeers();
   const { stats, refetch: refetchStats } = useUserStats();
+  const { trendingIds, rankOf } = useTrendingBeers();
   const isMobile = useIsMobile();
 
   const [refresh, setRefresh] = useState(false);
@@ -145,6 +147,7 @@ const Dashboard = () => {
   const [styleFilter, setStyleFilter] = useState(null);
   const [countryFilter, setCountryFilter] = useState(null);
   const [alcoholFilter, setAlcoholFilter] = useState([0, 15]);
+  const [trendingFilter, setTrendingFilter] = useState(false);
 
   useEffect(() => {
     if (refresh) {
@@ -186,6 +189,11 @@ const Dashboard = () => {
       if (minAlc === 0 && maxAlc === 15) return true;
       const alc = Number(beer.alcohol) || 0;
       return alc >= minAlc && alc <= maxAlc;
+    })
+    .filter((beer) => !trendingFilter || trendingIds.has(beer.id))
+    .sort((a, b) => {
+      if (!trendingFilter) return 0;
+      return rankOf(a.id) - rankOf(b.id);
     });
 
   return (
@@ -238,6 +246,8 @@ const Dashboard = () => {
         setCountryFilter={setCountryFilter}
         alcoholFilter={alcoholFilter}
         setAlcoholFilter={setAlcoholFilter}
+        trendingFilter={trendingFilter}
+        setTrendingFilter={setTrendingFilter}
         styles={styles}
         countries={countries}
       />
@@ -262,6 +272,7 @@ const Dashboard = () => {
             isInMyBeers={!!userBeers.find((b) => b.beer_id === beer.id)}
             inCuaderno={false}
             onVerMapa={beer.origen_lat != null ? () => { setFocusBeer(beer); setShowMap(true); } : null}
+            isTrending={trendingIds.has(beer.id)}
           />
         ))}
       </div>

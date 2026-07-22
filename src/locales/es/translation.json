@@ -229,7 +229,9 @@
     "clearBtn":          "Limpiar filtros",
     "styleSection":      "ESTILO",
     "countrySection":    "PAÍS",
-    "alcoholSection":    "GRADO ALCOHÓLICO"
+    "alcoholSection":    "GRADO ALCOHÓLICO",
+    "trending":          "Trending",
+    "trendingHint":      "Cervezas con más actividad de la comunidad en los últimos 7 días"
   },
   "beerform": {
     "verified":           "Verificada",

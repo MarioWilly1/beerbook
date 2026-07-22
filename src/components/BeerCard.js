@@ -30,7 +30,7 @@ const RAREZA_BADGE = {
   mitica:     { color: "#e040fb", bg: "rgba(224,64,251,0.1)",   border: "rgba(224,64,251,0.25)"  },
 };
 
-const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
+const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrending }) => {
   const { t, i18n } = useTranslation();
   const [expanded,  setExpanded]  = useState(false);
   const [times,     setTimes]     = useState(myBeerData?.times || 0);
@@ -134,6 +134,16 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa }) => {
               borderRadius: "8px", cursor: beer.foto_url ? "zoom-in" : "default", display: "block",
             }}
           />
+          {isTrending && (
+            <span style={{
+              position: "absolute", top: 6, left: 6,
+              background: "rgba(0,0,0,0.7)", color: "#ff8a3d",
+              fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
+              pointerEvents: "none",
+            }}>
+              🔥 {t("filters.trending")}
+            </span>
+          )}
           {photoUrl?.trim() && (
             <span style={{
               position: "absolute", bottom: 6, right: 6,

@@ -229,7 +229,9 @@
     "clearBtn":          "Filter löschen",
     "styleSection":      "STIL",
     "countrySection":    "LAND",
-    "alcoholSection":    "ALKOHOLGEHALT"
+    "alcoholSection":    "ALKOHOLGEHALT",
+    "trending":          "Trending",
+    "trendingHint":      "Biere mit der meisten Community-Aktivität in den letzten 7 Tagen"
   },
   "beerform": {
     "verified":           "Verifiziert",

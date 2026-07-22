@@ -193,6 +193,8 @@ const BeerFilters = ({
   setCountryFilter,
   alcoholFilter,
   setAlcoholFilter,
+  trendingFilter,
+  setTrendingFilter,
   styles,
   countries,
 }) => {
@@ -201,7 +203,7 @@ const BeerFilters = ({
 
   const [low, high] = alcoholFilter;
   const alcActive = low > 0 || high < 15;
-  const activeCount = [styleFilter, countryFilter, alcActive || null].filter(
+  const activeCount = [styleFilter, countryFilter, alcActive || null, trendingFilter || null].filter(
     Boolean
   ).length;
 
@@ -209,6 +211,7 @@ const BeerFilters = ({
     setStyleFilter(null);
     setCountryFilter(null);
     setAlcoholFilter([0, 15]);
+    setTrendingFilter(false);
   };
 
   return (
@@ -265,6 +268,27 @@ const BeerFilters = ({
         </div>
 
         <button
+          onClick={() => setTrendingFilter(!trendingFilter)}
+          title={t("filters.trendingHint")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "10px 12px",
+            borderRadius: 10,
+            cursor: "pointer",
+            border: `1.5px solid ${trendingFilter ? "#d4af37" : "#2e2215"}`,
+            background: trendingFilter ? "#d4af37" : "#2a1e0f",
+            color: trendingFilter ? "#0d0a06" : "#9a7d62",
+            fontWeight: 700,
+            fontSize: 13,
+            whiteSpace: "nowrap",
+          }}
+        >
+          🔥 {t("filters.trending")}
+        </button>
+
+        <button
           onClick={() => setOpen((v) => !v)}
           style={{
             display: "flex",
@@ -304,7 +328,7 @@ const BeerFilters = ({
       </div>
 
       {/* Active filter badges */}
-      {(styleFilter || countryFilter || alcActive) && (
+      {(styleFilter || countryFilter || alcActive || trendingFilter) && (
         <div
           style={{
             display: "flex",
@@ -313,6 +337,9 @@ const BeerFilters = ({
             padding: "0 14px 12px",
           }}
         >
+          {trendingFilter && (
+            <Badge label={`🔥 ${t("filters.trending")}`} onRemove={() => setTrendingFilter(false)} />
+          )}
           {styleFilter && (
             <Badge label={styleFilter} onRemove={() => setStyleFilter(null)} />
           )}
@@ -384,7 +411,7 @@ const BeerFilters = ({
             />
           </div>
 
-          {(styleFilter || countryFilter || alcActive) && (
+          {(styleFilter || countryFilter || alcActive || trendingFilter) && (
             <div
               style={{
                 display: "flex",

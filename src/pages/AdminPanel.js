@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { slugify } from "../utils/slugify";
+import { translateDescription } from "../utils/translate";
 
 function fmtDate(ts) {
   if (!ts) return "—";
@@ -34,6 +35,7 @@ const CargarCerveza = () => {
   const [coordsParsed, setCoordsParsed] = useState(null);
   const [coordsError, setCoordsError]   = useState("");
   const [saving, setSaving]   = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError]     = useState("");
 
@@ -85,13 +87,29 @@ const CargarCerveza = () => {
       foto_url = urlData.publicUrl;
     }
 
-    // 2. Insert en beers_new
+    // 2. Traducir la descripción (si hay) antes de guardar — MyMemory
+    // Translate, gratis, sin key. Si falla, quedan en null: BeerInfoModal
+    // cae a español en vez de mostrar vacío.
+    let info_detallada_en = null;
+    let info_detallada_de = null;
+    const infoTrimmed = form.info_detallada.trim();
+    if (infoTrimmed) {
+      setTranslating(true);
+      const translated = await translateDescription(infoTrimmed);
+      info_detallada_en = translated.en;
+      info_detallada_de = translated.de;
+      setTranslating(false);
+    }
+
+    // 3. Insert en beers_new
     const row = {
       nombre:             form.nombre.trim() || null,
       estilo:             form.estilo.trim() || null,
       pais:               form.pais.trim() || null,
       alcohol:            form.alcohol !== "" ? parseFloat(form.alcohol) : null,
-      info_detallada:     form.info_detallada.trim() || null,
+      info_detallada:     infoTrimmed || null,
+      info_detallada_en,
+      info_detallada_de,
       foto_url,
       origen_lat:         coordsParsed?.lat ?? null,
       origen_lng:         coordsParsed?.lng ?? null,
@@ -191,7 +209,7 @@ const CargarCerveza = () => {
           Pegá los datos básicos primero, luego copiá el prompt y pegalo en Claude.
         </p>
 
-        <Field label="Descripción técnica (pegar respuesta de Claude)">
+        <Field label="Descripción técnica (pegar respuesta de Claude) — se traduce solo a EN/DE al guardar">
           <textarea
             value={form.info_detallada}
             onChange={set("info_detallada")}
@@ -225,7 +243,7 @@ const CargarCerveza = () => {
       {success && <p style={{ margin: 0, color: "#4caf50", fontSize: 14 }}>{success}</p>}
 
       <button onClick={handleSave} disabled={saving} style={{ ...approveBtn, padding: "13px 0", fontSize: 15, borderRadius: 10 }}>
-        {saving ? "Guardando..." : "💾 Guardar cerveza"}
+        {translating ? "🌐 Traduciendo..." : saving ? "Guardando..." : "💾 Guardar cerveza"}
       </button>
     </div>
   );
@@ -611,6 +629,7 @@ const EditarCerveza = () => {
   const [coordsParsed, setCoordsParsed] = useState(null);
   const [coordsError,  setCoordsError]  = useState("");
   const [saving,       setSaving]       = useState(false);
+  const [translating,  setTranslating]  = useState(false);
   const [msg,          setMsg]          = useState("");
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -620,7 +639,7 @@ const EditarCerveza = () => {
     if (q.trim().length < 2) { setResults([]); return; }
     const { data } = await supabase
       .from("beers_new")
-      .select("id, nombre, estilo, pais, alcohol, rareza, es_edicion_especial, motivo_edicion, familia, info_detallada, foto_url, origen_lat, origen_lng")
+      .select("id, nombre, estilo, pais, alcohol, rareza, es_edicion_especial, motivo_edicion, familia, info_detallada, info_detallada_en, info_detallada_de, foto_url, origen_lat, origen_lng")
       .ilike("nombre", `%${q.trim()}%`)
       .order("nombre")
       .limit(20);
@@ -699,6 +718,25 @@ const EditarCerveza = () => {
       foto_url = urlData.publicUrl;
     }
 
+    // Solo vuelve a traducir si el texto en español realmente cambió
+    // respecto al que ya estaba guardado — así no gasta cupo de la API
+    // en cada guardado que no toca la descripción.
+    const infoTrimmed = form.info_detallada.trim();
+    let info_detallada_en = selected.info_detallada_en ?? null;
+    let info_detallada_de = selected.info_detallada_de ?? null;
+    if (infoTrimmed !== (selected.info_detallada || "")) {
+      if (infoTrimmed) {
+        setTranslating(true);
+        const translated = await translateDescription(infoTrimmed);
+        info_detallada_en = translated.en;
+        info_detallada_de = translated.de;
+        setTranslating(false);
+      } else {
+        info_detallada_en = null;
+        info_detallada_de = null;
+      }
+    }
+
     const { error } = await supabase.from("beers_new").update({
       nombre:              form.nombre.trim()         || null,
       estilo:              form.estilo.trim()         || null,
@@ -708,7 +746,9 @@ const EditarCerveza = () => {
       es_edicion_especial: form.es_edicion_especial,
       motivo_edicion:      form.motivo_edicion.trim() || null,
       familia:             form.familia.trim()        || null,
-      info_detallada:      form.info_detallada.trim() || null,
+      info_detallada:      infoTrimmed || null,
+      info_detallada_en,
+      info_detallada_de,
       foto_url,
       origen_lat:          coordsParsed?.lat ?? null,
       origen_lng:          coordsParsed?.lng ?? null,
@@ -717,7 +757,7 @@ const EditarCerveza = () => {
     setSaving(false);
     if (error) { setMsg(`❌ Error: ${error.message}`); return; }
     setMsg(`✓ "${form.nombre.trim()}" actualizada correctamente.`);
-    setSelected((s) => ({ ...s, ...form, foto_url, origen_lat: coordsParsed?.lat ?? null, origen_lng: coordsParsed?.lng ?? null }));
+    setSelected((s) => ({ ...s, ...form, foto_url, info_detallada_en, info_detallada_de, origen_lat: coordsParsed?.lat ?? null, origen_lng: coordsParsed?.lng ?? null }));
     setFotoFile(null); setFotoPreview(null);
   };
 
@@ -871,7 +911,7 @@ const EditarCerveza = () => {
 
           <button onClick={handleSave} disabled={saving}
             style={{ ...approveBtn, width: "100%", padding: "13px 0", fontSize: 15, borderRadius: 10 }}>
-            {saving ? "Guardando…" : "💾 Guardar cambios"}
+            {translating ? "🌐 Traduciendo..." : saving ? "Guardando…" : "💾 Guardar cambios"}
           </button>
         </div>
       )}

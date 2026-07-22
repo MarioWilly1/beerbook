@@ -1,7 +1,18 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
-import { getCountryName } from "../utils/countryDisplay";
+import { getCountryName, resolveSupportedLocale } from "../utils/countryDisplay";
+
+// Descripción según el idioma activo, con fallback a español si la
+// traducción automática (MyMemory, ver utils/translate.js) no existe o
+// falló al cargar/editar la cerveza — nunca queda vacío mientras haya
+// texto en español.
+function descriptionFor(beer, locale) {
+  const lang = resolveSupportedLocale(locale);
+  if (lang === "en") return beer.info_detallada_en || beer.info_detallada;
+  if (lang === "de") return beer.info_detallada_de || beer.info_detallada;
+  return beer.info_detallada;
+}
 
 const BeerInfoModal = ({ beer, onClose, onVerMapa }) => {
   const { t, i18n } = useTranslation();
@@ -40,7 +51,7 @@ const BeerInfoModal = ({ beer, onClose, onVerMapa }) => {
 
         {/* Descripción */}
         <p style={bodyStyle}>
-          {beer.info_detallada || t("beerInfo.unavailable")}
+          {descriptionFor(beer, i18n.language) || t("beerInfo.unavailable")}
         </p>
 
         {onVerMapa && beer.origen_lat != null && (

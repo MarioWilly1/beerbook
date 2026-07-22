@@ -42,6 +42,8 @@ export const useMyBeers = () => {
             descripcion,
             foto_url,
             info_detallada,
+            info_detallada_en,
+            info_detallada_de,
             rareza,
             es_edicion_especial,
             motivo_edicion,

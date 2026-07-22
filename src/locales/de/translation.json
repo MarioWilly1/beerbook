@@ -80,6 +80,13 @@
         "show":        "Anzeigen",
         "hide":        "Verbergen",
         "note":        "Deine Story ist für {{count}} Person(en) verborgen."
+      },
+      "hiddenEntries": {
+        "title":       "Biere verbergen",
+        "description": "Überprüfe, welche Einträge in deinem Notizbuch verborgen sind und vor wem. Um eine neue Eintrag für jemanden zu verbergen, mach das direkt bei diesem Eintrag in Mein Notizbuch.",
+        "loading":     "Wird geladen...",
+        "empty":       "Du hast keine vor irgendjemandem verborgenen Einträge.",
+        "unhide":      "Nicht mehr verbergen"
       }
     },
     "prefs": {
@@ -276,6 +283,17 @@
     "saving":             "Speichern...",
     "saveBtn":            "Speichern · +{{xp}} XP",
     "inNotebook":         "In deinem Notizbuch"
+  },
+  "hideEntry": {
+    "btn":               "Verbergen für...",
+    "hiddenCount_one":   "verborgen für {{count}}",
+    "hiddenCount_other": "verborgen für {{count}}",
+    "title":             "Dieses Bier verbergen für...",
+    "subtitle":          "Wähle, welche Freunde diesen Eintrag ({{beer}}) NICHT im Feed oder deinem Profil sehen sollen. Alle anderen sehen ihn wie gewohnt.",
+    "noFriends":         "Du hast noch keine Freunde, vor denen du etwas verbergen könntest.",
+    "searchPlaceholder": "Freund suchen...",
+    "noResults":         "Keine Ergebnisse.",
+    "save":              "Speichern"
   },
   "notebook": {
     "title":              "Mein Notizbuch",

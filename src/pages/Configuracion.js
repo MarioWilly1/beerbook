@@ -6,6 +6,7 @@ import { TIER_META } from "../utils/badges";
 import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
 import HiddenStoriesManager from "../components/HiddenStoriesManager";
+import HiddenEntriesManager from "../components/HiddenEntriesManager";
 import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
 
 const TABS = [
@@ -358,6 +359,17 @@ const Configuracion = ({ onProfileChange }) => {
               {t("settings.privacy.hiddenStories.description")}
             </p>
             {session && <HiddenStoriesManager currentUserId={session.user.id} />}
+          </div>
+
+          {/* Ocultar cervezas de amigos específicos */}
+          <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid #2e2215" }}>
+            <div style={{ fontWeight: 700, color: "#f0e4cc", marginBottom: 4, fontSize: 15 }}>
+              🙈 {t("settings.privacy.hiddenEntries.title")}
+            </div>
+            <p style={{ fontSize: 13, color: "#9a7d62", margin: "0 0 14px", lineHeight: 1.5 }}>
+              {t("settings.privacy.hiddenEntries.description")}
+            </p>
+            {session && <HiddenEntriesManager currentUserId={session.user.id} />}
           </div>
         </div>
       )}

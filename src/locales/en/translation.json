@@ -80,6 +80,13 @@
         "show":        "Show",
         "hide":        "Hide",
         "note":        "Your story is hidden from {{count}} person(s)."
+      },
+      "hiddenEntries": {
+        "title":       "Hide beers",
+        "description": "Review which notebook entries are hidden and from whom. To choose who to hide a new entry from, do it from that entry in My Notebook.",
+        "loading":     "Loading...",
+        "empty":       "You don't have any entries hidden from anyone.",
+        "unhide":      "Stop hiding"
       }
     },
     "prefs": {
@@ -276,6 +283,17 @@
     "saving":             "Saving...",
     "saveBtn":            "Save · +{{xp}} XP",
     "inNotebook":         "In your notebook"
+  },
+  "hideEntry": {
+    "btn":               "Hide from...",
+    "hiddenCount_one":   "hidden from {{count}}",
+    "hiddenCount_other": "hidden from {{count}}",
+    "title":             "Hide this beer from...",
+    "subtitle":          "Choose which friends should NOT see this entry ({{beer}}) in the feed or your profile. Everyone else still sees it normally.",
+    "noFriends":         "You have no friends yet to hide anything from.",
+    "searchPlaceholder": "Search friend...",
+    "noResults":         "No results.",
+    "save":              "Save"
   },
   "notebook": {
     "title":              "My Notebook",

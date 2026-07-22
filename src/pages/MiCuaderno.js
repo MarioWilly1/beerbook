@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile";
@@ -21,6 +21,7 @@ import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { hashToString } from "../utils/perceptualHash";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
+import HideEntryModal from "../components/HideEntryModal";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -277,11 +278,12 @@ const ctrlS = {
 };
 
 // ── NotebookCard — accordion card for Mi Cuaderno ─────────────────────────────
-const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoModal }) => {
+const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoModal, userId, hiddenCount, onHiddenChange }) => {
   const { t, i18n } = useTranslation();
   const [expanded,  setExpanded]  = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState("");
+  const [showHideModal, setShowHideModal] = useState(false);
   const fileInputRef = useRef(null);
 
   const handlePhotoSelect = async (e) => {
@@ -477,6 +479,29 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
 
           <LocationPicker value={beer.location} onChange={(loc) => onChange(beer.id, "location", loc)} />
 
+          {userId && (
+            <button
+              type="button"
+              onClick={() => setShowHideModal(true)}
+              style={nbHideFromBtn}
+            >
+              🙈 {t("hideEntry.btn")}
+              {hiddenCount > 0 && (
+                <span style={nbHideFromBadge}>{t("hideEntry.hiddenCount", { count: hiddenCount })}</span>
+              )}
+            </button>
+          )}
+
+          {showHideModal && (
+            <HideEntryModal
+              userId={userId}
+              beerId={beer.id}
+              beerNombre={beer.nombre}
+              onClose={() => setShowHideModal(false)}
+              onSaved={onHiddenChange}
+            />
+          )}
+
           {isComplete && (
             <div style={nbBonusBannerStyle}>
               🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
@@ -525,6 +550,23 @@ const MiCuaderno = () => {
   const [infoModal, setInfoModal]         = useState(null);
   const [activeTab, setActiveTab]         = useState("cuaderno");
   const [notebookSearch, setNotebookSearch] = useState("");
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [hiddenCounts, setHiddenCounts]   = useState({}); // { beer_id: cantidad de amigos a los que se les oculta }
+
+  const loadHiddenCounts = useCallback(async (uid) => {
+    const { data } = await supabase.from("entry_hidden_from").select("beer_id").eq("owner_id", uid);
+    const counts = {};
+    (data || []).forEach((r) => { counts[r.beer_id] = (counts[r.beer_id] || 0) + 1; });
+    setHiddenCounts(counts);
+  }, []);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return;
+      setCurrentUserId(session.user.id);
+      loadHiddenCounts(session.user.id);
+    });
+  }, [loadHiddenCounts]);
 
   useEffect(() => {
     setEditableBeers(
@@ -710,6 +752,9 @@ const MiCuaderno = () => {
                 onDelete={handleDelete}
                 onShowImage={setShowImage}
                 onInfoModal={setInfoModal}
+                userId={currentUserId}
+                hiddenCount={hiddenCounts[beer.id] || 0}
+                onHiddenChange={() => currentUserId && loadHiddenCounts(currentUserId)}
               />
             ))}
           </div>
@@ -739,5 +784,7 @@ const nbSaveBtn         = { flex: 1, padding: "8px 10px", background: "#d4af37",
 const nbDeleteBtn       = { padding: "8px 10px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "12px" };
 const nbPhotoBtn        = { padding: "8px 12px", background: "#1c1409", border: "1.5px dashed #3a2e20", borderRadius: 8, fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600, textAlign: "center" };
 const nbClearPhotoBtn   = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
+const nbHideFromBtn     = { display: "flex", alignItems: "center", gap: 6, width: "100%", padding: "7px 10px", marginTop: 8, background: "#1c1409", border: "1px solid #2e2215", borderRadius: 8, color: "#9a7d62", cursor: "pointer", fontSize: 12, fontWeight: 600, textAlign: "left" };
+const nbHideFromBadge   = { marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "#d4af37", background: "rgba(212,175,55,0.12)", padding: "2px 7px", borderRadius: 20 };
 
 export default MiCuaderno;

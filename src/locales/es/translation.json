@@ -80,6 +80,13 @@
         "show":        "Mostrar",
         "hide":        "Ocultar",
         "note":        "Tu historia está oculta para {{count}} persona(s)."
+      },
+      "hiddenEntries": {
+        "title":       "Ocultar cervezas",
+        "description": "Repasá qué entradas de tu cuaderno están ocultas y de quién. Para elegir a quién ocultarle una entrada nueva, hacelo desde esa entrada en Mi Cuaderno.",
+        "loading":     "Cargando...",
+        "empty":       "No tenés ninguna entrada oculta de nadie.",
+        "unhide":      "Dejar de ocultar"
       }
     },
     "prefs": {
@@ -276,6 +283,17 @@
     "saving":             "Guardando...",
     "saveBtn":            "Guardar · +{{xp}} XP",
     "inNotebook":         "En tu cuaderno"
+  },
+  "hideEntry": {
+    "btn":               "Ocultar de...",
+    "hiddenCount_one":   "oculta de {{count}}",
+    "hiddenCount_other": "oculta de {{count}}",
+    "title":             "Ocultar esta cerveza de...",
+    "subtitle":          "Elegí qué amigos NO van a ver esta entrada ({{beer}}) en el feed ni en tu perfil. El resto la sigue viendo normal.",
+    "noFriends":         "Todavía no tenés amigos para ocultarles nada.",
+    "searchPlaceholder": "Buscar amigo...",
+    "noResults":         "Sin resultados.",
+    "save":              "Guardar"
   },
   "notebook": {
     "title":              "Mi Cuaderno",

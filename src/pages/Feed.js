@@ -8,6 +8,7 @@ import PrestigeBadge from "../components/PrestigeBadge";
 import Lightbox from "../components/Lightbox";
 import ReactionBar from "../components/ReactionBar";
 import StoryBar from "../components/StoryBar";
+import ReportEntryModal from "../components/ReportEntryModal";
 
 const ACTION_EMOJI = {
   register: "🍺",
@@ -28,11 +29,12 @@ function timeAgo(dateStr, t) {
   return new Date(dateStr).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
-const FeedEntry = ({ entry, reactionData, currentUserId, onToggle }) => {
+const FeedEntry = ({ entry, reactionData, currentUserId, onToggle, onReport }) => {
   const { t } = useTranslation();
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const emoji = ACTION_EMOJI[entry.action] || "🍺";
   const label = t(`feed.action.${entry.action}`, { defaultValue: t("feed.action.default") });
+  const isOwn = entry.user_id === currentUserId;
 
   return (
     <>
@@ -52,6 +54,19 @@ const FeedEntry = ({ entry, reactionData, currentUserId, onToggle }) => {
           <span style={{ fontSize: 12, color: "#5a4535", flexShrink: 0 }}>
             {timeAgo(entry.created_at, t)}
           </span>
+          {!isOwn && (
+            <button
+              onClick={() => onReport(entry)}
+              title={t("feed.reportBtn")}
+              style={{
+                background: "none", border: "none", color: "#5a4535",
+                fontSize: 13, cursor: "pointer", padding: "2px 4px", flexShrink: 0,
+                opacity: 0.6,
+              }}
+            >
+              🚩
+            </button>
+          )}
         </div>
 
         {/* Content: beer photo + rating/comment/user photo */}
@@ -115,6 +130,7 @@ const Feed = () => {
   const { t } = useTranslation();
   const { feed, loading } = useFeed();
   const { reactionsMap, toggleReaction, currentUserId } = useFeedReactions(feed);
+  const [reportTarget, setReportTarget] = useState(null);
 
   if (loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("feed.loading")}</p>;
 
@@ -149,9 +165,17 @@ const Feed = () => {
               reactionData={reactionData}
               currentUserId={currentUserId}
               onToggle={toggleReaction}
+              onReport={setReportTarget}
             />
           );
         })
+      )}
+
+      {reportTarget && (
+        <ReportEntryModal
+          target={reportTarget}
+          onClose={() => setReportTarget(null)}
+        />
       )}
     </div>
   );

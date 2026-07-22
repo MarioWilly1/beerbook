@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
 import { supabase } from "../services/supabase";
@@ -13,6 +13,8 @@ import LocationPicker from "./LocationPicker";
 import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
 import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
+import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
+import { hashToString } from "../utils/perceptualHash";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -37,6 +39,10 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const [comment,   setComment]   = useState(myBeerData?.comment || "");
   const [rating,    setRating]    = useState(myBeerData?.Rating ?? "");
   const [photoUrl,  setPhotoUrl]  = useState(myBeerData?.user_photo_url || "");
+  const [photoHash, setPhotoHash] = useState(undefined); // undefined = sin cambios esta sesión (ver nota en handleSave)
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState("");
+  const fileInputRef = useRef(null);
   const [location,  setLocation]  = useState(
     myBeerData?.location_lat
       ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true }
@@ -45,6 +51,31 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const [saving,     setSaving]    = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const [infoOpen,   setInfoOpen]  = useState(false);
+
+  const handlePhotoSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadErr("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Sin sesión");
+      const { blob, hash } = await compressImage(file);
+      const publicUrl = await uploadUserBeerPhoto(supabase, session.user.id, beer.nombre, beer.id, blob);
+      setPhotoUrl(publicUrl);
+      setPhotoHash(hashToString(hash));
+    } catch {
+      setUploadErr(t("beerform.uploadError"));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoUrl("");
+    setPhotoHash(null);
+  };
 
   const isColeccionable = beer.es_edicion_especial || RAREZA_COLECCIONABLE.has(beer.rareza);
   const collectionBonus = (!isInMyBeers && isColeccionable) ? 20 : 0;
@@ -68,7 +99,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
     const newLevel = getLevelInfo(newTotal).level;
 
-    const { error } = await supabase.from("user_beers").upsert({
+    // photo_hash es un bigint de 64 bits — nunca se lee de vuelta desde la
+    // base (perdería precisión al pasar por JSON/Number en JS). Solo se
+    // manda cuando esta sesión lo calculó (subida nueva) o lo limpió
+    // (quitar foto); si no cambió, se omite y Postgres deja intacto el
+    // valor ya guardado (mismo criterio que MiCuaderno.js).
+    const payload = {
       user_id:         session.user.id,
       beer_id:         beer.id,
       times,
@@ -80,7 +116,10 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       location_lng:    location?.lng    ?? null,
       location_name:   location?.name   ?? null,
       location_public: location?.isPublic ?? true,
-    });
+    };
+    if (photoHash !== undefined) payload.photo_hash = photoHash;
+
+    const { error } = await supabase.from("user_beers").upsert(payload);
 
     if (error) { setSaving(false); return; }
 
@@ -271,12 +310,46 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
               {t("beerform.photoLabel")} <XpBadge xp={XP_VALUES.PHOTO} />
             </label>
             <input
-              type="text"
-              value={photoUrl}
-              onChange={(e) => setPhotoUrl(e.target.value)}
-              placeholder="https://..."
-              style={inputStyle}
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoSelect}
+              style={{ display: "none" }}
             />
+            {uploadErr && (
+              <p style={{ margin: "0 0 6px", fontSize: 11, color: "#c07a3f" }}>{uploadErr}</p>
+            )}
+            {photoUrl ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <img
+                  src={photoUrl} alt="Tu foto"
+                  style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", cursor: "pointer", flexShrink: 0 }}
+                  onClick={() => setLightboxSrc(photoUrl)}
+                />
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    style={{ ...photoBtnStyle, opacity: uploading ? 0.6 : 1 }}
+                  >
+                    {uploading ? t("beerform.uploading") : t("beerform.changePhotoBtn")}
+                  </button>
+                  <button type="button" onClick={handleRemovePhoto} style={clearPhotoBtnStyle}>
+                    {t("beerform.removePhotoBtn")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                style={{ ...photoBtnStyle, width: "100%", opacity: uploading ? 0.6 : 1 }}
+              >
+                {uploading ? t("beerform.uploading") : t("beerform.uploadPhotoBtn")}
+              </button>
+            )}
           </div>
 
           <LocationPicker value={location} onChange={setLocation} />
@@ -316,5 +389,7 @@ const labelStyle       = { display: "block", fontSize: "11px", fontWeight: "600"
 const inputStyle       = { width: "100%", padding: "6px 8px", border: "1px solid #2e2215", borderRadius: "6px", fontSize: "13px", boxSizing: "border-box", background: "#2a1e0f", color: "#f0e4cc" };
 const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", color: "#d4af37", fontWeight: "600", marginBottom: "8px" };
 const saveBtn          = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
+const photoBtnStyle      = { padding: "8px 12px", background: "#1c1409", border: "1.5px dashed #3a2e20", borderRadius: 8, fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600, textAlign: "center" };
+const clearPhotoBtnStyle = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
 
 export default BeerCard;

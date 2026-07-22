@@ -8,6 +8,7 @@ import { getLevelInfo } from "../utils/xp";
 import { prestigeTierFor } from "../utils/prestigeTiers";
 import Avatar from "../components/Avatar";
 import PrestigeBadge from "../components/PrestigeBadge";
+import ReportUserEntriesModal from "../components/ReportUserEntriesModal";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
@@ -106,7 +107,20 @@ const LeagueSelect = ({ leagues, league, onChange }) => {
   );
 };
 
-const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
+const ReportIcon = ({ onReport }) => (
+  <button
+    onClick={(e) => { e.stopPropagation(); onReport(); }}
+    title="Reportar"
+    style={{
+      background: "none", border: "none", color: "inherit", opacity: 0.45,
+      fontSize: 13, cursor: "pointer", padding: "2px 4px", flexShrink: 0,
+    }}
+  >
+    🚩
+  </button>
+);
+
+const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onReport }) => {
   const pos = Number(entry.rank_pos);
   const { level } = getLevelInfo(Number(entry.total_xp));
   return (
@@ -129,11 +143,12 @@ const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
         </div>
         <div style={{ fontSize: 11, color: isSelf ? "#5a3a10" : "#5a4535" }}>🍺 {entry.total_beers} {verifiedLabel}</div>
       </div>
+      {!isSelf && onReport && <ReportIcon onReport={onReport} />}
     </div>
   );
 };
 
-const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) => {
+const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onReport }) => {
   const pos = Number(entry.rank_pos);
   return (
     <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
@@ -152,6 +167,7 @@ const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel }) =
         <div style={{ fontSize: 14, fontWeight: 700, color: "#2a6b3a" }}>🍺 {entry.total_beers}</div>
         <div style={{ fontSize: 11, color: isSelf ? "#5a3a10" : "#5a4535" }}>{verifiedLabel}</div>
       </div>
+      {!isSelf && onReport && <ReportIcon onReport={onReport} />}
     </div>
   );
 };
@@ -182,6 +198,7 @@ const Ranking = () => {
   const [dim, setDim]               = useState("xp");
   const [showConsent, setShowConsent] = useState(false);
   const [consentSession, setConsentSession] = useState(null);
+  const [reportUser, setReportUser] = useState(null);
 
   useEffect(() => {
     const checkConsent = async () => {
@@ -347,6 +364,7 @@ const Ranking = () => {
                 onClick={() => navigate(`/perfil/${entry.id}`)}
                 selfLabel={selfLabel}
                 verifiedLabel={verifiedLabel}
+                onReport={currentUserId ? () => setReportUser({ id: entry.id, nombre: entry.nombre }) : undefined}
               />
             ))}
 
@@ -379,6 +397,10 @@ const Ranking = () => {
           </>
         )}
       </div>
+
+      {reportUser && (
+        <ReportUserEntriesModal user={reportUser} onClose={() => setReportUser(null)} />
+      )}
     </>
   );
 };

@@ -19,27 +19,8 @@ import LocationPicker from "../components/LocationPicker";
 import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
 import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
-import { slugify } from "../utils/slugify";
-
-function compressImage(file, maxDimension = 1080, quality = 0.85) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      let { width, height } = img;
-      if (width > maxDimension || height > maxDimension) {
-        if (width >= height) { height = Math.round((height * maxDimension) / width); width = maxDimension; }
-        else                 { width  = Math.round((width  * maxDimension) / height); height = maxDimension; }
-      }
-      const canvas = document.createElement("canvas");
-      canvas.width = width; canvas.height = height;
-      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-      canvas.toBlob((blob) => resolve(blob), "image/jpeg", quality);
-    };
-    img.src = objectUrl;
-  });
-}
+import { hashToString } from "../utils/perceptualHash";
+import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -311,15 +292,10 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Sin sesión");
-      const blob = await compressImage(file);
-      const safeName = slugify(beer.nombre) || String(beer.id);
-      const path = `${session.user.id}/${safeName}_${crypto.randomUUID()}.jpg`;
-      const { error: upErr } = await supabase.storage
-        .from("user-beers")
-        .upload(path, blob, { contentType: "image/jpeg" });
-      if (upErr) throw upErr;
-      const { data: { publicUrl } } = supabase.storage.from("user-beers").getPublicUrl(path);
+      const { blob, hash } = await compressImage(file);
+      const publicUrl = await uploadUserBeerPhoto(supabase, session.user.id, beer.nombre, beer.id, blob);
       onChange(beer.id, "user_photo_url", publicUrl);
+      onChange(beer.id, "photo_hash", hashToString(hash));
     } catch {
       setUploadErr("Error al subir la foto. Intentá de nuevo.");
     } finally {
@@ -481,7 +457,7 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
                     {uploading ? "⏳ Subiendo…" : "📷 Cambiar foto"}
                   </button>
                   <button
-                    onClick={() => onChange(beer.id, "user_photo_url", "")}
+                    onClick={() => { onChange(beer.id, "user_photo_url", ""); onChange(beer.id, "photo_hash", null); }}
                     style={nbClearPhotoBtn}
                   >
                     🗑️ Quitar foto
@@ -594,7 +570,13 @@ const MiCuaderno = () => {
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
     const newLevel = getLevelInfo(newTotal).level;
 
-    const { error } = await supabase.from("user_beers").update({
+    // photo_hash es un bigint de 64 bits — nunca se lee de vuelta desde la
+    // base (perdería precisión al pasar por JSON/Number en JS), así que
+    // solo se manda cuando esta sesión lo acaba de calcular (subida nueva
+    // vía handlePhotoSelect) o lo limpió explícitamente (botón quitar
+    // foto). Si no cambió, se omite del payload y Postgres deja intacto
+    // el valor ya guardado.
+    const payload = {
       times:           beer.times,
       comment:         beer.comment,
       commercialized:  beer.commercialized,
@@ -605,7 +587,11 @@ const MiCuaderno = () => {
       location_lng:    beer.location?.lng    ?? null,
       location_name:   beer.location?.name   ?? null,
       location_public: beer.location?.isPublic ?? true,
-    }).eq("user_id", session.user.id).eq("beer_id", beer.id);
+    };
+    if (beer.photo_hash !== undefined) payload.photo_hash = beer.photo_hash;
+
+    const { error } = await supabase.from("user_beers").update(payload)
+      .eq("user_id", session.user.id).eq("beer_id", beer.id);
 
     if (error) return;
 

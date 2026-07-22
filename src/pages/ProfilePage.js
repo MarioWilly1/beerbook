@@ -9,6 +9,8 @@ import Avatar from "../components/Avatar";
 import PrestigeBadge from "../components/PrestigeBadge";
 import PrestigeAscensionModal from "../components/PrestigeAscensionModal";
 import PrestigeCloseupModal from "../components/PrestigeCloseupModal";
+import ReportEntryModal from "../components/ReportEntryModal";
+import Lightbox from "../components/Lightbox";
 
 const ACH_BY_SLUG = new Map(ACHIEVEMENTS.map((a) => [a.slug, a]));
 
@@ -28,6 +30,9 @@ const ProfilePage = () => {
   const [reqLoading, setReqLoading]       = useState(false);
   const [ascension, setAscension]         = useState(null); // número de prestigio a repetir en el modal, o null
   const [prestigeCloseup, setPrestigeCloseup] = useState(null); // número de prestigio para la vista de cerca, o null
+  const [verifiedEntries, setVerifiedEntries] = useState([]);
+  const [lightboxSrc, setLightboxSrc]     = useState(null);
+  const [reportTarget, setReportTarget]   = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -73,14 +78,27 @@ const ProfilePage = () => {
       const canSeeStats = isSelf || (prof.perfil_publico ?? true) || friendStatus;
 
       if (canSeeStats) {
-        const [beersRes, achRes, badgesRes] = await Promise.all([
+        const [beersRes, achRes, badgesRes, entriesRes] = await Promise.all([
           supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", userId),
           supabase.from("user_achievements")
             .select("slug, nombre, unlocked_at, xp_awarded")
             .eq("user_id", userId)
             .order("unlocked_at", { ascending: false }),
           supabase.from("user_badges").select("badge_slug, tier, xp_awarded").eq("user_id", userId),
+          // user_beers solo tiene policies de SELECT para user_id=auth.uid()
+          // — ver el cuaderno de OTRO usuario necesita esta RPC SECURITY
+          // DEFINER, que replica server-side la misma regla de canSeeStats
+          // (dueño / perfil público / amigos). Ver 20260722010000_visible_user_beers.sql.
+          supabase.rpc("get_visible_user_beers", { p_user_id: userId }),
         ]);
+
+        setVerifiedEntries(
+          (entriesRes.data || []).map((row) => ({
+            beer_id: row.beer_id,
+            user_photo_url: row.user_photo_url,
+            beers_new: { nombre: row.beer_nombre },
+          }))
+        );
 
         const beerData     = beersRes.data || [];
         const achData      = achRes.data || [];
@@ -197,6 +215,12 @@ const ProfilePage = () => {
         <PrestigeCloseupModal prestige={prestigeCloseup} onClose={() => setPrestigeCloseup(null)} />
       )}
 
+      <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+
+      {reportTarget && (
+        <ReportEntryModal target={reportTarget} onClose={() => setReportTarget(null)} />
+      )}
+
       {/* Nivel + barra de XP — vive solo acá, no en el uso general de la app */}
       {canSeeStats && stats && (
         <div style={{ marginBottom: 20, padding: "16px 20px", background: "#1c1409", borderRadius: 14, border: "1px solid #2e2215" }}>
@@ -258,6 +282,45 @@ const ProfilePage = () => {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          {verifiedEntries.length > 0 && (
+            <div style={{ background: "#1c1409", borderRadius: 14, border: "1px solid #2e2215", padding: "18px 20px", marginBottom: 20 }}>
+              <p style={{ margin: "0 0 14px", fontSize: 12, fontWeight: 700, color: "#5a4535", textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                {t("profile.verifiedEntriesLabel")}
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: 10 }}>
+                {verifiedEntries.map((entry) => (
+                  <div key={entry.beer_id} style={{ position: "relative" }}>
+                    <img
+                      src={entry.user_photo_url}
+                      alt={entry.beers_new?.nombre || ""}
+                      title={entry.beers_new?.nombre || ""}
+                      onClick={() => setLightboxSrc(entry.user_photo_url)}
+                      style={{ width: "100%", aspectRatio: "1", objectFit: "cover", borderRadius: 8, cursor: "zoom-in", display: "block" }}
+                    />
+                    {!isSelf && currentUserId && (
+                      <button
+                        onClick={() => setReportTarget({
+                          user_id: userId,
+                          beer_id: entry.beer_id,
+                          nombre: profileData.nombre,
+                          beer_nombre: entry.beers_new?.nombre || "",
+                        })}
+                        title={t("feed.reportBtn")}
+                        style={{
+                          position: "absolute", top: 4, right: 4,
+                          background: "rgba(0,0,0,0.6)", border: "none", borderRadius: 6,
+                          color: "#f0e4cc", fontSize: 12, cursor: "pointer", padding: "2px 5px", lineHeight: 1,
+                        }}
+                      >
+                        🚩
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           )}

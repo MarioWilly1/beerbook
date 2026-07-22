@@ -474,6 +474,131 @@ const SuggestionsPanel = ({ t }) => {
   );
 };
 
+// ── Sub-panel: Reportes (anti-trampa) ──────────────────────────────────────────
+const SOURCE_META = {
+  duplicate_photo:  { icon: "🪞", color: "#c07a3f", labelKey: "admin.reportSourceDuplicate" },
+  velocity:         { icon: "⚡", color: "#4a90d9", labelKey: "admin.reportSourceVelocity" },
+  community_report: { icon: "🚩", color: "#8b2020", labelKey: "admin.reportSourceCommunity" },
+};
+
+const ReportsPanel = ({ t }) => {
+  const [flags, setFlags]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [acting, setActing]   = useState(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("entry_flags")
+      .select(`
+        *,
+        reported_profile:profiles!entry_flags_user_id_fkey(nombre, avatar_url),
+        reporter_profile:profiles!entry_flags_reporter_id_fkey(nombre),
+        beers_new(nombre, foto_url)
+      `)
+      .order("created_at", { ascending: false });
+    setFlags(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleDismiss = async (flag) => {
+    setActing(flag.id);
+    await supabase.from("entry_flags").update({
+      status:      "dismissed",
+      reviewed_at: new Date().toISOString(),
+    }).eq("id", flag.id);
+    await load();
+    setActing(null);
+  };
+
+  const handleUnverify = async (flag) => {
+    setActing(flag.id);
+    await supabase.rpc("admin_unverify_entry", { p_flag_id: flag.id });
+    await load();
+    setActing(null);
+  };
+
+  if (loading) return <p style={{ color: "#9a7d62", padding: 20 }}>{t("admin.loading")}</p>;
+  if (flags.length === 0) return <p style={{ color: "#5a4535", padding: 20, textAlign: "center" }}>{t("admin.reportsEmpty")}</p>;
+
+  const pending  = flags.filter((f) => f.status === "pending");
+  const reviewed = flags.filter((f) => f.status !== "pending");
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {pending.length === 0 && reviewed.length > 0 && (
+        <p style={{ color: "#5a4535", fontSize: 13, textAlign: "center", margin: "0 0 8px" }}>
+          {t("admin.noPendingReports")}
+        </p>
+      )}
+
+      {[...pending, ...reviewed].map((f) => {
+        const isPending = f.status === "pending";
+        const meta = SOURCE_META[f.source] || SOURCE_META.community_report;
+        return (
+          <div key={f.id} style={cardStyle}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 20, flexShrink: 0,
+                    background: `${meta.color}26`, color: meta.color,
+                  }}>
+                    {meta.icon} {t(meta.labelKey)}
+                  </span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 20, flexShrink: 0,
+                    background: isPending ? "rgba(212,175,55,0.15)" : f.status === "confirmed" ? "rgba(139,32,32,0.2)" : "rgba(42,107,58,0.2)",
+                    color: isPending ? "#d4af37" : f.status === "confirmed" ? "#c07a3f" : "#4caf50",
+                  }}>
+                    {t(`admin.status_${f.status}`)}
+                  </span>
+                </div>
+
+                <p style={{ margin: "0 0 4px", fontWeight: 700, color: "#f0e4cc", fontSize: 14 }}>
+                  {f.reported_profile?.nombre || "?"} — 🍺 {f.beers_new?.nombre || `#${f.beer_id}`}
+                </p>
+                {f.reason && (
+                  <p style={{ margin: "0 0 6px", color: "#9a7d62", fontSize: 13, fontStyle: "italic" }}>
+                    "{f.reason}"
+                  </p>
+                )}
+                <p style={{ margin: 0, color: "#5a4535", fontSize: 12 }}>
+                  {f.source === "community_report" && (
+                    <>{t("admin.reportedBy")}: {f.reporter_profile?.nombre || "?"} · </>
+                  )}
+                  {fmtDate(f.created_at)}
+                </p>
+              </div>
+
+              {isPending && (
+                <div style={{ display: "flex", gap: 6, flexShrink: 0, flexDirection: "column" }}>
+                  <button
+                    onClick={() => handleUnverify(f)}
+                    disabled={acting === f.id}
+                    style={rejectBtn}
+                  >
+                    {acting === f.id ? "..." : t("admin.unverify")}
+                  </button>
+                  <button
+                    onClick={() => handleDismiss(f)}
+                    disabled={acting === f.id}
+                    style={approveBtn}
+                  >
+                    {t("admin.dismiss")}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ── Sub-panel: Editar Cerveza ─────────────────────────────────────────────────
 const EditarCerveza = () => {
   const [query,        setQuery]        = useState("");
@@ -778,6 +903,7 @@ const AdminPanel = ({ profile }) => {
         {[
           { key: "support",     label: t("admin.tabSupport"),     icon: "🆘" },
           { key: "suggestions", label: t("admin.tabSuggestions"), icon: "💡" },
+          { key: "reportes",    label: t("admin.tabReports"),     icon: "🚩" },
           { key: "cargar",      label: "Cargar Cerveza",          icon: "🍺" },
           { key: "editar",      label: "Editar Cerveza",          icon: "✏️" },
         ].map(({ key, label, icon }) => (
@@ -799,6 +925,7 @@ const AdminPanel = ({ profile }) => {
 
       {tab === "support"     && <SupportPanel     t={t} />}
       {tab === "suggestions" && <SuggestionsPanel t={t} />}
+      {tab === "reportes"    && <ReportsPanel     t={t} />}
       {tab === "cargar"      && <CargarCerveza />}
       {tab === "editar"      && <EditarCerveza />}
     </div>

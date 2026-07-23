@@ -95,7 +95,9 @@
       "audioOff":      "Activa para escuchar efectos de sonido sutiles en acciones clave.",
       "audioNote":     "Preferencias de audio. Se guardan en este dispositivo.",
       "languageTitle": "Idioma",
-      "languageNote":  "La preferencia se sincroniza con tu cuenta."
+      "languageNote":  "La preferencia se sincroniza con tu cuenta.",
+      "onboardingTitle": "Introducción a BeerBook",
+      "onboardingBtn":   "🎬 Volver a ver la introducción"
     }
   },
   "logros": {
@@ -568,6 +570,31 @@
     "closeup": {
       "percentile": "🏆 Solo el {{pct}}% de la comunidad alcanzó esta liga o una superior",
       "close": "Cerrar"
+    }
+  },
+  "onboarding": {
+    "skip":  "Saltar",
+    "next":  "Siguiente",
+    "start": "Empezar",
+    "slide1": {
+      "title": "🍺 Bienvenido a BeerBook",
+      "text":  "Tu diario personal de cervezas, ahora con mucho más. Descubre, colecciona y compite con amigos."
+    },
+    "slide2": {
+      "title": "Cada cerveza cuenta",
+      "text":  "Registra las cervezas que pruebas, valóralas y sube de nivel. Cuanto más completa la entrada (foto, nota, puntuación), más experiencia ganas."
+    },
+    "slide3": {
+      "title": "Cervezas raras te esperan",
+      "text":  "Algunas cervezas son difíciles de encontrar. Consíguelas y desbloquéalas en tu colección."
+    },
+    "slide4": {
+      "title": "¿De dónde viene tu cerveza?",
+      "text":  "Descubre el origen real de cada cerveza en el mapa interactivo, y encuentra lugares donde otros ya probaron algo bueno."
+    },
+    "slide5": {
+      "title": "No estás solo en esto",
+      "text":  "Agrega amigos, compite en el ranking por ligas de Prestigio, comparte historias, y chatea."
     }
   }
 }

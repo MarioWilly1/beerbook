@@ -95,7 +95,9 @@
       "audioOff":      "Aktivieren, um subtile Soundeffekte bei wichtigen Aktionen zu hören.",
       "audioNote":     "Audioeinstellungen werden auf diesem Gerät gespeichert.",
       "languageTitle": "Sprache",
-      "languageNote":  "Die Einstellung wird mit deinem Konto synchronisiert."
+      "languageNote":  "Die Einstellung wird mit deinem Konto synchronisiert.",
+      "onboardingTitle": "BeerBook-Einführung",
+      "onboardingBtn":   "🎬 Einführung erneut ansehen"
     }
   },
   "logros": {
@@ -568,6 +570,31 @@
     "closeup": {
       "percentile": "🏆 Nur {{pct}}% der Community haben diese Liga oder höher erreicht",
       "close": "Schließen"
+    }
+  },
+  "onboarding": {
+    "skip":  "Überspringen",
+    "next":  "Weiter",
+    "start": "Loslegen",
+    "slide1": {
+      "title": "🍺 Willkommen bei BeerBook",
+      "text":  "Dein persönliches Bier-Tagebuch, jetzt mit noch mehr. Entdecke, sammle und tritt gegen Freunde an."
+    },
+    "slide2": {
+      "title": "Jedes Bier zählt",
+      "text":  "Trage die Biere ein, die du probierst, bewerte sie und steige im Level auf. Je vollständiger dein Eintrag (Foto, Notiz, Bewertung), desto mehr Erfahrung sammelst du."
+    },
+    "slide3": {
+      "title": "Seltene Biere warten auf dich",
+      "text":  "Manche Biere sind schwer zu finden. Ergattere sie und schalte sie in deiner Sammlung frei."
+    },
+    "slide4": {
+      "title": "Woher kommt dein Bier?",
+      "text":  "Entdecke die wahre Herkunft jedes Bieres auf der interaktiven Karte und finde Orte, an denen andere schon etwas Gutes probiert haben."
+    },
+    "slide5": {
+      "title": "Du bist damit nicht allein",
+      "text":  "Füge Freunde hinzu, tritt im Ranking der Prestige-Ligen an, teile Geschichten und chatte."
     }
   }
 }

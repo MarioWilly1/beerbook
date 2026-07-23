@@ -95,7 +95,9 @@
       "audioOff":      "Enable to hear subtle sound effects on key actions.",
       "audioNote":     "Audio preferences are saved on this device.",
       "languageTitle": "Language",
-      "languageNote":  "Preference syncs to your account."
+      "languageNote":  "Preference syncs to your account.",
+      "onboardingTitle": "BeerBook introduction",
+      "onboardingBtn":   "🎬 Watch the intro again"
     }
   },
   "logros": {
@@ -568,6 +570,31 @@
     "closeup": {
       "percentile": "🏆 Only {{pct}}% of the community has reached this league or higher",
       "close": "Close"
+    }
+  },
+  "onboarding": {
+    "skip":  "Skip",
+    "next":  "Next",
+    "start": "Get started",
+    "slide1": {
+      "title": "🍺 Welcome to BeerBook",
+      "text":  "Your personal beer diary, now with a lot more. Discover, collect, and compete with friends."
+    },
+    "slide2": {
+      "title": "Every beer counts",
+      "text":  "Log the beers you try, rate them, and level up. The more complete your entry (photo, note, rating), the more experience you earn."
+    },
+    "slide3": {
+      "title": "Rare beers await you",
+      "text":  "Some beers are hard to find. Get them and unlock them in your collection."
+    },
+    "slide4": {
+      "title": "Where does your beer come from?",
+      "text":  "Discover the real origin of every beer on the interactive map, and find places where others already tried something good."
+    },
+    "slide5": {
+      "title": "You're not alone in this",
+      "text":  "Add friends, compete in the ranking through Prestige leagues, share stories, and chat."
     }
   }
 }

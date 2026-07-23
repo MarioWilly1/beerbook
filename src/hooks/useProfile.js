@@ -17,7 +17,7 @@ export const useProfile = (session) => {
     Promise.all([
       supabase
         .from("profiles")
-        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking, ranking_consent_shown, current_streak, longest_streak, preferred_language, prestige, prestige_xp_baseline")
+        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking, ranking_consent_shown, current_streak, longest_streak, preferred_language, prestige, prestige_xp_baseline, onboarding_visto")
         .eq("id", userId)
         .single(),
       // is_admin ya no es una columna legible directo de profiles (ver

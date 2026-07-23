@@ -25,6 +25,7 @@ import LugarPage from "./pages/LugarPage";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 import AdminPanel from "./pages/AdminPanel";
+import Onboarding from "./components/Onboarding";
 
 function App() {
   const location = useLocation();
@@ -141,6 +142,17 @@ function App() {
   // Logged in but no profile → age verification
   if (!profile) {
     return <AgeVerificationPage session={session} onComplete={setProfile} />;
+  }
+
+  // Perfil recién creado (o migrado) que todavía no vio el onboarding →
+  // se muestra antes de entrar al Dashboard por primera vez.
+  if (!profile.onboarding_visto) {
+    return (
+      <Onboarding
+        userId={session.user.id}
+        onFinish={() => setProfile((p) => ({ ...p, onboarding_visto: true }))}
+      />
+    );
   }
 
   // Fully authenticated → main app

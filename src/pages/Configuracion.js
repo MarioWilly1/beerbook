@@ -7,6 +7,7 @@ import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
 import HiddenStoriesManager from "../components/HiddenStoriesManager";
 import HiddenEntriesManager from "../components/HiddenEntriesManager";
+import Onboarding from "../components/Onboarding";
 import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
 
 const TABS = [
@@ -66,6 +67,7 @@ const Configuracion = ({ onProfileChange }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const { badges } = useBadges();
   const unlockedBadges = badges.filter((b) => b.currentTier);
@@ -420,6 +422,23 @@ const Configuracion = ({ onProfileChange }) => {
               {t("settings.prefs.languageNote")}
             </p>
           </div>
+
+          {/* Volver a ver la introducción animada */}
+          <div style={{ paddingTop: 24, marginTop: 24, borderTop: "1px solid #2e2215" }}>
+            <div style={{ fontWeight: 600, color: "#f0e4cc", marginBottom: 10 }}>
+              {t("settings.prefs.onboardingTitle")}
+            </div>
+            <button
+              onClick={() => setShowOnboarding(true)}
+              style={{
+                padding: "10px 20px", borderRadius: 10, border: "1px solid #2e2215",
+                background: "#2a1e0f", color: "#d4af37", fontWeight: 700, fontSize: 14,
+                cursor: "pointer",
+              }}
+            >
+              {t("settings.prefs.onboardingBtn")}
+            </button>
+          </div>
         </div>
       )}
 
@@ -436,6 +455,16 @@ const Configuracion = ({ onProfileChange }) => {
             setShowAvatarSelector(false);
           }}
           onClose={() => setShowAvatarSelector(false)}
+        />
+      )}
+
+      {showOnboarding && session && (
+        <Onboarding
+          userId={session.user.id}
+          onFinish={() => {
+            setShowOnboarding(false);
+            if (onProfileChange) onProfileChange({ onboarding_visto: true });
+          }}
         />
       )}
     </div>

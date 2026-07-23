@@ -66,6 +66,7 @@ ALTER TABLE public.entry_flags ENABLE ROW LEVEL SECURITY;
 -- Reportar: cualquier autenticado inserta SU PROPIO reporte, nunca
 -- sobre su propia entrada. El resto de la validación (motivo
 -- 1-300 chars) queda en el CHECK constraint de arriba.
+DROP POLICY IF EXISTS "entry_flags_report_insert" ON public.entry_flags;
 CREATE POLICY "entry_flags_report_insert" ON public.entry_flags
   FOR INSERT TO authenticated WITH CHECK (
     source = 'community_report'
@@ -75,6 +76,7 @@ CREATE POLICY "entry_flags_report_insert" ON public.entry_flags
 
 -- Lectura: el dueño de la entrada ve sus propios flags (transparencia),
 -- el reportante ve lo que reportó, y el admin ve todo.
+DROP POLICY IF EXISTS "entry_flags_select" ON public.entry_flags;
 CREATE POLICY "entry_flags_select" ON public.entry_flags
   FOR SELECT TO authenticated USING (
     user_id = auth.uid() OR reporter_id = auth.uid() OR is_admin()
@@ -82,6 +84,7 @@ CREATE POLICY "entry_flags_select" ON public.entry_flags
 
 -- Resolver (dismiss/confirm) queda reservado a admin — igual patrón
 -- que support_tickets/beer_suggestions (is_admin() en USING/WITH CHECK).
+DROP POLICY IF EXISTS "entry_flags_admin_update" ON public.entry_flags;
 CREATE POLICY "entry_flags_admin_update" ON public.entry_flags
   FOR UPDATE TO authenticated USING (is_admin()) WITH CHECK (is_admin());
 

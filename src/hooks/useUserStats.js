@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
 import { getLevelInfo } from "../utils/xp";
+import { isStreakActive } from "../utils/streak";
 
 export const useUserStats = () => {
   const [stats, setStats] = useState({
@@ -26,7 +27,7 @@ export const useUserStats = () => {
       supabase.from("user_achievements").select("xp_awarded").eq("user_id", uid),
       supabase.from("user_badges").select("xp_awarded").eq("user_id", uid),
       supabase.from("profiles")
-        .select("current_streak, longest_streak, prestige, prestige_xp_baseline")
+        .select("current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline")
         .eq("id", uid)
         .single(),
     ]);
@@ -47,6 +48,7 @@ export const useUserStats = () => {
     const { level }    = getLevelInfo(cycleXP);
     const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;
     const prestigeThreshold = thresholdRes.data ?? null;
+    const streakActive = isStreakActive(profileRes.data?.last_activity_date);
 
     setStats({
       xp: cycleXP,
@@ -54,7 +56,7 @@ export const useUserStats = () => {
       beers: beerData.length,
       verifiedBeers,
       level,
-      currentStreak: profileRes.data?.current_streak || 0,
+      currentStreak: streakActive ? (profileRes.data?.current_streak || 0) : 0,
       longestStreak: profileRes.data?.longest_streak || 0,
       prestige: profileRes.data?.prestige || 0,
       prestigeThreshold,

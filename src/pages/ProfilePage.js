@@ -11,6 +11,7 @@ import PrestigeAscensionModal from "../components/PrestigeAscensionModal";
 import PrestigeCloseupModal from "../components/PrestigeCloseupModal";
 import ReportEntryModal from "../components/ReportEntryModal";
 import Lightbox from "../components/Lightbox";
+import { isStreakActive } from "../utils/streak";
 
 const ACH_BY_SLUG = new Map(ACHIEVEMENTS.map((a) => [a.slug, a]));
 
@@ -45,7 +46,7 @@ const ProfilePage = () => {
 
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, prestige, prestige_xp_baseline")
+        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline")
         .eq("id", userId)
         .single();
 
@@ -251,7 +252,11 @@ const ProfilePage = () => {
             <StatCard
               label={t("profile.statStreak")}
               value={`🔥 ${profileData.longest_streak ?? 0}`}
-              sub={profileData.current_streak > 0 ? t("profile.statStreakActive", { count: profileData.current_streak }) : t("profile.statStreakSub")}
+              sub={
+                isStreakActive(profileData.last_activity_date) && profileData.current_streak > 0
+                  ? t("profile.statStreakActive", { count: profileData.current_streak })
+                  : t("profile.statStreakSub")
+              }
             />
             <StatCard label={t("profile.statAchievements")} value={`🏆 ${achievements.total}`} sub={t("profile.statAchievementsSub")} />
           </div>

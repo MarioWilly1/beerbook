@@ -22,10 +22,11 @@ export const useUserStats = () => {
 
     const uid = session.user.id;
 
-    const [beersRes, achRes, badgesRes, profileRes] = await Promise.all([
+    const [beersRes, achRes, badgesRes, challengesRes, profileRes] = await Promise.all([
       supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", uid),
       supabase.from("user_achievements").select("xp_awarded").eq("user_id", uid),
       supabase.from("user_badges").select("xp_awarded").eq("user_id", uid),
+      supabase.from("user_challenge_completions").select("xp_awarded").eq("user_id", uid),
       supabase.from("profiles")
         .select("current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline")
         .eq("id", uid)
@@ -40,9 +41,10 @@ export const useUserStats = () => {
 
     const beerData     = beersRes.data || [];
     const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);
-    const achXP        = (achRes.data    || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
-    const badgeXP      = (badgesRes.data || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
-    const lifetimeXP   = beerXP + achXP + badgeXP;
+    const achXP        = (achRes.data       || []).reduce((s, a) => s + (a.xp_awarded || 0), 0);
+    const badgeXP      = (badgesRes.data    || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
+    const challengeXP  = (challengesRes.data || []).reduce((s, c) => s + (c.xp_awarded || 0), 0);
+    const lifetimeXP   = beerXP + achXP + badgeXP + challengeXP;
     const baseline     = profileRes.data?.prestige_xp_baseline || 0;
     const cycleXP       = Math.max(0, lifetimeXP - baseline);
     const { level }    = getLevelInfo(cycleXP);

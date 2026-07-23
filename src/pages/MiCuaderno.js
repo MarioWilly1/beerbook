@@ -13,6 +13,7 @@ import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { checkAndAwardBadges } from "../utils/badges";
+import { fetchWeeklyChallengeProgress, checkAndAwardWeeklyChallenge } from "../utils/weeklyChallenge";
 import { logActivity } from "../utils/activity";
 import Lightbox from "../components/Lightbox";
 import LocationPicker from "../components/LocationPicker";
@@ -647,6 +648,7 @@ const MiCuaderno = () => {
       achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
       achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
     ]);
+    fetchWeeklyChallengeProgress().then(checkAndAwardWeeklyChallenge); // fire-and-forget, el banner del Dashboard refleja el resultado
 
     refetchStats();
     soundClink();

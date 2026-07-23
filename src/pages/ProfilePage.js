@@ -79,13 +79,14 @@ const ProfilePage = () => {
       const canSeeStats = isSelf || (prof.perfil_publico ?? true) || friendStatus;
 
       if (canSeeStats) {
-        const [beersRes, achRes, badgesRes, entriesRes] = await Promise.all([
+        const [beersRes, achRes, badgesRes, challengesRes, entriesRes] = await Promise.all([
           supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", userId),
           supabase.from("user_achievements")
             .select("slug, nombre, unlocked_at, xp_awarded")
             .eq("user_id", userId)
             .order("unlocked_at", { ascending: false }),
           supabase.from("user_badges").select("badge_slug, tier, xp_awarded").eq("user_id", userId),
+          supabase.from("user_challenge_completions").select("xp_awarded").eq("user_id", userId),
           // user_beers solo tiene policies de SELECT para user_id=auth.uid()
           // — ver el cuaderno de OTRO usuario necesita esta RPC SECURITY
           // DEFINER, que replica server-side la misma regla de canSeeStats
@@ -106,7 +107,8 @@ const ProfilePage = () => {
         const beerXP       = beerData.reduce((s, b) => s + (b.XP || 0), 0);
         const achXP        = achData.reduce((s, a) => s + (a.xp_awarded || 0), 0);
         const badgeXP      = (badgesRes.data || []).reduce((s, b) => s + (b.xp_awarded || 0), 0);
-        const lifetimeXP  = beerXP + achXP + badgeXP;
+        const challengeXP  = (challengesRes.data || []).reduce((s, c) => s + (c.xp_awarded || 0), 0);
+        const lifetimeXP  = beerXP + achXP + badgeXP + challengeXP;
         const cycleXP      = Math.max(0, lifetimeXP - (prof.prestige_xp_baseline || 0));
         const totalBeers   = beerData.length;
         const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;

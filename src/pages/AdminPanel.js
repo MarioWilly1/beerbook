@@ -919,6 +919,210 @@ const EditarCerveza = () => {
   );
 };
 
+// ── Sub-panel: Reto Semanal ───────────────────────────────────────────────────
+// Mismas 15 métricas que ya usa validate_user_achievement() (sin Racha, que no
+// tiene sentido acotada a una semana) — ver compute_metric_for_user() en
+// 20260723040000_weekly_challenges.sql.
+const METRIC_OPTIONS = [
+  { value: "totalBeers",                label: "Cervezas registradas (total)" },
+  { value: "verifiedBeers",             label: "Cervezas verificadas (con foto)" },
+  { value: "beersWithComments",         label: "Cervezas con comentario" },
+  { value: "verifiedWithRatings",       label: "Cervezas verificadas con puntuación" },
+  { value: "completeEntries",           label: "Entradas completas (foto + nota + puntuación)" },
+  { value: "verifiedDistinctCountries", label: "Países distintos (verificadas)" },
+  { value: "verifiedDistinctStyles",    label: "Estilos distintos (verificadas)" },
+  { value: "beersWithLocation",         label: "Cervezas con ubicación" },
+  { value: "coleccionCount",            label: "Cervezas de colección (rara o más)" },
+  { value: "coleccionEpica",            label: "Cervezas épicas" },
+  { value: "coleccionLegendaria",       label: "Cervezas legendarias" },
+  { value: "coleccionMitica",           label: "Cervezas míticas" },
+  { value: "coleccionEdicionEspecial",  label: "Cervezas de edición especial" },
+  { value: "totalXP",                   label: "XP ganado" },
+  { value: "friendCount",               label: "Amigos agregados" },
+];
+
+const EMPTY_RETO_FORM = {
+  nombre: "", descripcion: "", metric: "totalBeers", threshold: "3", xp_bonus: "50",
+  fecha_inicio: "", fecha_fin: "",
+};
+
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+const retoStatus = (r) => {
+  const today = todayISO();
+  if (r.fecha_fin < today) return { label: "Finalizado", color: "#5a4535" };
+  if (r.fecha_inicio > today) return { label: "Programado", color: "#8b6b2e" };
+  return { label: "Activo ahora", color: "#4caf50" };
+};
+
+const RetosPanel = () => {
+  const [form, setForm]           = useState(EMPTY_RETO_FORM);
+  const [editingId, setEditingId] = useState(null);
+  const [retos, setRetos]         = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [saving, setSaving]       = useState(false);
+  const [msg, setMsg]             = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("weekly_challenges")
+      .select("*")
+      .order("fecha_inicio", { ascending: false });
+    setRetos(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const setField = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+
+  const resetForm = () => { setForm(EMPTY_RETO_FORM); setEditingId(null); };
+
+  const handleEdit = (r) => {
+    setForm({
+      nombre: r.nombre, descripcion: r.descripcion || "",
+      metric: r.metric, threshold: String(r.threshold), xp_bonus: String(r.xp_bonus),
+      fecha_inicio: r.fecha_inicio, fecha_fin: r.fecha_fin,
+    });
+    setEditingId(r.id);
+    setMsg("");
+  };
+
+  const handleDelete = async (id) => {
+    const { error } = await supabase.from("weekly_challenges").delete().eq("id", id);
+    if (error) { setMsg(`✕ No se pudo borrar: ${error.message}`); return; }
+    if (editingId === id) resetForm();
+    load();
+  };
+
+  const handleSave = async () => {
+    setMsg("");
+    if (!form.nombre.trim()) { setMsg("✕ El nombre no puede estar vacío."); return; }
+    if (!form.fecha_inicio || !form.fecha_fin) { setMsg("✕ Completá fecha de inicio y fin."); return; }
+    if (form.fecha_fin < form.fecha_inicio) { setMsg("✕ La fecha de fin no puede ser anterior al inicio."); return; }
+    const threshold = parseInt(form.threshold, 10);
+    const xpBonus   = parseInt(form.xp_bonus, 10);
+    if (!threshold || threshold <= 0) { setMsg("✕ El umbral tiene que ser mayor a 0."); return; }
+    if (!xpBonus || xpBonus <= 0)     { setMsg("✕ El XP de recompensa tiene que ser mayor a 0."); return; }
+
+    setSaving(true);
+    const payload = {
+      nombre: form.nombre.trim(),
+      descripcion: form.descripcion.trim() || null,
+      metric: form.metric,
+      threshold,
+      xp_bonus: xpBonus,
+      fecha_inicio: form.fecha_inicio,
+      fecha_fin: form.fecha_fin,
+    };
+
+    const { error } = editingId
+      ? await supabase.from("weekly_challenges").update(payload).eq("id", editingId)
+      : await supabase.from("weekly_challenges").insert(payload);
+
+    setSaving(false);
+    if (error) {
+      setMsg(
+        error.code === "23P01"
+          ? "✕ Las fechas se solapan con otro reto ya creado."
+          : `✕ ${error.message}`
+      );
+      return;
+    }
+    setMsg(editingId ? "✓ Reto actualizado." : "✓ Reto creado.");
+    resetForm();
+    load();
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={sectionCard}>
+        <h3 style={sectionTitle}>{editingId ? "Editar reto" : "Nuevo reto semanal"}</h3>
+
+        <Field label="Nombre">
+          <input value={form.nombre} onChange={(e) => setField("nombre", e.target.value)}
+            maxLength={100} style={input} placeholder="Ej: Explorador de estilos" />
+        </Field>
+
+        <Field label="Descripción (se muestra a los usuarios)">
+          <textarea value={form.descripcion} onChange={(e) => setField("descripcion", e.target.value)}
+            rows={2} maxLength={300} style={textarea} placeholder="Ej: Probá 3 estilos distintos esta semana" />
+        </Field>
+
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <Field label="Métrica" style={{ flex: "1 1 220px" }}>
+            <select value={form.metric} onChange={(e) => setField("metric", e.target.value)} style={input}>
+              {METRIC_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+            </select>
+          </Field>
+          <Field label="Umbral" style={{ flex: "1 1 100px" }}>
+            <input type="number" min="1" value={form.threshold}
+              onChange={(e) => setField("threshold", e.target.value)} style={input} />
+          </Field>
+          <Field label="XP de recompensa" style={{ flex: "1 1 120px" }}>
+            <input type="number" min="1" value={form.xp_bonus}
+              onChange={(e) => setField("xp_bonus", e.target.value)} style={input} />
+          </Field>
+        </div>
+
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <Field label="Fecha de inicio" style={{ flex: "1 1 160px" }}>
+            <input type="date" value={form.fecha_inicio}
+              onChange={(e) => setField("fecha_inicio", e.target.value)} style={input} />
+          </Field>
+          <Field label="Fecha de fin" style={{ flex: "1 1 160px" }}>
+            <input type="date" value={form.fecha_fin}
+              onChange={(e) => setField("fecha_fin", e.target.value)} style={input} />
+          </Field>
+        </div>
+
+        {msg && <p style={{ margin: "0 0 12px", fontSize: 13, color: msg.startsWith("✓") ? "#4caf50" : "#c0392b" }}>{msg}</p>}
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={handleSave} disabled={saving} style={approveBtn}>
+            {saving ? "Guardando…" : editingId ? "💾 Guardar cambios" : "➕ Crear reto"}
+          </button>
+          {editingId && (
+            <button onClick={resetForm} style={rejectBtn}>Cancelar edición</button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <h3 style={sectionTitle}>Historial de retos</h3>
+        {loading ? (
+          <p style={{ color: "#9a7d62", fontSize: 13 }}>Cargando…</p>
+        ) : retos.length === 0 ? (
+          <p style={{ color: "#5a4535", fontSize: 13 }}>Todavía no creaste ningún reto.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {retos.map((r) => {
+              const status = retoStatus(r);
+              return (
+                <div key={r.id} style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 14 }}>{r.nombre}</div>
+                    <div style={{ fontSize: 12, color: "#9a7d62", marginTop: 2 }}>
+                      {METRIC_OPTIONS.find((m) => m.value === r.metric)?.label || r.metric} · umbral {r.threshold} · +{r.xp_bonus} XP
+                    </div>
+                    <div style={{ fontSize: 11, color: "#5a4535", marginTop: 2 }}>
+                      {r.fecha_inicio} → {r.fecha_fin}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: status.color }}>{status.label}</span>
+                  <button onClick={() => handleEdit(r)} style={{ ...copyBtn, padding: "6px 12px", fontSize: 12 }}>Editar</button>
+                  <button onClick={() => handleDelete(r.id)} style={{ ...rejectBtn, padding: "6px 12px", fontSize: 12 }}>Borrar</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ── Página principal AdminPanel ────────────────────────────────────────────────
 const AdminPanel = ({ profile }) => {
   const navigate = useNavigate();
@@ -946,6 +1150,7 @@ const AdminPanel = ({ profile }) => {
           { key: "reportes",    label: t("admin.tabReports"),     icon: "🚩" },
           { key: "cargar",      label: "Cargar Cerveza",          icon: "🍺" },
           { key: "editar",      label: "Editar Cerveza",          icon: "✏️" },
+          { key: "retos",       label: "Reto Semanal",            icon: "🎯" },
         ].map(({ key, label, icon }) => (
           <button
             key={key}
@@ -968,6 +1173,7 @@ const AdminPanel = ({ profile }) => {
       {tab === "reportes"    && <ReportsPanel     t={t} />}
       {tab === "cargar"      && <CargarCerveza />}
       {tab === "editar"      && <EditarCerveza />}
+      {tab === "retos"       && <RetosPanel />}
     </div>
   );
 };

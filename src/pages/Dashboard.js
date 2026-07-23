@@ -9,6 +9,7 @@ import { supabase } from "../services/supabase";
 import OriginMapPanel from "../components/OriginMapPanel";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useTrendingBeers } from "../hooks/useTrendingBeers";
+import WeeklyChallengeBanner from "../components/WeeklyChallengeBanner";
 
 const STYLE_KEYWORDS = ["IPA", "Lager", "Stout", "Ale", "Porter", "Saison", "Sour", "Dubbel", "Tripel"];
 
@@ -199,6 +200,8 @@ const Dashboard = () => {
   return (
     <div>
       <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>
+
+      <WeeklyChallengeBanner />
 
       {/* Map toggle + suggest row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>

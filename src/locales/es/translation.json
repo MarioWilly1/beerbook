@@ -596,5 +596,10 @@
       "title": "No estás solo en esto",
       "text":  "Agrega amigos, compite en el ranking por ligas de Prestigio, comparte historias, y chatea."
     }
+  },
+  "weeklyChallenge": {
+    "completed": "¡Completado! +{{xp}} XP",
+    "daysLeft_one": "Queda {{count}} día",
+    "daysLeft_other": "Quedan {{count}} días"
   }
 }

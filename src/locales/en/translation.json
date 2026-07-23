@@ -596,5 +596,10 @@
       "title": "You're not alone in this",
       "text":  "Add friends, compete in the ranking through Prestige leagues, share stories, and chat."
     }
+  },
+  "weeklyChallenge": {
+    "completed": "Completed! +{{xp}} XP",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left"
   }
 }

@@ -7,6 +7,7 @@ import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { logActivity } from "../utils/activity";
 import { checkAndAwardBadges } from "../utils/badges";
+import { fetchWeeklyChallengeProgress, checkAndAwardWeeklyChallenge } from "../utils/weeklyChallenge";
 import Lightbox from "./Lightbox";
 import BeerInfoModal from "./BeerInfoModal";
 import LocationPicker from "./LocationPicker";
@@ -129,6 +130,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       updateStreak(),
       fetchAchievementStats(session.user.id),
     ]);
+    fetchWeeklyChallengeProgress().then(checkAndAwardWeeklyChallenge); // fire-and-forget, el banner del Dashboard refleja el resultado
     const [newAchievements, newBadges] = await Promise.all([
       achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
       achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),

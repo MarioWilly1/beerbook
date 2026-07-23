@@ -13,39 +13,15 @@ export function isStreakActive(lastActivityDate) {
   return lastActivityDate === today || lastActivityDate === yesterday;
 }
 
-// Updates streak for userId after a qualifying action (beer save).
-// Returns the new current_streak value.
-export async function updateStreak(userId) {
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("current_streak, longest_streak, last_activity_date")
-    .eq("id", userId)
-    .single();
-
-  if (error || !profile) return 0;
-
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86_400_000).toISOString().split("T")[0];
-
-  if (profile.last_activity_date === today) {
-    return profile.current_streak; // already active today
-  }
-
-  const newStreak =
-    profile.last_activity_date === yesterday
-      ? (profile.current_streak || 0) + 1
-      : 1;
-
-  const newLongest = Math.max(newStreak, profile.longest_streak || 0);
-
-  await supabase
-    .from("profiles")
-    .update({
-      current_streak: newStreak,
-      longest_streak: newLongest,
-      last_activity_date: today,
-    })
-    .eq("id", userId);
-
-  return newStreak;
+// Updates streak for the current user after a qualifying action (beer save).
+// Recalculado server-side vía la RPC update_streak() (SECURITY DEFINER,
+// misma lógica que tenía este archivo antes) — current_streak/longest_streak/
+// last_activity_date ya no aceptan un UPDATE directo del cliente
+// (protect_profile_sensitive_columns(), ver migración
+// 20260723030000_harden_streak_and_validate_racha.sql). Devuelve el
+// current_streak resultante.
+export async function updateStreak() {
+  const { data, error } = await supabase.rpc("update_streak");
+  if (error) return 0;
+  return data ?? 0;
 }

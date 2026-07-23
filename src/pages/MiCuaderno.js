@@ -640,7 +640,7 @@ const MiCuaderno = () => {
     await logActivity(session.user.id, beer.id, { rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
 
     const [newStreak, achStats] = await Promise.all([
-      updateStreak(session.user.id),
+      updateStreak(),
       fetchAchievementStats(session.user.id),
     ]);
     const [newAchievements, newBadges] = await Promise.all([

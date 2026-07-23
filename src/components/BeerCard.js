@@ -126,7 +126,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     await logActivity(session.user.id, beer.id, { rating, comment, photo: photoUrl });
 
     const [newStreak, achStats] = await Promise.all([
-      updateStreak(session.user.id),
+      updateStreak(),
       fetchAchievementStats(session.user.id),
     ]);
     const [newAchievements, newBadges] = await Promise.all([

@@ -28,6 +28,7 @@ export const useMyBeers = () => {
           location_lng,
           location_name,
           location_public,
+          price_paid,
           place_id,
           en_coleccion,
           condicion,

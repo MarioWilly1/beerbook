@@ -320,7 +320,9 @@
     "errorDenied":  "Permiso denegado. Puedes continuar sin ubicación.",
     "errorTimeout": "No se pudo obtener la ubicación. Inténtalo de nuevo.",
     "errorSupport": "Tu navegador no soporta geolocalización.",
-    "private":      "privada"
+    "private":      "privada",
+    "pricePaid":       "Precio pagado (€, opcional)",
+    "pricePlaceholder": "Ej: 5.50"
   },
   "ranking": {
     "title":               "Ranking BeerBook",
@@ -465,12 +467,15 @@
     "loading":      "Cargando lugar...",
     "notFound":     "Lugar no encontrado.",
     "backHome":     "← Inicio",
-    "viewMap":      "Ver en mapa",
+    "moreInfo":     "Más información",
     "unclaimed":    "Lugar no reclamado",
     "beersRanking": "Cervezas más registradas aquí",
     "visitors":     "Quiénes pasaron por aquí",
     "noBeers":      "Aún no hay cervezas registradas aquí.",
-    "noVisitors":   "Aún no hay visitantes con perfil público."
+    "noVisitors":   "Aún no hay visitantes con perfil público.",
+    "noPriceData":     "Sin datos de precio aún",
+    "avgPriceLabel_one":   "promedio de {{count}} aporte",
+    "avgPriceLabel_other": "promedio de {{count}} aportes"
   },
   "beerInfo": {
     "btnTitle":     "Ver descripción técnica",

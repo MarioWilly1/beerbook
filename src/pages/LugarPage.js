@@ -7,7 +7,7 @@ import Avatar from "../components/Avatar";
 const LugarPage = () => {
   const { id } = useParams();
   const { t }  = useTranslation();
-  const { place, beers, visitors, loading, error } = useLugar(id);
+  const { place, beers, visitors, priceStats, loading, error } = useLugar(id);
 
   return (
     <div style={pageStyle}>
@@ -39,13 +39,28 @@ const LugarPage = () => {
                     rel="noopener noreferrer"
                     style={mapLinkStyle}
                   >
-                    📍 {t("lugar.viewMap")}
+                    🔗 {t("lugar.moreInfo")}
                   </a>
                 )}
                 {!place.claimed_by_business && (
                   <span style={unclaimedStyle}>
                     🏳 {t("lugar.unclaimed")}
                   </span>
+                )}
+              </div>
+
+              <div style={priceCardStyle}>
+                {priceStats?.avg_price != null ? (
+                  <>
+                    <span style={{ fontWeight: 700, color: "#d4af37" }}>
+                      💶 €{Number(priceStats.avg_price).toFixed(2)}
+                    </span>
+                    <span style={{ color: "#9a7d62", marginLeft: 6 }}>
+                      {t("lugar.avgPriceLabel", { count: Number(priceStats.sample_count) })}
+                    </span>
+                  </>
+                ) : (
+                  <span style={{ color: "#5a4535" }}>💶 {t("lugar.noPriceData")}</span>
                 )}
               </div>
             </div>
@@ -176,6 +191,16 @@ const mapLinkStyle = {
   borderRadius:   20,
   padding:        "4px 12px",
   fontWeight:     600,
+};
+
+const priceCardStyle = {
+  marginTop:    10,
+  fontSize:     13,
+  padding:      "8px 14px",
+  background:   "#1c1409",
+  border:       "1px solid #2e2215",
+  borderRadius: 10,
+  display:      "inline-block",
 };
 
 const unclaimedStyle = {

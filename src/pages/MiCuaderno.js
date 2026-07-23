@@ -580,7 +580,7 @@ const MiCuaderno = () => {
         commercialized: beer.commercialized ?? true,
         user_photo_url: beer.user_photo_url || "",
         location: beer.location_lat
-          ? { lat: beer.location_lat, lng: beer.location_lng, name: beer.location_name, isPublic: beer.location_public ?? true }
+          ? { lat: beer.location_lat, lng: beer.location_lng, name: beer.location_name, isPublic: beer.location_public ?? true, price: beer.price_paid ?? null }
           : null,
         en_coleccion:      beer.en_coleccion ?? false,
         condicion:         beer.condicion ?? null,
@@ -630,6 +630,7 @@ const MiCuaderno = () => {
       location_lng:    beer.location?.lng    ?? null,
       location_name:   beer.location?.name   ?? null,
       location_public: beer.location?.isPublic ?? true,
+      price_paid:      beer.location?.price  ?? null,
     };
     if (beer.photo_hash !== undefined) payload.photo_hash = beer.photo_hash;
 

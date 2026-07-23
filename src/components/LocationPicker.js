@@ -148,6 +148,26 @@ const LocationPicker = ({ value, onChange }) => {
           ✕ {t("location.removeBtn")}
         </button>
       </div>
+
+      <div style={{ marginTop: 10 }}>
+        <label style={{ fontSize: 12, color: "#555", display: "block", marginBottom: 4 }}>
+          💶 {t("location.pricePaid")}
+        </label>
+        <input
+          type="number"
+          min="0.01"
+          max="200"
+          step="0.01"
+          inputMode="decimal"
+          value={value.price ?? ""}
+          onChange={(e) => {
+            const raw = e.target.value;
+            onChange({ ...value, price: raw === "" ? null : Number(raw) });
+          }}
+          placeholder={t("location.pricePlaceholder")}
+          style={priceInputStyle}
+        />
+      </div>
     </div>
   );
 };
@@ -156,5 +176,10 @@ const wrapperStyle  = { paddingTop: 10, borderTop: "1px solid #f0f0f0", marginTo
 const addBtnStyle   = { padding: "7px 14px", border: "1px dashed #d4af37", background: "#fffbee", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "#8b6b2e", fontWeight: 600 };
 const removeBtnStyle = { fontSize: 11, color: "#c0392b", background: "none", border: "none", cursor: "pointer", padding: "2px 6px" };
 const errorStyle    = { margin: "6px 0 0", fontSize: 12, color: "#c0392b" };
+const priceInputStyle = {
+  width: "100%", maxWidth: 140, padding: "7px 10px", borderRadius: 8,
+  border: "1px solid #e0e0e0", fontSize: 13, color: "#333",
+  outline: "none", boxSizing: "border-box",
+};
 
 export default LocationPicker;

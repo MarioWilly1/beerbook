@@ -320,7 +320,9 @@
     "errorDenied":  "Permission denied. You can continue without location.",
     "errorTimeout": "Could not get location. Try again.",
     "errorSupport": "Your browser does not support geolocation.",
-    "private":      "private"
+    "private":      "private",
+    "pricePaid":       "Price paid (€, optional)",
+    "pricePlaceholder": "E.g: 5.50"
   },
   "ranking": {
     "title":               "BeerBook Ranking",
@@ -465,12 +467,15 @@
     "loading":      "Loading place...",
     "notFound":     "Place not found.",
     "backHome":     "← Home",
-    "viewMap":      "View on map",
+    "moreInfo":     "More information",
     "unclaimed":    "Unclaimed place",
     "beersRanking": "Most registered beers here",
     "visitors":     "Who's been here",
     "noBeers":      "No beers registered here yet.",
-    "noVisitors":   "No public visitors yet."
+    "noVisitors":   "No public visitors yet.",
+    "noPriceData":     "No price data yet",
+    "avgPriceLabel_one":   "average from {{count}} entry",
+    "avgPriceLabel_other": "average from {{count}} entries"
   },
   "beerInfo": {
     "btnTitle":     "View technical description",

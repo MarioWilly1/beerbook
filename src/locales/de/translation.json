@@ -320,7 +320,9 @@
     "errorDenied":  "Zugriff verweigert. Du kannst ohne Standort fortfahren.",
     "errorTimeout": "Standort konnte nicht ermittelt werden. Versuche es erneut.",
     "errorSupport": "Dein Browser unterstützt keine Standortbestimmung.",
-    "private":      "privat"
+    "private":      "privat",
+    "pricePaid":       "Bezahlter Preis (€, optional)",
+    "pricePlaceholder": "Z.B: 5.50"
   },
   "ranking": {
     "title":               "BeerBook Rangliste",
@@ -465,12 +467,15 @@
     "loading":      "Ort wird geladen...",
     "notFound":     "Ort nicht gefunden.",
     "backHome":     "← Startseite",
-    "viewMap":      "Auf Karte anzeigen",
+    "moreInfo":     "Mehr Informationen",
     "unclaimed":    "Nicht beansprucht",
     "beersRanking": "Meistregistrierte Biere hier",
     "visitors":     "Wer war hier",
     "noBeers":      "Noch keine Biere hier registriert.",
-    "noVisitors":   "Noch keine öffentlichen Besucher."
+    "noVisitors":   "Noch keine öffentlichen Besucher.",
+    "noPriceData":     "Noch keine Preisdaten",
+    "avgPriceLabel_one":   "Durchschnitt aus {{count}} Eintrag",
+    "avgPriceLabel_other": "Durchschnitt aus {{count}} Einträgen"
   },
   "beerInfo": {
     "btnTitle":     "Technische Beschreibung anzeigen",

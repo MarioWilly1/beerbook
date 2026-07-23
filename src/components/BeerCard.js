@@ -46,7 +46,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const fileInputRef = useRef(null);
   const [location,  setLocation]  = useState(
     myBeerData?.location_lat
-      ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true }
+      ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true, price: myBeerData.price_paid ?? null }
       : null
   );
   const [saving,     setSaving]    = useState(false);
@@ -117,6 +117,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       location_lng:    location?.lng    ?? null,
       location_name:   location?.name   ?? null,
       location_public: location?.isPublic ?? true,
+      price_paid:      location?.price  ?? null,
     };
     if (photoHash !== undefined) payload.photo_hash = photoHash;
 

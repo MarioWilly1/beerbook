@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "../services/supabase";
 
 export const useLugar = (placeId) => {
-  const [place,    setPlace]    = useState(null);
-  const [beers,    setBeers]    = useState([]);
-  const [visitors, setVisitors] = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState(null);
+  const [place,      setPlace]      = useState(null);
+  const [beers,      setBeers]      = useState([]);
+  const [visitors,   setVisitors]   = useState([]);
+  const [priceStats, setPriceStats] = useState(null);
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState(null);
 
   useEffect(() => {
     if (!placeId) return;
@@ -19,10 +20,12 @@ export const useLugar = (placeId) => {
         { data: placeData, error: placeErr },
         { data: beerData,  error: beerErr  },
         { data: visitData, error: visitErr },
+        { data: priceData, error: priceErr },
       ] = await Promise.all([
         supabase.from("places").select("*").eq("id", placeId).single(),
-        supabase.rpc("get_lugar_beers",    { p_place_id: placeId }),
-        supabase.rpc("get_lugar_visitors", { p_place_id: placeId }),
+        supabase.rpc("get_lugar_beers",       { p_place_id: placeId }),
+        supabase.rpc("get_lugar_visitors",    { p_place_id: placeId }),
+        supabase.rpc("get_lugar_price_stats", { p_place_id: placeId }),
       ]);
 
       if (placeErr) {
@@ -31,8 +34,10 @@ export const useLugar = (placeId) => {
         setPlace(placeData);
         setBeers(beerData  || []);
         setVisitors(visitData || []);
+        setPriceStats(priceData?.[0] || null);
         if (beerErr)  console.error("[useLugar] beers:",    beerErr.message);
         if (visitErr) console.error("[useLugar] visitors:", visitErr.message);
+        if (priceErr) console.error("[useLugar] price:",    priceErr.message);
       }
 
       setLoading(false);
@@ -41,5 +46,5 @@ export const useLugar = (placeId) => {
     load();
   }, [placeId]);
 
-  return { place, beers, visitors, loading, error };
+  return { place, beers, visitors, priceStats, loading, error };
 };

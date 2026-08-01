@@ -608,6 +608,7 @@
   "weeklyChallenge": {
     "completed": "Completed! +{{xp}} XP",
     "daysLeft_one": "{{count}} day left",
-    "daysLeft_other": "{{count}} days left"
+    "daysLeft_other": "{{count}} days left",
+    "endsToday": "Ends today"
   }
 }

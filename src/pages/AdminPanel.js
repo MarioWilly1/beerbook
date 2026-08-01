@@ -6,7 +6,7 @@ import { slugify } from "../utils/slugify";
 import { translateDescription } from "../utils/translate";
 import {
   QuestionIcon, LightBulbIcon, FlagIcon, BeakerIcon, PencilIcon, GoalIcon,
-  CopyIcon, CheckIcon, PlusIcon,
+  ZapIcon, CopyIcon, CheckIcon, PlusIcon,
 } from "@primer/octicons-react";
 
 function fmtDate(ts) {
@@ -945,9 +945,14 @@ const METRIC_OPTIONS = [
   { value: "friendCount",               label: "Amigos agregados" },
 ];
 
+const DURATION_OPTIONS = [
+  { value: "diario",  label: "Diario",  Icon: ZapIcon },
+  { value: "semanal", label: "Semanal", Icon: GoalIcon },
+];
+
 const EMPTY_RETO_FORM = {
   nombre: "", descripcion: "", metric: "totalBeers", threshold: "3", xp_bonus: "50",
-  fecha_inicio: "", fecha_fin: "",
+  fecha_inicio: "", fecha_fin: "", duration_type: "semanal",
 };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -987,7 +992,7 @@ const RetosPanel = () => {
     setForm({
       nombre: r.nombre, descripcion: r.descripcion || "",
       metric: r.metric, threshold: String(r.threshold), xp_bonus: String(r.xp_bonus),
-      fecha_inicio: r.fecha_inicio, fecha_fin: r.fecha_fin,
+      fecha_inicio: r.fecha_inicio, fecha_fin: r.fecha_fin, duration_type: r.duration_type,
     });
     setEditingId(r.id);
     setMsg("");
@@ -1019,6 +1024,7 @@ const RetosPanel = () => {
       xp_bonus: xpBonus,
       fecha_inicio: form.fecha_inicio,
       fecha_fin: form.fecha_fin,
+      duration_type: form.duration_type,
     };
 
     const { error } = editingId
@@ -1029,7 +1035,7 @@ const RetosPanel = () => {
     if (error) {
       setMsg(
         error.code === "23P01"
-          ? "✕ Las fechas se solapan con otro reto ya creado."
+          ? `✕ Las fechas se solapan con otro reto ${form.duration_type} ya creado.`
           : `✕ ${error.message}`
       );
       return;
@@ -1042,7 +1048,28 @@ const RetosPanel = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={sectionCard}>
-        <h3 style={sectionTitle}>{editingId ? "Editar reto" : "Nuevo reto semanal"}</h3>
+        <h3 style={sectionTitle}>{editingId ? "Editar reto" : "Nuevo reto"}</h3>
+
+        <Field label="Duración">
+          <div style={{ display: "flex", gap: 10 }}>
+            {DURATION_OPTIONS.map((d) => (
+              <button
+                key={d.value}
+                type="button"
+                onClick={() => setField("duration_type", d.value)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700,
+                  border: `1px solid ${form.duration_type === d.value ? "#d4af37" : "#2e2215"}`,
+                  background: form.duration_type === d.value ? "rgba(212,175,55,0.12)" : "#0d0a06",
+                  color: form.duration_type === d.value ? "#d4af37" : "#9a7d62",
+                }}
+              >
+                <d.Icon size={14} /> {d.label}
+              </button>
+            ))}
+          </div>
+        </Field>
 
         <Field label="Nombre">
           <input value={form.nombre} onChange={(e) => setField("nombre", e.target.value)}
@@ -1106,7 +1133,9 @@ const RetosPanel = () => {
               return (
                 <div key={r.id} style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: 200 }}>
-                    <div style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 14 }}>{r.nombre}</div>
+                    <div style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 14 }}>
+                      {r.duration_type === "diario" ? "⚡" : "🎯"} {r.nombre}
+                    </div>
                     <div style={{ fontSize: 12, color: "#9a7d62", marginTop: 2 }}>
                       {METRIC_OPTIONS.find((m) => m.value === r.metric)?.label || r.metric} · umbral {r.threshold} · +{r.xp_bonus} XP
                     </div>

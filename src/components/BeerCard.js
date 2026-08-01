@@ -132,7 +132,9 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       updateStreak(),
       fetchAchievementStats(session.user.id),
     ]);
-    fetchWeeklyChallengeProgress().then(checkAndAwardWeeklyChallenge); // fire-and-forget, el banner del Dashboard refleja el resultado
+    // fire-and-forget, el banner del Dashboard refleja el resultado — puede
+    // haber hasta 2 retos activos (diario + semanal) para chequear
+    fetchWeeklyChallengeProgress().then((list) => list.forEach(checkAndAwardWeeklyChallenge));
     const [newAchievements, newBadges] = await Promise.all([
       achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
       achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),

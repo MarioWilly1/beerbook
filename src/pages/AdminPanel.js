@@ -6,7 +6,7 @@ import { slugify } from "../utils/slugify";
 import { translateDescription } from "../utils/translate";
 import {
   QuestionIcon, LightBulbIcon, FlagIcon, BeakerIcon, PencilIcon, GoalIcon,
-  ZapIcon, CopyIcon, CheckIcon, PlusIcon, ContainerIcon,
+  ZapIcon, CopyIcon, CheckIcon, PlusIcon, ContainerIcon, TelescopeIcon, PulseIcon,
 } from "@primer/octicons-react";
 
 function fmtDate(ts) {
@@ -1074,15 +1074,20 @@ const EditarCerveza = () => {
 // Mismas 15 métricas que ya usa validate_user_achievement() (sin Racha, que no
 // tiene sentido acotada a una semana) — ver compute_metric_for_user() en
 // 20260723040000_weekly_challenges.sql.
+// activity: true → disponible también en scope "actividad" (describe qué le
+// hacés a una entrada, da igual si es vieja o nueva). Las que faltan ese flag
+// son inherentemente sobre el conjunto de cervezas que ya conocés (colección/
+// países/estilos distintos/XP/amigos) — re-tocar algo que ya tenías no
+// "descubre" nada, tiene sentido que sigan siendo solo de descubrimiento.
 const METRIC_OPTIONS = [
-  { value: "totalBeers",                label: "Cervezas registradas (total)" },
-  { value: "verifiedBeers",             label: "Cervezas verificadas (con foto)" },
-  { value: "beersWithComments",         label: "Cervezas con comentario" },
-  { value: "verifiedWithRatings",       label: "Cervezas verificadas con puntuación" },
-  { value: "completeEntries",           label: "Entradas completas (foto + nota + puntuación)" },
+  { value: "totalBeers",                label: "Cervezas registradas (total)",              activity: true },
+  { value: "verifiedBeers",             label: "Cervezas verificadas (con foto)",           activity: true },
+  { value: "beersWithComments",         label: "Cervezas con comentario",                    activity: true },
+  { value: "verifiedWithRatings",       label: "Cervezas verificadas con puntuación",       activity: true },
+  { value: "completeEntries",           label: "Entradas completas (foto + nota + puntuación)", activity: true },
   { value: "verifiedDistinctCountries", label: "Países distintos (verificadas)" },
   { value: "verifiedDistinctStyles",    label: "Estilos distintos (verificadas)" },
-  { value: "beersWithLocation",         label: "Cervezas con ubicación" },
+  { value: "beersWithLocation",         label: "Cervezas con ubicación",                     activity: true },
   { value: "coleccionCount",            label: "Cervezas de colección (rara o más)" },
   { value: "coleccionEpica",            label: "Cervezas épicas" },
   { value: "coleccionLegendaria",       label: "Cervezas legendarias" },
@@ -1097,9 +1102,18 @@ const DURATION_OPTIONS = [
   { value: "semanal", label: "Semanal", Icon: GoalIcon },
 ];
 
+// discovery: registrar algo NUEVO (se agota con un catálogo finito, tiene
+// sentido que sea más raro/semanal). activity: hacer algo en CUALQUIER
+// entrada, nueva o vieja (comentar, valorar, subir foto) — nunca se agota,
+// usa activity_log en vez de user_beers.created_at (ver compute_metric_for_user).
+const SCOPE_OPTIONS = [
+  { value: "discovery", label: "Descubrimiento", Icon: TelescopeIcon },
+  { value: "activity",  label: "Actividad",      Icon: PulseIcon },
+];
+
 const EMPTY_RETO_FORM = {
   nombre: "", descripcion: "", metric: "totalBeers", threshold: "3", xp_bonus: "50",
-  fecha_inicio: "", fecha_fin: "", duration_type: "semanal",
+  fecha_inicio: "", fecha_fin: "", duration_type: "semanal", metric_scope: "discovery",
 };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -1140,6 +1154,7 @@ const RetosPanel = () => {
       nombre: r.nombre, descripcion: r.descripcion || "",
       metric: r.metric, threshold: String(r.threshold), xp_bonus: String(r.xp_bonus),
       fecha_inicio: r.fecha_inicio, fecha_fin: r.fecha_fin, duration_type: r.duration_type,
+      metric_scope: r.metric_scope || "discovery",
     });
     setEditingId(r.id);
     setMsg("");
@@ -1172,6 +1187,7 @@ const RetosPanel = () => {
       fecha_inicio: form.fecha_inicio,
       fecha_fin: form.fecha_fin,
       duration_type: form.duration_type,
+      metric_scope: form.metric_scope,
     };
 
     const { error } = editingId
@@ -1218,6 +1234,37 @@ const RetosPanel = () => {
           </div>
         </Field>
 
+        <Field label="Alcance">
+          <div style={{ display: "flex", gap: 10 }}>
+            {SCOPE_OPTIONS.map((s) => (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => {
+                  setForm((f) => {
+                    const stillValid = s.value !== "activity" || METRIC_OPTIONS.find((m) => m.value === f.metric)?.activity;
+                    return { ...f, metric_scope: s.value, metric: stillValid ? f.metric : "totalBeers" };
+                  });
+                }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700,
+                  border: `1px solid ${form.metric_scope === s.value ? "#d4af37" : "#2e2215"}`,
+                  background: form.metric_scope === s.value ? "rgba(212,175,55,0.12)" : "#0d0a06",
+                  color: form.metric_scope === s.value ? "#d4af37" : "#9a7d62",
+                }}
+              >
+                <s.Icon size={14} /> {s.label}
+              </button>
+            ))}
+          </div>
+          <p style={{ margin: "6px 0 0", fontSize: 11, color: "#5a4535" }}>
+            {form.metric_scope === "activity"
+              ? "Cuenta cualquier entrada tocada en el rango de fechas, nueva o vieja (comentar/valorar/subir foto)."
+              : "Solo cuenta cervezas registradas por PRIMERA VEZ dentro del rango de fechas."}
+          </p>
+        </Field>
+
         <Field label="Nombre">
           <input value={form.nombre} onChange={(e) => setField("nombre", e.target.value)}
             maxLength={100} style={input} placeholder="Ej: Explorador de estilos" />
@@ -1236,7 +1283,9 @@ const RetosPanel = () => {
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <Field label="Métrica" style={{ flex: "1 1 220px" }}>
             <select value={form.metric} onChange={(e) => setField("metric", e.target.value)} style={input}>
-              {METRIC_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+              {METRIC_OPTIONS
+                .filter((m) => form.metric_scope !== "activity" || m.activity)
+                .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
             </select>
           </Field>
           <Field label="Umbral" style={{ flex: "1 1 100px" }}>
@@ -1282,13 +1331,15 @@ const RetosPanel = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {retos.map((r) => {
               const status = retoStatus(r);
+              const ScopeIcon = (SCOPE_OPTIONS.find((s) => s.value === (r.metric_scope || "discovery")) || SCOPE_OPTIONS[0]).Icon;
               return (
                 <div key={r.id} style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 14 }}>
                       {r.duration_type === "diario" ? "⚡" : "🎯"} {r.nombre}
                     </div>
-                    <div style={{ fontSize: 12, color: "#9a7d62", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "#9a7d62", marginTop: 2, display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+                      <ScopeIcon size={12} />
                       {METRIC_OPTIONS.find((m) => m.value === r.metric)?.label || r.metric} · umbral {r.threshold} · +{r.xp_bonus} XP
                     </div>
                     <div style={{ fontSize: 11, color: "#5a4535", marginTop: 2 }}>

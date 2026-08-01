@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../services/supabase";
 import Lightbox from "./Lightbox";
+import { CheckIcon, TrashIcon } from "@primer/octicons-react";
 
 const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
   const [times, setTimes] = useState(beer.times || 0);
@@ -99,9 +100,13 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
                 border: "none",
                 padding: "6px",
                 borderRadius: "6px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
               }}
             >
-              💾 Guardar cambios
+              <CheckIcon size={14} /> Guardar cambios
             </button>
 
             <button
@@ -112,9 +117,11 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
                 border: "none",
                 padding: "6px 10px",
                 borderRadius: "6px",
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              🗑
+              <TrashIcon size={14} />
             </button>
           </div>
         </div>

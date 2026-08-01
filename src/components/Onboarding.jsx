@@ -8,6 +8,7 @@ import { supabase } from "../services/supabase";
 import CollectionCard from "./CollectionCard";
 import { PrestigeCup } from "./PrestigeBadge";
 import { prestigeTierFor } from "../utils/prestigeTiers";
+import { XIcon } from "@primer/octicons-react";
 import { computeEntryXP } from "../utils/xp";
 
 const SLIDE_COUNT = 5;
@@ -261,8 +262,9 @@ const Onboarding = ({ userId, onFinish }) => {
         position: "absolute", top: 18, right: 18, zIndex: 2,
         background: "none", border: "none", color: "#9a7d62",
         fontSize: 14, fontWeight: 600, cursor: "pointer", padding: "8px 12px",
+        display: "flex", alignItems: "center", gap: 6,
       }}>
-        {t("onboarding.skip")} ✕
+        {t("onboarding.skip")} <XIcon size={13} />
       </button>
 
       <div

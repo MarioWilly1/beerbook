@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { getSignedStoryUrl } from "../hooks/useStories";
 import Avatar from "./Avatar";
+import { TrashIcon, XIcon, EyeIcon, PaperAirplaneIcon } from "@primer/octicons-react";
 
 const STORY_DURATION_MS = 5000; // 5 s por historia
 
@@ -330,15 +331,15 @@ const StoryViewer = ({
           <button
             title={t("stories.deleteBtn")}
             onClick={(e) => { e.stopPropagation(); stopProgress(); setPaused(true); setConfirmDelete(true); }}
-            style={{ ...closeBtnStyle, fontSize: 16 }}
+            style={closeBtnStyle}
           >
-            🗑
+            <TrashIcon size={16} />
           </button>
         )}
 
         {/* Botón cerrar */}
         <button onClick={(e) => { e.stopPropagation(); onClose(); }} style={closeBtnStyle}>
-          ✕
+          <XIcon size={18} />
         </button>
       </div>
 
@@ -348,7 +349,7 @@ const StoryViewer = ({
           onClick={(e) => { e.stopPropagation(); setShowViewers((v) => !v); }}
           style={viewersFooterBtn}
         >
-          👁 {viewers ? viewers.length : "—"} {t("stories.viewers")}
+          <EyeIcon size={13} /> {viewers ? viewers.length : "—"} {t("stories.viewers")}
         </button>
       )}
 
@@ -379,10 +380,10 @@ const StoryViewer = ({
       {showViewers && isMine && (
         <div style={viewersPanelStyle} onClick={(e) => e.stopPropagation()}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <span style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 13 }}>
-              👁 {t("stories.viewedBy")} ({viewers?.length || 0})
+            <span style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+              <EyeIcon size={14} /> {t("stories.viewedBy")} ({viewers?.length || 0})
             </span>
-            <button onClick={() => setShowViewers(false)} style={closeBtnStyle}>✕</button>
+            <button onClick={() => setShowViewers(false)} style={closeBtnStyle}><XIcon size={16} /></button>
           </div>
           {(!viewers || viewers.length === 0) ? (
             <p style={{ color: "#5a4535", fontSize: 12, textAlign: "center" }}>
@@ -452,7 +453,7 @@ const StoryViewer = ({
                 disabled={!replyText.trim() || replySending}
                 style={replySendBtnStyle(!replyText.trim() || replySending)}
               >
-                ➤
+                <PaperAirplaneIcon size={16} />
               </button>
             </>
           )}
@@ -554,11 +555,12 @@ const closeBtnStyle = {
   background: "none",
   border:     "none",
   color:      "rgba(240,228,204,0.8)",
-  fontSize:   18,
   cursor:     "pointer",
   padding:    "4px 8px",
   lineHeight: 1,
   pointerEvents: "all",
+  display:    "flex",
+  alignItems: "center",
 };
 
 const viewersFooterBtn = {
@@ -576,6 +578,9 @@ const viewersFooterBtn = {
   zIndex:         10,
   whiteSpace:     "nowrap",
   pointerEvents:  "all",
+  display:        "flex",
+  alignItems:     "center",
+  gap:            6,
 };
 
 const viewersPanelStyle = {

@@ -1,6 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "../services/supabase";
 import { useAuth } from "../hooks/useAuth";
+import { SignOutIcon, SignInIcon } from "@primer/octicons-react";
 
 const AuthButton = () => {
   const { session } = useAuth();
@@ -27,11 +28,11 @@ const AuthButton = () => {
 
   return session ? (
     <button onClick={logout} style={styles.btn}>
-      🚪 Cerrar sesión
+      <SignOutIcon size={14} /> Cerrar sesión
     </button>
   ) : (
     <button onClick={login} style={styles.btn}>
-      🔐 Iniciar sesión
+      <SignInIcon size={14} /> Iniciar sesión
     </button>
   );
 };
@@ -46,6 +47,10 @@ const styles = {
     borderRadius: "6px",
     cursor: "pointer",
     width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
   },
 };
 

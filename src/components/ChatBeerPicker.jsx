@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMyBeers } from "../hooks/useMyBeers";
+import { XIcon } from "@primer/octicons-react";
 
 const ChatBeerPicker = ({ onSelect, onClose }) => {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ const ChatBeerPicker = ({ onSelect, onClose }) => {
           <h3 style={{ margin: 0, color: "#f0e4cc", fontSize: 16, fontFamily: "'Playfair Display', serif" }}>
             🍺 {t("chat.shareBeer")}
           </h3>
-          <button onClick={onClose} style={closeBtnStyle}>✕</button>
+          <button onClick={onClose} style={closeBtnStyle}><XIcon size={16} /></button>
         </div>
 
         <input
@@ -87,8 +88,9 @@ const modalStyle = {
   boxShadow: "0 -8px 40px rgba(0,0,0,0.6)",
 };
 const closeBtnStyle = {
-  background: "none", border: "none", fontSize: 18,
+  background: "none", border: "none",
   cursor: "pointer", color: "#5a4535", lineHeight: 1, padding: "2px 6px",
+  display: "flex", alignItems: "center",
 };
 const searchStyle = {
   width: "100%", padding: "9px 14px",

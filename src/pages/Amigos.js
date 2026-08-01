@@ -6,6 +6,7 @@ import { checkSocialAchievements } from "../utils/achievements";
 import { useUserStats } from "../hooks/useUserStats";
 import Avatar from "../components/Avatar";
 import { useDM } from "../hooks/useDM";
+import { CommentIcon } from "@primer/octicons-react";
 
 const Amigos = () => {
   const { t } = useTranslation();
@@ -144,7 +145,7 @@ const Amigos = () => {
             <div key={f.id} style={rowStyle}>
               <Avatar avatarUrl={f.avatar_url} nombre={f.nombre} size={36} />
               <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{f.nombre}</span>
-              <button onClick={() => openDM(f.id)} style={btnMsg} title={t("friends.sendMessage")}>💬</button>
+              <button onClick={() => openDM(f.id)} style={{ ...btnMsg, display: "flex" }} title={t("friends.sendMessage")}><CommentIcon size={14} /></button>
               <button onClick={() => handleRemove(f.id)} style={btnDanger}>{t("friends.removeBtn")}</button>
             </div>
           ))

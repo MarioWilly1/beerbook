@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useBeers } from "../hooks/useBeers";
 import { supabase } from "../services/supabase";
 import { paisToIso, ISO_TO_ID, ISO_DISPLAY } from "../utils/paisToIso";
+import { XIcon } from "@primer/octicons-react";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -48,15 +49,15 @@ const BeerRow = ({ beer, isSelected, onClick }) => (
 // ── Sub-component: Avatar chip in "tried by" list ─────────────────────────────
 const UserChip = ({ ub }) => (
   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "#1c1409", border: "1px solid #2e2215", borderRadius: 10 }}>
-    {ub.profiles?.avatar_url ? (
-      <img src={ub.profiles.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} onError={(e) => { e.target.style.display = "none"; }} />
+    {ub.avatar_url ? (
+      <img src={ub.avatar_url} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} onError={(e) => { e.target.style.display = "none"; }} />
     ) : (
       <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#2a1e0f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👤</div>
     )}
     <div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e4cc" }}>{ub.profiles?.nombre || "—"}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e4cc" }}>{ub.nombre || "—"}</div>
       {ub.rating > 0 && (
-        <div style={{ fontSize: 11, color: "#d4af37" }}>{"★".repeat(ub.rating)}{"☆".repeat(5 - ub.rating)}</div>
+        <div style={{ fontSize: 11, color: "#d4af37" }}>{"★".repeat(Math.round(ub.rating))}{"☆".repeat(5 - Math.round(ub.rating))}</div>
       )}
     </div>
     {ub.times > 1 && (
@@ -97,27 +98,15 @@ const MapaMundial = () => {
 
   const countryBeers = selectedIso ? (beersByIso[selectedIso] || []) : [];
 
-  // Load "who tried this beer" respecting privacy
+  // Load "who tried this beer" respecting privacy — get_beer_tried_by()
+  // aplica la regla server-side (perfil público o amigo); un SELECT directo
+  // contra user_beers no puede leer filas de otros usuarios (RLS: solo
+  // user_id = auth.uid()), por eso antes nunca aparecía nadie.
   const loadTriedBy = useCallback(async (beer) => {
     if (!beer) { setTriedBy([]); return; }
     setTriedLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    const [{ data: ubData }, { data: friendsData }] = await Promise.all([
-      supabase
-        .from("user_beers")
-        .select("user_id, rating, times, profiles(nombre, avatar_url, perfil_publico)")
-        .eq("beer_id", beer.id),
-      user
-        ? supabase.from("friendships").select("friend_id").eq("user_id", user.id)
-        : Promise.resolve({ data: [] }),
-    ]);
-
-    const friendIds = new Set((friendsData || []).map((f) => f.friend_id));
-    const visible = (ubData || []).filter(
-      (ub) => ub.profiles?.perfil_publico || (user && friendIds.has(ub.user_id))
-    );
-    setTriedBy(visible);
+    const { data, error } = await supabase.rpc("get_beer_tried_by", { p_beer_id: beer.id });
+    setTriedBy(error ? [] : data || []);
     setTriedLoading(false);
   }, []);
 
@@ -260,8 +249,8 @@ const MapaMundial = () => {
               </h2>
               <button
                 onClick={() => { setSelectedIso(null); setSelectedBeer(null); }}
-                style={{ background: "none", border: "none", color: "#5a4535", fontSize: 20, cursor: "pointer", lineHeight: 1 }}
-              >✕</button>
+                style={{ background: "none", border: "none", color: "#5a4535", cursor: "pointer", lineHeight: 1, display: "flex" }}
+              ><XIcon size={18} /></button>
             </div>
             <p style={{ margin: "4px 0 0", fontSize: 12, color: "#9a7d62" }}>
               {t("map.beerCount", { count: countryBeers.length })}
@@ -303,8 +292,8 @@ const MapaMundial = () => {
                   </div>
                   <button
                     onClick={() => setSelectedBeer(null)}
-                    style={{ background: "none", border: "none", color: "#5a4535", fontSize: 20, cursor: "pointer", lineHeight: 1, flexShrink: 0 }}
-                  >✕</button>
+                    style={{ background: "none", border: "none", color: "#5a4535", cursor: "pointer", lineHeight: 1, flexShrink: 0, display: "flex" }}
+                  ><XIcon size={18} /></button>
                 </div>
 
                 <p style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 700, color: "#9a7d62", textTransform: "uppercase", letterSpacing: "0.4px" }}>

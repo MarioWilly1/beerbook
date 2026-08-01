@@ -10,6 +10,7 @@ import OriginMapPanel from "../components/OriginMapPanel";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useTrendingBeers } from "../hooks/useTrendingBeers";
 import WeeklyChallengeBanner from "../components/WeeklyChallengeBanner";
+import { XIcon, GlobeIcon, ChevronUpIcon, ChevronDownIcon } from "@primer/octicons-react";
 
 const STYLE_KEYWORDS = ["IPA", "Lager", "Stout", "Ale", "Porter", "Saison", "Sour", "Dubbel", "Tripel"];
 
@@ -67,7 +68,7 @@ const SuggestBeerModal = ({ onClose, t }) => {
           <h2 style={{ margin: 0, flex: 1, fontFamily: "'Playfair Display', serif", color: "#f0e4cc", fontSize: 20 }}>
             💡 {t("suggest.title")}
           </h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "#5a4535", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "#5a4535", cursor: "pointer", lineHeight: 1, display: "flex" }}><XIcon size={20} /></button>
         </div>
         <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 20px", lineHeight: 1.5 }}>
           {t("suggest.subtitle")}
@@ -217,7 +218,7 @@ const Dashboard = () => {
             transition: "all 0.15s",
           }}
         >
-          🗺️ {t("dashboard.mapBtn")} {showMap ? "▲" : "▼"}
+          <GlobeIcon size={14} /> {t("dashboard.mapBtn")} {showMap ? <ChevronUpIcon size={14} /> : <ChevronDownIcon size={14} />}
         </button>
         <button
           onClick={() => setShowSuggest(true)}

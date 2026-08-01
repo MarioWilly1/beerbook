@@ -12,6 +12,71 @@ const isOver18 = (dateStr) => {
   return age >= 18;
 };
 
+// Mismo patrón de hover que SidebarLink (Layout.js): useState local +
+// onMouseEnter/onMouseLeave, no CSS :hover.
+const HoverTitle = ({ children, style }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <h1
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ ...style, color: hovered ? "#8b6b2e" : style.color, transition: "color 0.15s" }}
+    >
+      {children}
+    </h1>
+  );
+};
+
+const AgeCheckboxLabel = ({ ageConfirmed, onChange }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <label
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer",
+        borderRadius: "8px", padding: "4px", margin: "-4px",
+        background: hovered ? "rgba(212,175,55,0.08)" : "transparent",
+        transition: "background 0.15s",
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={ageConfirmed}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ marginTop: "2px", width: "17px", height: "17px", accentColor: "#d4af37", cursor: "pointer", flexShrink: 0 }}
+      />
+      <span style={{ fontSize: "14px", color: "#444", lineHeight: "1.6" }}>
+        <strong>Confirmo que soy mayor de 18 años</strong> y entiendo que
+        BeerBook es una app sobre consumo de alcohol.
+      </span>
+    </label>
+  );
+};
+
+// Botón "salir" (menor de edad): hover en tono rojizo — es una acción de
+// salida/negativa, tiene que distinguirse del resto.
+const ExitButton = ({ onClick }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        ...exitBtnStyle,
+        color: hovered ? "#c0392b" : "#bbb",
+        background: hovered ? "rgba(192,57,43,0.08)" : "none",
+        borderRadius: "8px",
+        transition: "all 0.15s",
+      }}
+    >
+      No soy mayor de edad — salir
+    </button>
+  );
+};
+
 const AgeVerificationPage = ({ session, onComplete }) => {
   const suggestedName =
     session?.user?.user_metadata?.full_name ||
@@ -29,12 +94,12 @@ const AgeVerificationPage = ({ session, onComplete }) => {
     setError("");
 
     if (!ageConfirmed) {
-      setError("Debés confirmar que sos mayor de 18 años para continuar.");
+      setError("Debés confirmar que eres mayor de 18 años para continuar.");
       return;
     }
 
     if (fechaNacimiento && !isOver18(fechaNacimiento)) {
-      setError("Según tu fecha de nacimiento, no sos mayor de 18 años.");
+      setError("Según tu fecha de nacimiento, no eres mayor de 18 años.");
       return;
     }
 
@@ -64,11 +129,11 @@ const AgeVerificationPage = ({ session, onComplete }) => {
       <div style={cardStyle}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
           <div style={{ fontSize: "48px" }}>🍺</div>
-          <h1 style={{ margin: "10px 0 6px", fontSize: "22px", color: "#111", fontWeight: 800 }}>
+          <HoverTitle style={{ margin: "10px 0 6px", fontSize: "22px", color: "#111", fontWeight: 800 }}>
             Bienvenido/a a BeerBook
-          </h1>
+          </HoverTitle>
           <p style={{ color: "#666", fontSize: "14px", margin: 0, lineHeight: "1.6" }}>
-            Antes de continuar, necesitamos confirmar que sos mayor de edad.
+            Antes de continuar, necesitamos confirmar que eres mayor de edad.
             BeerBook es una app sobre cerveza y consumo de alcohol.
           </p>
         </div>
@@ -80,6 +145,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Tu nombre"
+              className="auth-input"
               style={inputStyle}
             />
           </Field>
@@ -92,18 +158,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
           </Field>
 
           <div style={ageBannerStyle}>
-            <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={ageConfirmed}
-                onChange={(e) => setAgeConfirmed(e.target.checked)}
-                style={{ marginTop: "2px", width: "17px", height: "17px", accentColor: "#d4af37", cursor: "pointer", flexShrink: 0 }}
-              />
-              <span style={{ fontSize: "14px", color: "#444", lineHeight: "1.6" }}>
-                <strong>Confirmo que soy mayor de 18 años</strong> y entiendo que
-                BeerBook es una app sobre consumo de alcohol.
-              </span>
-            </label>
+            <AgeCheckboxLabel ageConfirmed={ageConfirmed} onChange={setAgeConfirmed} />
           </div>
 
           {error && <div style={errorBoxStyle}>{error}</div>}
@@ -120,13 +175,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
             {loading ? "Entrando..." : "Entrar a BeerBook"}
           </button>
 
-          <button
-            type="button"
-            onClick={handleExit}
-            style={exitBtnStyle}
-          >
-            No soy mayor de edad — salir
-          </button>
+          <ExitButton onClick={handleExit} />
         </form>
       </div>
     </div>
@@ -186,6 +235,7 @@ const inputStyle = {
   outline: "none",
   boxSizing: "border-box",
   color: "#111",
+  background: "#fff",
 };
 
 const ageBannerStyle = {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../services/supabase";
 import DateInput from "../components/DateInput";
+import { EyeIcon, EyeClosedIcon } from "@primer/octicons-react";
 
 const isOver18 = (dateStr) => {
   if (!dateStr) return true;
@@ -10,6 +11,48 @@ const isOver18 = (dateStr) => {
   const m = today.getMonth() - birth.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
   return age >= 18;
+};
+
+// Mismo patrón de hover que SidebarLink (Layout.js): useState local +
+// onMouseEnter/onMouseLeave, no CSS :hover.
+const HoverTitle = ({ children, style }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <h1
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ ...style, color: hovered ? "#8b6b2e" : style.color, transition: "color 0.15s" }}
+    >
+      {children}
+    </h1>
+  );
+};
+
+const AgeCheckboxLabel = ({ ageConfirmed, onChange }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <label
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer",
+        borderRadius: "8px", padding: "4px", margin: "-4px",
+        background: hovered ? "rgba(212,175,55,0.08)" : "transparent",
+        transition: "background 0.15s",
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={ageConfirmed}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ marginTop: "2px", width: "17px", height: "17px", accentColor: "#d4af37", cursor: "pointer", flexShrink: 0 }}
+      />
+      <span style={{ fontSize: "14px", color: "#444", lineHeight: "1.6" }}>
+        <strong>Confirmo que soy mayor de 18 años</strong> y entiendo que
+        BeerBook es una app sobre consumo de alcohol.
+      </span>
+    </label>
+  );
 };
 
 const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) => {
@@ -28,12 +71,12 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
     setError("");
 
     if (!ageConfirmed) {
-      setError("Debés confirmar que sos mayor de 18 años para crear una cuenta.");
+      setError("Debés confirmar que eres mayor de 18 años para crear una cuenta.");
       return;
     }
 
     if (fechaNacimiento && !isOver18(fechaNacimiento)) {
-      setError("Según tu fecha de nacimiento, no sos mayor de 18 años.");
+      setError("Según tu fecha de nacimiento, no eres mayor de 18 años.");
       return;
     }
 
@@ -100,9 +143,9 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
       <div style={cardStyle}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
           <div style={{ fontSize: "44px" }}>🍺</div>
-          <h1 style={{ margin: "10px 0 4px", fontSize: "24px", color: "#111", fontWeight: 800 }}>
+          <HoverTitle style={{ margin: "10px 0 4px", fontSize: "24px", color: "#111", fontWeight: 800 }}>
             Crear cuenta
-          </h1>
+          </HoverTitle>
           <p style={{ color: "#888", fontSize: "14px", margin: 0 }}>
             Únite a BeerBook
           </p>
@@ -116,6 +159,7 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
               onChange={(e) => setNombre(e.target.value)}
               required
               placeholder="Tu nombre"
+              className="auth-input"
               style={inputStyle}
             />
           </Field>
@@ -127,6 +171,7 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="tu@email.com"
+              className="auth-input"
               style={inputStyle}
             />
           </Field>
@@ -140,10 +185,11 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
                 required
                 minLength={8}
                 placeholder="Mínimo 8 caracteres"
+                className="auth-input"
                 style={inputStyle}
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} style={eyeBtnStyle}>
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? <EyeClosedIcon size={16} /> : <EyeIcon size={16} />}
               </button>
             </div>
           </Field>
@@ -156,18 +202,7 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
           </Field>
 
           <div style={ageBannerStyle}>
-            <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={ageConfirmed}
-                onChange={(e) => setAgeConfirmed(e.target.checked)}
-                style={{ marginTop: "2px", width: "17px", height: "17px", accentColor: "#d4af37", cursor: "pointer", flexShrink: 0 }}
-              />
-              <span style={{ fontSize: "14px", color: "#444", lineHeight: "1.6" }}>
-                <strong>Confirmo que soy mayor de 18 años</strong> y entiendo que
-                BeerBook es una app sobre consumo de alcohol.
-              </span>
-            </label>
+            <AgeCheckboxLabel ageConfirmed={ageConfirmed} onChange={setAgeConfirmed} />
           </div>
 
           {error && <div style={errorBoxStyle}>{error}</div>}

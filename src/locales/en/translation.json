@@ -15,7 +15,10 @@
   },
   "sidebar": {
     "changeAvatar": "Change avatar →",
-    "viewProfile":  "View my profile"
+    "viewProfile":  "View my profile",
+    "logoutConfirmTitle":   "Are you sure?",
+    "logoutConfirmMessage": "You're about to sign out of BeerBook.",
+    "cancel":               "Cancel"
   },
   "toast": {
     "saved":         "Saved · +{{xp}} XP",

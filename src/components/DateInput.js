@@ -44,6 +44,7 @@ const DateInput = ({ onChange }) => {
         value={day}
         onChange={handleDay}
         maxLength={2}
+        className="auth-input"
         style={{ ...field, width: "62px" }}
       />
       <span style={sep}>/</span>
@@ -55,6 +56,7 @@ const DateInput = ({ onChange }) => {
         value={month}
         onChange={handleMonth}
         maxLength={2}
+        className="auth-input"
         style={{ ...field, width: "62px" }}
       />
       <span style={sep}>/</span>
@@ -66,6 +68,7 @@ const DateInput = ({ onChange }) => {
         value={year}
         onChange={handleYear}
         maxLength={4}
+        className="auth-input"
         style={{ ...field, width: "96px" }}
       />
     </div>

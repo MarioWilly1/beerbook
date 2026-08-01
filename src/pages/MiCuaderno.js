@@ -23,6 +23,10 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { hashToString } from "../utils/perceptualHash";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import HideEntryModal from "../components/HideEntryModal";
+import {
+  BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
+  CheckIcon, SearchIcon, XIcon,
+} from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -455,15 +459,15 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    style={{ ...nbPhotoBtn, opacity: uploading ? 0.6 : 1 }}
+                    style={{ ...nbPhotoBtn, opacity: uploading ? 0.6 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
-                    {uploading ? "⏳ Subiendo…" : "📷 Cambiar foto"}
+                    {uploading ? "⏳ Subiendo…" : (<><DeviceCameraIcon size={14} /> Cambiar foto</>)}
                   </button>
                   <button
                     onClick={() => { onChange(beer.id, "user_photo_url", ""); onChange(beer.id, "photo_hash", null); }}
-                    style={nbClearPhotoBtn}
+                    style={{ ...nbClearPhotoBtn, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
-                    🗑️ Quitar foto
+                    <TrashIcon size={14} /> Quitar foto
                   </button>
                 </div>
               </div>
@@ -471,9 +475,9 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                style={{ ...nbPhotoBtn, width: "100%", opacity: uploading ? 0.6 : 1 }}
+                style={{ ...nbPhotoBtn, width: "100%", opacity: uploading ? 0.6 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
               >
-                {uploading ? "⏳ Subiendo…" : "📷 Subir foto"}
+                {uploading ? "⏳ Subiendo…" : (<><DeviceCameraIcon size={14} /> Subir foto</>)}
               </button>
             )}
           </div>
@@ -484,9 +488,9 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
             <button
               type="button"
               onClick={() => setShowHideModal(true)}
-              style={nbHideFromBtn}
+              style={{ ...nbHideFromBtn, display: "flex", alignItems: "center", gap: 6 }}
             >
-              🙈 {t("hideEntry.btn")}
+              <EyeClosedIcon size={14} /> {t("hideEntry.btn")}
               {hiddenCount > 0 && (
                 <span style={nbHideFromBadge}>{t("hideEntry.hiddenCount", { count: hiddenCount })}</span>
               )}
@@ -510,11 +514,11 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
           )}
 
           <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-            <button onClick={() => onSave(beer)} style={nbSaveBtn}>
-              💾 {t("notebook.saveBtn", { xp: xpPreview })}
+            <button onClick={() => onSave(beer)} style={{ ...nbSaveBtn, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <CheckIcon size={14} /> {t("notebook.saveBtn", { xp: xpPreview })}
             </button>
-            <button onClick={() => onDelete(beer.id)} style={nbDeleteBtn}>
-              🗑️
+            <button onClick={() => onDelete(beer.id)} style={{ ...nbDeleteBtn, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <TrashIcon size={14} />
             </button>
           </div>
 
@@ -649,7 +653,9 @@ const MiCuaderno = () => {
       achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
       achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
     ]);
-    fetchWeeklyChallengeProgress().then(checkAndAwardWeeklyChallenge); // fire-and-forget, el banner del Dashboard refleja el resultado
+    // fire-and-forget, el banner del Dashboard refleja el resultado — puede
+    // haber hasta 2 retos activos (diario + semanal) para chequear
+    fetchWeeklyChallengeProgress().then((list) => list.forEach(checkAndAwardWeeklyChallenge));
 
     refetchStats();
     soundClink();
@@ -682,11 +688,13 @@ const MiCuaderno = () => {
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215" }}>
         {[
-          { id: "cuaderno",  label: `📓 ${t("notebook.title")}` },
-          { id: "coleccion", label: "💎 Colección" },
+          { id: "cuaderno",  label: t("notebook.title"), Icon: BookIcon },
+          { id: "coleccion", label: "Colección", Icon: DiamondIcon },
         ].map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+            className="config-tab"
             style={{
+              display: "flex", alignItems: "center", gap: 6,
               padding: "8px 16px", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600,
               borderRadius: "8px 8px 0 0",
               background:   activeTab === tab.id ? "#2a1e0f" : "none",
@@ -694,7 +702,7 @@ const MiCuaderno = () => {
               borderBottom: activeTab === tab.id ? "2px solid #d4af37" : "2px solid transparent",
               marginBottom: -1, transition: "all 0.15s",
             }}>
-            {tab.label}
+            <tab.Icon size={14} /> {tab.label}
           </button>
         ))}
       </div>
@@ -706,9 +714,9 @@ const MiCuaderno = () => {
           <div style={{ position: "relative", marginBottom: 16 }}>
             <span style={{
               position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)",
-              fontSize: 14, color: "#5a4535", pointerEvents: "none",
+              color: "#5a4535", pointerEvents: "none", display: "flex",
             }}>
-              🔍
+              <SearchIcon size={14} />
             </span>
             <input
               type="text"
@@ -727,9 +735,9 @@ const MiCuaderno = () => {
                 style={{
                   position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
                   background: "none", border: "none", color: "#5a4535",
-                  fontSize: 16, cursor: "pointer", lineHeight: 1,
+                  cursor: "pointer", lineHeight: 1, display: "flex",
                 }}>
-                ✕
+                <XIcon size={16} />
               </button>
             )}
           </div>

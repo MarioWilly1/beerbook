@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
+import { XIcon, SearchIcon, FlameIcon, FilterIcon } from "@primer/octicons-react";
 
 const RANGE_CSS = `
   .bf-thumb {
@@ -94,7 +95,7 @@ const Badge = ({ label, onRemove }) => (
         lineHeight: 1,
       }}
     >
-      ✕
+      <XIcon size={10} />
     </button>
   </span>
 );
@@ -241,12 +242,12 @@ const BeerFilters = ({
               left: 11,
               top: "50%",
               transform: "translateY(-50%)",
-              fontSize: 15,
               color: "#5a4535",
               pointerEvents: "none",
+              display: "flex",
             }}
           >
-            🔍
+            <SearchIcon size={15} />
           </span>
           <input
             type="text"
@@ -285,7 +286,7 @@ const BeerFilters = ({
             whiteSpace: "nowrap",
           }}
         >
-          🔥 {t("filters.trending")}
+          <FlameIcon size={14} /> {t("filters.trending")}
         </button>
 
         <button
@@ -305,7 +306,7 @@ const BeerFilters = ({
             whiteSpace: "nowrap",
           }}
         >
-          ⚙️ {t("filters.filtersBtn")}
+          <FilterIcon size={14} /> {t("filters.filtersBtn")}
           {activeCount > 0 && (
             <span
               style={{
@@ -338,7 +339,7 @@ const BeerFilters = ({
           }}
         >
           {trendingFilter && (
-            <Badge label={`🔥 ${t("filters.trending")}`} onRemove={() => setTrendingFilter(false)} />
+            <Badge label={<><FlameIcon size={12} /> {t("filters.trending")}</>} onRemove={() => setTrendingFilter(false)} />
           )}
           {styleFilter && (
             <Badge label={styleFilter} onRemove={() => setStyleFilter(null)} />

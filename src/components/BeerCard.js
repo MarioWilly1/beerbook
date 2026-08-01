@@ -16,6 +16,7 @@ import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { hashToString } from "../utils/perceptualHash";
+import { GlobeIcon, CheckIcon } from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -231,9 +232,9 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
               <button
                 onClick={(e) => { e.stopPropagation(); onVerMapa(); }}
                 title="Ver en el mapa de origen"
-                style={infoBtnStyle}
+                style={{ ...infoBtnStyle, display: "flex" }}
               >
-                🗺️
+                <GlobeIcon size={14} />
               </button>
             )}
             <button
@@ -366,9 +367,9 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
           <button
             onClick={handleSave}
             disabled={saving}
-            style={{ ...saveBtn, opacity: saving ? 0.6 : 1 }}
+            style={{ ...saveBtn, opacity: saving ? 0.6 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
           >
-            {saving ? t("beerform.saving") : `💾 ${t("beerform.saveBtn", { xp: xpPreview })}`}
+            {saving ? t("beerform.saving") : (<><CheckIcon size={14} /> {t("beerform.saveBtn", { xp: xpPreview })}</>)}
           </button>
         </div>
       )}

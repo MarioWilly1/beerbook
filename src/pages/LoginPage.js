@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { supabase } from "../services/supabase";
+import { EyeIcon, EyeClosedIcon } from "@primer/octicons-react";
 
 const LoginPage = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState("");
@@ -68,6 +69,7 @@ const LoginPage = ({ onSwitchToRegister }) => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="tu@email.com"
+              className="auth-input"
               style={inputStyle}
             />
           </Field>
@@ -80,10 +82,11 @@ const LoginPage = ({ onSwitchToRegister }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
+                className="auth-input"
                 style={inputStyle}
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} style={eyeBtnStyle}>
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? <EyeClosedIcon size={16} /> : <EyeIcon size={16} />}
               </button>
             </div>
           </Field>

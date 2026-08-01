@@ -9,12 +9,13 @@ import HiddenStoriesManager from "../components/HiddenStoriesManager";
 import HiddenEntriesManager from "../components/HiddenEntriesManager";
 import Onboarding from "../components/Onboarding";
 import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
+import { PersonIcon, LockIcon, SlidersIcon, QuestionIcon } from "@primer/octicons-react";
 
 const TABS = [
-  { key: "perfil",       icon: "👤", tKey: "settings.tabs.profile"     },
-  { key: "privacidad",   icon: "🔒", tKey: "settings.tabs.privacy"     },
-  { key: "preferencias", icon: "🎛", tKey: "settings.tabs.preferences" },
-  { key: "ayuda",        icon: "🆘", tKey: "settings.tabs.support"     },
+  { key: "perfil",       Icon: PersonIcon,   tKey: "settings.tabs.profile"     },
+  { key: "privacidad",   Icon: LockIcon,     tKey: "settings.tabs.privacy"     },
+  { key: "preferencias", Icon: SlidersIcon,  tKey: "settings.tabs.preferences" },
+  { key: "ayuda",        Icon: QuestionIcon, tKey: "settings.tabs.support"     },
 ];
 
 const LANGUAGES = [
@@ -167,11 +168,13 @@ const Configuracion = ({ onProfileChange }) => {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #2e2215", overflowX: "auto" }}>
-        {TABS.map(({ key, icon, tKey }) => (
+        {TABS.map(({ key, Icon, tKey }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
+            className="config-tab"
             style={{
+              display: "flex", alignItems: "center", gap: 6,
               padding: "10px 22px", border: "none", background: "none",
               cursor: "pointer", fontWeight: 700, fontSize: 14,
               color: tab === key ? "#d4af37" : "#5a4535",
@@ -179,7 +182,7 @@ const Configuracion = ({ onProfileChange }) => {
               marginBottom: -2, transition: "all 0.15s",
             }}
           >
-            {icon} {t(tKey)}
+            <Icon size={14} /> {t(tKey)}
           </button>
         ))}
       </div>
@@ -235,16 +238,16 @@ const Configuracion = ({ onProfileChange }) => {
             <label style={labelStyle}>{t("settings.profile.bioLabel")}</label>
             <textarea
               value={bio}
-              onChange={(e) => setBio(e.target.value.slice(0, 200))}
+              onChange={(e) => setBio(e.target.value.slice(0, 400))}
               placeholder={t("settings.profile.bioPlaceholder")}
               rows={3}
-              style={{ ...inputStyle, resize: "vertical" }}
+              style={{ ...inputStyle, resize: "none" }}
               spellCheck="true"
               autoCorrect="on"
               autoCapitalize="sentences"
             />
-            <div style={{ fontSize: 11, color: bio.length >= 180 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
-              {bio.length}/200
+            <div style={{ fontSize: 11, color: bio.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+              {bio.length}/400
             </div>
           </div>
 

@@ -4,6 +4,10 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { slugify } from "../utils/slugify";
 import { translateDescription } from "../utils/translate";
+import {
+  QuestionIcon, LightBulbIcon, FlagIcon, BeakerIcon, PencilIcon, GoalIcon,
+  CopyIcon, CheckIcon, PlusIcon,
+} from "@primer/octicons-react";
 
 function fmtDate(ts) {
   if (!ts) return "—";
@@ -202,8 +206,8 @@ const CargarCerveza = () => {
       <div style={sectionCard}>
         <p style={sectionTitle}>Asistente Claude</p>
 
-        <button onClick={handleCopyPrompt} style={copyBtn}>
-          📋 Copiar prompt para Claude
+        <button onClick={handleCopyPrompt} style={{ ...copyBtn, display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <CopyIcon size={14} /> Copiar prompt para Claude
         </button>
         <p style={{ margin: "8px 0 16px", color: "#5a4535", fontSize: 12 }}>
           Pegá los datos básicos primero, luego copiá el prompt y pegalo en Claude.
@@ -242,8 +246,8 @@ const CargarCerveza = () => {
       {error   && <p style={{ margin: 0, color: "#c0392b", fontSize: 14 }}>{error}</p>}
       {success && <p style={{ margin: 0, color: "#4caf50", fontSize: 14 }}>{success}</p>}
 
-      <button onClick={handleSave} disabled={saving} style={{ ...approveBtn, padding: "13px 0", fontSize: 15, borderRadius: 10 }}>
-        {translating ? "🌐 Traduciendo..." : saving ? "Guardando..." : "💾 Guardar cerveza"}
+      <button onClick={handleSave} disabled={saving} style={{ ...approveBtn, padding: "13px 0", fontSize: 15, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+        {translating ? "🌐 Traduciendo..." : saving ? "Guardando..." : (<><CheckIcon size={14} /> Guardar cerveza</>)}
       </button>
     </div>
   );
@@ -881,8 +885,8 @@ const EditarCerveza = () => {
           <div style={sectionCard}>
             <p style={sectionTitle}>Asistente Claude</p>
 
-            <button onClick={handleCopyPrompt} style={copyBtn}>
-              📋 Copiar prompt para Claude
+            <button onClick={handleCopyPrompt} style={{ ...copyBtn, display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <CopyIcon size={14} /> Copiar prompt para Claude
             </button>
             <p style={{ margin: "8px 0 16px", color: "#5a4535", fontSize: 12 }}>
               Usá el prompt para obtener descripción técnica y coordenadas actualizadas.
@@ -910,8 +914,8 @@ const EditarCerveza = () => {
           )}
 
           <button onClick={handleSave} disabled={saving}
-            style={{ ...approveBtn, width: "100%", padding: "13px 0", fontSize: 15, borderRadius: 10 }}>
-            {translating ? "🌐 Traduciendo..." : saving ? "Guardando…" : "💾 Guardar cambios"}
+            style={{ ...approveBtn, width: "100%", padding: "13px 0", fontSize: 15, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            {translating ? "🌐 Traduciendo..." : saving ? "Guardando…" : (<><CheckIcon size={14} /> Guardar cambios</>)}
           </button>
         </div>
       )}
@@ -1080,8 +1084,8 @@ const RetosPanel = () => {
         {msg && <p style={{ margin: "0 0 12px", fontSize: 13, color: msg.startsWith("✓") ? "#4caf50" : "#c0392b" }}>{msg}</p>}
 
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={handleSave} disabled={saving} style={approveBtn}>
-            {saving ? "Guardando…" : editingId ? "💾 Guardar cambios" : "➕ Crear reto"}
+          <button onClick={handleSave} disabled={saving} style={{ ...approveBtn, display: "flex", alignItems: "center", gap: 6 }}>
+            {saving ? "Guardando…" : editingId ? (<><CheckIcon size={14} /> Guardar cambios</>) : (<><PlusIcon size={14} /> Crear reto</>)}
           </button>
           {editingId && (
             <button onClick={resetForm} style={rejectBtn}>Cancelar edición</button>
@@ -1145,17 +1149,19 @@ const AdminPanel = ({ profile }) => {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "2px solid #2e2215", overflowX: "auto" }}>
         {[
-          { key: "support",     label: t("admin.tabSupport"),     icon: "🆘" },
-          { key: "suggestions", label: t("admin.tabSuggestions"), icon: "💡" },
-          { key: "reportes",    label: t("admin.tabReports"),     icon: "🚩" },
-          { key: "cargar",      label: "Cargar Cerveza",          icon: "🍺" },
-          { key: "editar",      label: "Editar Cerveza",          icon: "✏️" },
-          { key: "retos",       label: "Reto Semanal",            icon: "🎯" },
-        ].map(({ key, label, icon }) => (
+          { key: "support",     label: t("admin.tabSupport"),     Icon: QuestionIcon },
+          { key: "suggestions", label: t("admin.tabSuggestions"), Icon: LightBulbIcon },
+          { key: "reportes",    label: t("admin.tabReports"),     Icon: FlagIcon },
+          { key: "cargar",      label: "Cargar Cerveza",          Icon: BeakerIcon },
+          { key: "editar",      label: "Editar Cerveza",          Icon: PencilIcon },
+          { key: "retos",       label: "Reto Semanal",            Icon: GoalIcon },
+        ].map(({ key, label, Icon }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
+            className="config-tab"
             style={{
+              display: "flex", alignItems: "center", gap: 6,
               padding: "10px 22px", border: "none", background: "none",
               cursor: "pointer", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap",
               color: tab === key ? "#d4af37" : "#5a4535",
@@ -1163,7 +1169,7 @@ const AdminPanel = ({ profile }) => {
               marginBottom: -2, transition: "all 0.15s",
             }}
           >
-            {icon} {label}
+            <Icon size={14} /> {label}
           </button>
         ))}
       </div>

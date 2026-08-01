@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { XIcon } from "@primer/octicons-react";
 
 const Lightbox = ({ src, alt = "", onClose }) => {
   useEffect(() => {
@@ -52,12 +53,11 @@ const Lightbox = ({ src, alt = "", onClose }) => {
           justifyContent: "center",
           cursor: "pointer",
           color: "#fff",
-          fontSize: 18,
           fontWeight: 700,
           lineHeight: 1,
         }}
       >
-        ✕
+        <XIcon size={18} />
       </button>
     </div>
   );

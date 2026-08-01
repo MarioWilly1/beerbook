@@ -21,6 +21,14 @@ h1, h2, h3 {
   color: #f0e4cc;
 }
 
+/* Inputs sobre card blanca (Register/Login/AgeVerification): el ::selection
+   global (dorado translúcido + texto crema) queda casi invisible sobre
+   fondo blanco con texto oscuro — acá va con buen contraste propio. */
+.auth-input::selection {
+  background: #d4af37;
+  color: #1c1410;
+}
+
 input, textarea, select {
   background: #2a1e0f;
   color: #f0e4cc;
@@ -48,6 +56,13 @@ button {
 
 button:active:not(:disabled) {
   transform: scale(0.97);
+}
+
+/* Tabs de Configuración: el scale(0.97) de arriba, con el borde inferior
+   de 3px pegado al borde del contenedor, generaba un salto vertical
+   perceptible al hacer click — quedan quietas a propósito. */
+.config-tab:active {
+  transform: none !important;
 }
 
 /* ── Scrollbar (webkit) ───────────────────────────────────────────────────── */

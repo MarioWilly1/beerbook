@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getCountryName, resolveSupportedLocale } from "../utils/countryDisplay";
+import { XIcon, GlobeIcon } from "@primer/octicons-react";
 
 // Descripción según el idioma activo, con fallback a español si la
 // traducción automática (MyMemory, ver utils/translate.js) no existe o
@@ -41,7 +42,7 @@ const BeerInfoModal = ({ beer, onClose, onVerMapa }) => {
               )}
             </div>
           </div>
-          <button onClick={onClose} style={closeBtnStyle} title="Cerrar">✕</button>
+          <button onClick={onClose} style={closeBtnStyle} title="Cerrar"><XIcon size={16} /></button>
         </div>
 
         <div style={dividerStyle} />
@@ -61,7 +62,7 @@ const BeerInfoModal = ({ beer, onClose, onVerMapa }) => {
               onClick={() => { onClose(); onVerMapa(); }}
               style={mapBtnStyle}
             >
-              🗺️ Ver en el mapa de origen
+              <GlobeIcon size={14} /> Ver en el mapa de origen
             </button>
           </>
         )}
@@ -119,11 +120,11 @@ const closeBtnStyle = {
   background:   "none",
   border:       "none",
   color:        "rgba(240,228,204,0.5)",
-  fontSize:     18,
   cursor:       "pointer",
   padding:      "2px 4px",
   lineHeight:   1,
   flexShrink:   0,
+  display:      "flex",
 };
 
 const dividerStyle = {

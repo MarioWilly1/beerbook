@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { getCountryName } from "../utils/countryDisplay";
+import { XIcon, ScreenNormalIcon, ScreenFullIcon } from "@primer/octicons-react";
 
 // ── Marker icons ───────────────────────────────────────────────────────────────
 function makeIcon(count, selected = false) {
@@ -74,16 +75,16 @@ const BeerRow = ({ beer, isSelected, onClick }) => (
 
 const UserChip = ({ ub }) => (
   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "#1c1409", border: "1px solid #2e2215", borderRadius: 10 }}>
-    {ub.profiles?.avatar_url ? (
-      <img src={ub.profiles.avatar_url} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+    {ub.avatar_url ? (
+      <img src={ub.avatar_url} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
         onError={(e) => { e.target.style.display = "none"; }} />
     ) : (
       <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#2a1e0f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>👤</div>
     )}
     <div style={{ minWidth: 0 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e4cc" }}>{ub.profiles?.nombre || "—"}</div>
-      {ub.Rating > 0 && (
-        <div style={{ fontSize: 11, color: "#d4af37" }}>{"★".repeat(ub.Rating)}{"☆".repeat(5 - ub.Rating)}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e4cc" }}>{ub.nombre || "—"}</div>
+      {ub.rating > 0 && (
+        <div style={{ fontSize: 11, color: "#d4af37" }}>{"★".repeat(Math.round(ub.rating))}{"☆".repeat(5 - Math.round(ub.rating))}</div>
       )}
     </div>
     {ub.times > 1 && <div style={{ marginLeft: "auto", fontSize: 11, color: "#9a7d62", flexShrink: 0 }}>×{ub.times}</div>}
@@ -118,22 +119,11 @@ const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
   const loadTriedBy = useCallback(async (beer) => {
     if (!beer) { setTriedBy([]); return; }
     setTriedLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    const [{ data: ubData }, { data: friendsData }] = await Promise.all([
-      supabase
-        .from("user_beers")
-        .select(`user_id, "Rating", times, profiles(nombre, avatar_url, perfil_publico)`)
-        .eq("beer_id", beer.id),
-      user
-        ? supabase.from("friendships").select("friend_id").eq("user_id", user.id)
-        : Promise.resolve({ data: [] }),
-    ]);
-    const friendIds = new Set((friendsData || []).map((f) => f.friend_id));
-    setTriedBy(
-      (ubData || []).filter(
-        (ub) => ub.profiles?.perfil_publico || (user && friendIds.has(ub.user_id))
-      )
-    );
+    // get_beer_tried_by() aplica la regla de visibilidad (perfil público o
+    // amigo) server-side — un SELECT directo contra user_beers no puede
+    // leer filas de otros usuarios (RLS: solo user_id = auth.uid()).
+    const { data, error } = await supabase.rpc("get_beer_tried_by", { p_beer_id: beer.id });
+    setTriedBy(error ? [] : data || []);
     setTriedLoading(false);
   }, []);
 
@@ -249,7 +239,7 @@ const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
           👥 {t("map.triedByTitle")} — {selectedBeer.nombre}
         </p>
         <button onClick={() => setSelectedBeer(null)}
-          style={{ background: "none", border: "none", color: "#5a4535", fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
+          style={{ background: "none", border: "none", color: "#5a4535", cursor: "pointer", lineHeight: 1, display: "flex" }}><XIcon size={16} /></button>
       </div>
       {triedLoading ? (
         <p style={{ color: "#9a7d62", fontSize: 13 }}>{t("map.triedByLoading")}</p>
@@ -269,9 +259,9 @@ const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
       <button
         onClick={() => setExpanded((e) => !e)}
         title={expanded ? t("map.collapse") : t("map.expand")}
-        style={{ background: "none", border: "1px solid #2e2215", borderRadius: 6, color: "#8b6b2e", fontSize: 14, cursor: "pointer", padding: "2px 8px", lineHeight: 1.4 }}
+        style={{ background: "none", border: "1px solid #2e2215", borderRadius: 6, color: "#8b6b2e", cursor: "pointer", padding: "2px 8px", display: "flex" }}
       >
-        {expanded ? "⊡" : "⛶"}
+        {expanded ? <ScreenNormalIcon size={14} /> : <ScreenFullIcon size={14} />}
       </button>
     </div>
   );
@@ -287,9 +277,9 @@ const OriginMapPanel = ({ beers, focusBeer, onFocusConsumed }) => {
           </span>
           <button
             onClick={() => setExpanded(false)}
-            style={{ background: "none", border: "1px solid #2e2215", borderRadius: 6, color: "#9a7d62", fontSize: 13, cursor: "pointer", padding: "4px 10px" }}
+            style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "1px solid #2e2215", borderRadius: 6, color: "#9a7d62", fontSize: 13, cursor: "pointer", padding: "4px 10px" }}
           >
-            {t("map.collapse")} ✕
+            {t("map.collapse")} <XIcon size={13} />
           </button>
         </div>
 

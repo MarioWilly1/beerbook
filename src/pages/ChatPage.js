@@ -6,6 +6,7 @@ import { useChatPhoto } from "../hooks/useChatPhoto";
 import Avatar from "../components/Avatar";
 import ChatBeerPicker from "../components/ChatBeerPicker";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { ArrowLeftIcon, DeviceCameraIcon, BeakerIcon, PaperAirplaneIcon } from "@primer/octicons-react";
 
 function formatMsgTime(ts) {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -212,7 +213,7 @@ const ChatPage = () => {
     <div style={isMobile ? mobilePageStyle : pageStyle}>
       {/* Header */}
       <div style={headerStyle}>
-        <button onClick={() => navigate("/chats")} style={backBtnStyle}>←</button>
+        <button onClick={() => navigate("/chats")} style={backBtnStyle}><ArrowLeftIcon size={18} /></button>
         {otherUser && <Avatar avatarUrl={otherUser.avatar_url} nombre={otherUser.nombre} size={36} />}
         <span style={{ fontWeight: 700, fontSize: 15, color: "#f0e4cc", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {otherUser?.nombre || "…"}
@@ -263,14 +264,14 @@ const ChatPage = () => {
           title={t("chat.sendPhoto")}
           style={attachBtnStyle}
         >
-          {uploadingPhoto ? "⏳" : "📷"}
+          {uploadingPhoto ? "⏳" : <DeviceCameraIcon size={16} />}
         </button>
         <button
           onClick={() => setShowBeerPicker(true)}
           title={t("chat.shareBeer")}
           style={attachBtnStyle}
         >
-          🍺
+          <BeakerIcon size={16} />
         </button>
         <input
           ref={inputRef}
@@ -291,7 +292,7 @@ const ChatPage = () => {
           disabled={!text.trim() || sending}
           style={sendBtnStyle(!!text.trim() && !sending)}
         >
-          ➤
+          <PaperAirplaneIcon size={16} />
         </button>
       </div>
 
@@ -323,8 +324,9 @@ const headerStyle = {
   flexShrink: 0,
 };
 const backBtnStyle = {
-  background: "none", border: "none", color: "#d4af37", fontSize: 20,
+  background: "none", border: "none", color: "#d4af37",
   cursor: "pointer", padding: "0 8px 0 0", lineHeight: 1, flexShrink: 0,
+  display: "flex", alignItems: "center",
 };
 const messagesAreaStyle = {
   flex: 1, overflowY: "auto", padding: "16px 16px 8px",

@@ -12,6 +12,7 @@ import PrestigeCloseupModal from "../components/PrestigeCloseupModal";
 import ReportEntryModal from "../components/ReportEntryModal";
 import Lightbox from "../components/Lightbox";
 import { isStreakActive } from "../utils/streak";
+import { FlagIcon, GearIcon } from "@primer/octicons-react";
 
 const ACH_BY_SLUG = new Map(ACHIEVEMENTS.map((a) => [a.slug, a]));
 
@@ -320,10 +321,10 @@ const ProfilePage = () => {
                         style={{
                           position: "absolute", top: 4, right: 4,
                           background: "rgba(0,0,0,0.6)", border: "none", borderRadius: 6,
-                          color: "#f0e4cc", fontSize: 12, cursor: "pointer", padding: "2px 5px", lineHeight: 1,
+                          color: "#f0e4cc", cursor: "pointer", padding: "2px 5px", lineHeight: 1, display: "flex",
                         }}
                       >
-                        🚩
+                        <FlagIcon size={12} />
                       </button>
                     )}
                   </div>
@@ -386,9 +387,9 @@ const ProfilePage = () => {
         {isSelf && (
           <button
             onClick={() => navigate("/configuracion")}
-            style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid #2e2215", background: "#2a1e0f", color: "#9a7d62", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 10, border: "1px solid #2e2215", background: "#2a1e0f", color: "#9a7d62", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
           >
-            ⚙️ {t("profile.editProfile")}
+            <GearIcon size={14} /> {t("profile.editProfile")}
           </button>
         )}
         {!isSelf && canSeeStats && !isFriend && currentUserId && (

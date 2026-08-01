@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { PRESET_AVATARS } from "../utils/avatarPresets";
 import Avatar from "./Avatar";
+import { XIcon } from "@primer/octicons-react";
 
 function compressImage(file, maxDimension = 800, quality = 0.82) {
   return new Promise((resolve) => {
@@ -120,7 +121,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f0e4cc" }}>{t("avatar.ui.title")}</h2>
-          <button onClick={onClose} style={closeBtnStyle}>✕</button>
+          <button onClick={onClose} style={closeBtnStyle}><XIcon size={18} /></button>
         </div>
 
         {/* Current avatar preview */}
@@ -161,7 +162,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
                 onClick={() => { setFile(null); setPreviewUrl(null); }}
                 style={clearBtnStyle}
               >
-                ✕
+                <XIcon size={14} />
               </button>
               <button
                 onClick={handleUpload}
@@ -229,7 +230,7 @@ const modalStyle = {
 };
 const closeBtnStyle = {
   background: "none", border: "none", fontSize: 20, cursor: "pointer",
-  color: "#5a4535", lineHeight: 1, padding: "2px 6px",
+  color: "#5a4535", lineHeight: 1, padding: "2px 6px", display: "flex",
 };
 const sectionStyle = {
   background: "#2a1e0f", border: "1px solid #2e2215", borderRadius: 10,
@@ -252,6 +253,7 @@ const saveBtnStyle = {
 const clearBtnStyle = {
   padding: "4px 8px", background: "#2a0a0a", border: "1px solid #8b2020",
   borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 13, fontWeight: 600,
+  display: "flex", alignItems: "center",
 };
 const gridStyle = {
   display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8,

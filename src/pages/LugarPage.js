@@ -3,6 +3,16 @@ import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLugar } from "../hooks/useLugar";
 import Avatar from "../components/Avatar";
+import { LinkExternalIcon } from "@primer/octicons-react";
+
+// Indicador de rango de precio estilo Google Maps — umbrales en € para
+// una caña/pinta de cerveza en un bar (España).
+const priceTier = (avg) => {
+  if (avg == null) return null;
+  if (avg < 4) return "€";
+  if (avg <= 8) return "€€";
+  return "€€€";
+};
 
 const LugarPage = () => {
   const { id } = useParams();
@@ -39,7 +49,7 @@ const LugarPage = () => {
                     rel="noopener noreferrer"
                     style={mapLinkStyle}
                   >
-                    🔗 {t("lugar.moreInfo")}
+                    <LinkExternalIcon size={13} /> {t("lugar.moreInfo")}
                   </a>
                 )}
                 {!place.claimed_by_business && (
@@ -54,6 +64,9 @@ const LugarPage = () => {
                   <>
                     <span style={{ fontWeight: 700, color: "#d4af37" }}>
                       💶 €{Number(priceStats.avg_price).toFixed(2)}
+                    </span>
+                    <span style={{ fontWeight: 700, color: "#9a7d62", marginLeft: 8 }}>
+                      {priceTier(Number(priceStats.avg_price))}
                     </span>
                     <span style={{ color: "#9a7d62", marginLeft: 6 }}>
                       {t("lugar.avgPriceLabel", { count: Number(priceStats.sample_count) })}

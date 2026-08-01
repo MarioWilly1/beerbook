@@ -9,18 +9,19 @@ import { prestigeTierFor } from "../utils/prestigeTiers";
 import Avatar from "../components/Avatar";
 import PrestigeBadge from "../components/PrestigeBadge";
 import ReportUserEntriesModal from "../components/ReportUserEntriesModal";
+import { TrophyIcon, CalendarIcon, PeopleIcon, StarIcon, BeakerIcon, FlagIcon } from "@primer/octicons-react";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
 
 const SCOPE_TABS = [
-  { key: "total",   emoji: "🏅", tKey: "ranking.scope.total"   },
-  { key: "semanal", emoji: "📅", tKey: "ranking.scope.weekly"  },
-  { key: "amigos",  emoji: "👥", tKey: "ranking.scope.friends" },
+  { key: "total",   Icon: TrophyIcon,   tKey: "ranking.scope.total"   },
+  { key: "semanal", Icon: CalendarIcon, tKey: "ranking.scope.weekly"  },
+  { key: "amigos",  Icon: PeopleIcon,   tKey: "ranking.scope.friends" },
 ];
 
 const DIM_OPTIONS = [
-  { key: "xp",    emoji: "⭐", tKey: "ranking.dim.xp"    },
-  { key: "beers", emoji: "🍺", tKey: "ranking.dim.beers" },
+  { key: "xp",    Icon: StarIcon,   tKey: "ranking.dim.xp"    },
+  { key: "beers", Icon: BeakerIcon, tKey: "ranking.dim.beers" },
 ];
 
 const leagueLabel = (t, prestige) => (prestige === 0 ? t("ranking.leagueBase") : t("ranking.leagueN", { n: prestige }));
@@ -113,10 +114,10 @@ const ReportIcon = ({ onReport }) => (
     title="Reportar"
     style={{
       background: "none", border: "none", color: "inherit", opacity: 0.45,
-      fontSize: 13, cursor: "pointer", padding: "2px 4px", flexShrink: 0,
+      cursor: "pointer", padding: "2px 4px", flexShrink: 0, display: "flex",
     }}
   >
-    🚩
+    <FlagIcon size={13} />
   </button>
 );
 
@@ -306,11 +307,12 @@ const Ranking = () => {
 
         {/* Dimension switcher */}
         <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
-          {DIM_OPTIONS.map(({ key, emoji, tKey }) => (
+          {DIM_OPTIONS.map(({ key, Icon, tKey }) => (
             <button
               key={key}
               onClick={() => handleDimChange(key)}
               style={{
+                display: "flex", alignItems: "center", gap: 6,
                 padding: "6px 14px", borderRadius: 20,
                 border: dim === key ? "2px solid #d4af37" : "2px solid #2e2215",
                 fontWeight: 700, fontSize: 13, cursor: "pointer",
@@ -319,14 +321,14 @@ const Ranking = () => {
                 transition: "all 0.15s",
               }}
             >
-              {emoji} {t(tKey)}
+              <Icon size={14} /> {t(tKey)}
             </button>
           ))}
         </div>
 
         {/* Scope tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-          {SCOPE_TABS.map(({ key, emoji, tKey }) => {
+          {SCOPE_TABS.map(({ key, Icon, tKey }) => {
             const disabled = dim === "beers" && key === "semanal";
             const active   = scope === key;
             return (
@@ -336,6 +338,7 @@ const Ranking = () => {
                 disabled={disabled}
                 title={disabled ? t("ranking.disabledWeekly") : undefined}
                 style={{
+                  display: "flex", alignItems: "center", gap: 6,
                   padding: "8px 16px", borderRadius: 8, border: "none",
                   fontWeight: 600, fontSize: 13,
                   cursor: disabled ? "not-allowed" : "pointer",
@@ -345,7 +348,7 @@ const Ranking = () => {
                   transition: "all 0.15s",
                 }}
               >
-                {emoji} {t(tKey)}
+                <Icon size={14} /> {t(tKey)}
               </button>
             );
           })}

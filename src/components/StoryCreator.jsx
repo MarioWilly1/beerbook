@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useCreateStory } from "../hooks/useCreateStory";
+import { XIcon, DeviceCameraIcon, PencilIcon } from "@primer/octicons-react";
 
 const BG_COLORS = [
   "#1c1409", "#0f1a2e", "#0f2a18", "#2a0a0a",
@@ -54,7 +55,7 @@ const StoryCreator = ({ currentUserId, onClose, onSuccess }) => {
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#f0e4cc" }}>
             {t("stories.creator.title")}
           </h2>
-          <button onClick={onClose} style={closeBtnStyle}>✕</button>
+          <button onClick={onClose} style={closeBtnStyle}><XIcon size={18} /></button>
         </div>
 
         {/* Selector de modo */}
@@ -63,13 +64,13 @@ const StoryCreator = ({ currentUserId, onClose, onSuccess }) => {
             onClick={() => setMode("photo")}
             style={{ ...modeTabStyle, ...(mode === "photo" ? modeTabActiveStyle : {}) }}
           >
-            📷 {t("stories.creator.tabPhoto")}
+            <DeviceCameraIcon size={14} /> {t("stories.creator.tabPhoto")}
           </button>
           <button
             onClick={() => setMode("text")}
             style={{ ...modeTabStyle, ...(mode === "text" ? modeTabActiveStyle : {}) }}
           >
-            ✏️ {t("stories.creator.tabText")}
+            <PencilIcon size={14} /> {t("stories.creator.tabText")}
           </button>
         </div>
 
@@ -89,7 +90,7 @@ const StoryCreator = ({ currentUserId, onClose, onSuccess }) => {
                 onClick={() => fileInputRef.current.click()}
                 style={uploadZoneStyle}
               >
-                <span style={{ fontSize: 40 }}>📷</span>
+                <DeviceCameraIcon size={40} />
                 <span style={{ fontSize: 13, color: "#9a7d62", marginTop: 8 }}>
                   {t("stories.creator.choosePhoto")}
                 </span>
@@ -105,7 +106,7 @@ const StoryCreator = ({ currentUserId, onClose, onSuccess }) => {
                   onClick={() => { setFile(null); setPreviewUrl(null); }}
                   style={clearPhotoBtn}
                 >
-                  ✕
+                  <XIcon size={14} />
                 </button>
               </div>
             )}
@@ -232,11 +233,12 @@ const headerStyle = {
 const closeBtnStyle = {
   background: "none",
   border:     "none",
-  fontSize:   20,
   cursor:     "pointer",
   color:      "#5a4535",
   lineHeight: 1,
   padding:    "2px 6px",
+  display:    "flex",
+  alignItems: "center",
 };
 
 const modeTabsStyle = {
@@ -255,6 +257,10 @@ const modeTabStyle = {
   fontSize:     13,
   fontWeight:   600,
   cursor:       "pointer",
+  display:      "flex",
+  alignItems:   "center",
+  justifyContent: "center",
+  gap:          6,
 };
 
 const modeTabActiveStyle = {
@@ -291,7 +297,6 @@ const clearPhotoBtn = {
   alignItems: "center",
   justifyContent: "center",
   cursor:     "pointer",
-  fontSize:   12,
 };
 
 const previewTextStyle = {

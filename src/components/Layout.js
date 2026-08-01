@@ -12,11 +12,17 @@ import { TIER_META } from "../utils/badges";
 import { useTotalUnread } from "../hooks/useTotalUnread";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useUserStats } from "../hooks/useUserStats";
+import ConfirmModal from "./ConfirmModal";
+import {
+  ThreeBarsIcon, RssIcon, PeopleIcon, CommentIcon, GearIcon, ToolsIcon,
+  SignOutIcon, PencilIcon,
+} from "@primer/octicons-react";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [prestigeCloseup, setPrestigeCloseup] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -32,6 +38,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
     "Usuario";
 
   const handleLogout = async () => {
+    setShowLogoutConfirm(false);
     await supabase.auth.signOut();
   };
 
@@ -56,9 +63,9 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
         }}>
           <button
             onClick={() => setDrawerOpen(o => !o)}
-            style={{ background: "none", border: "none", color: "#d4af37", fontSize: 22, cursor: "pointer", padding: "4px 8px", lineHeight: 1 }}
+            style={{ background: "none", border: "none", color: "#d4af37", cursor: "pointer", padding: "4px 8px", lineHeight: 1, display: "flex" }}
           >
-            ☰
+            <ThreeBarsIcon size={22} />
           </button>
           <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#d4af37", fontWeight: 700 }}>
             🍺 BeerBook
@@ -141,10 +148,10 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
                   background: "#d4af37", borderRadius: "50%",
                   width: 18, height: 18,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 10, lineHeight: 1, cursor: "pointer",
+                  color: "#0d0a06", lineHeight: 1, cursor: "pointer",
                 }}
               >
-                ✏️
+                <PencilIcon size={10} />
               </span>
               {stats.currentStreak > 0 && (
                 <span style={{
@@ -222,9 +229,9 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <SidebarLink to="/" label={t("nav.catalog")} onClick={closeDrawer} />
             <SidebarLink to="/cuaderno" label={t("nav.notebook")} onClick={closeDrawer} />
-            <SidebarLink to="/feed" label={`📡 ${t("nav.feed")}`} onClick={closeDrawer} />
-            <SidebarLink to="/amigos" label={`👥 ${t("nav.friends")}`} onClick={closeDrawer} />
-            <SidebarLink to="/chats" label={`💬 ${t("nav.messages")}`} badge={totalUnread} onClick={closeDrawer} />
+            <SidebarLink to="/feed" label={t("nav.feed")} Icon={RssIcon} onClick={closeDrawer} />
+            <SidebarLink to="/amigos" label={t("nav.friends")} Icon={PeopleIcon} onClick={closeDrawer} />
+            <SidebarLink to="/chats" label={t("nav.messages")} Icon={CommentIcon} badge={totalUnread} onClick={closeDrawer} />
             <SidebarLink to="/logros" label={t("nav.achievements")} onClick={closeDrawer} />
             <SidebarLink to="/ranking" label={t("nav.ranking")} onClick={closeDrawer} />
             <SidebarLink to="/sobre-nosotros" label={t("nav.about")} onClick={closeDrawer} />
@@ -232,9 +239,9 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <SidebarLink to="/configuracion" label={`⚙️ ${t("nav.settings")}`} onClick={closeDrawer} />
-          {profile?.is_admin && <SidebarLink to="/admin" label={`🔧 ${t("nav.admin")}`} onClick={closeDrawer} />}
-          <SidebarButton label={`🚪 ${t("nav.logout")}`} onClick={handleLogout} />
+          <SidebarLink to="/configuracion" label={t("nav.settings")} Icon={GearIcon} onClick={closeDrawer} />
+          {profile?.is_admin && <SidebarLink to="/admin" label={t("nav.admin")} Icon={ToolsIcon} onClick={closeDrawer} />}
+          <SidebarButton label={t("nav.logout")} Icon={SignOutIcon} onClick={() => setShowLogoutConfirm(true)} />
         </div>
       </aside>
 
@@ -265,11 +272,23 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
       {prestigeCloseup != null && (
         <PrestigeCloseupModal prestige={prestigeCloseup} onClose={() => setPrestigeCloseup(null)} />
       )}
+
+      {showLogoutConfirm && (
+        <ConfirmModal
+          title={t("sidebar.logoutConfirmTitle")}
+          message={t("sidebar.logoutConfirmMessage")}
+          confirmLabel={t("nav.logout")}
+          cancelLabel={t("sidebar.cancel")}
+          danger
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+        />
+      )}
     </div>
   );
 };
 
-const SidebarLink = ({ to, label, badge, onClick }) => {
+const SidebarLink = ({ to, label, Icon, badge, onClick }) => {
   const [hovered, setHovered] = useState(false);
   const hasBadge = badge > 0;
   return (
@@ -292,53 +311,66 @@ const SidebarLink = ({ to, label, badge, onClick }) => {
         fontWeight: isActive ? "700" : "500",
         transition: "background 0.18s ease, transform 0.12s ease",
         transform: hovered && !isActive ? "translateX(2px)" : "none",
-        display: hasBadge ? "flex" : "block",
+        display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: hasBadge ? "space-between" : "flex-start",
+        gap: "10px",
       })}
     >
-      {hasBadge ? (
-        <>
-          <span>{label}</span>
-          <span style={{
-            background: "#c0392b",
-            color: "#fff",
-            borderRadius: 999,
-            minWidth: 18,
-            height: 18,
-            padding: "0 5px",
-            fontSize: 11,
-            fontWeight: 700,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            lineHeight: 1,
-            flexShrink: 0,
-          }}>
-            {badge > 99 ? "99+" : badge}
-          </span>
-        </>
-      ) : label}
+      <span style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+        {Icon && <Icon size={16} />}
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+      </span>
+      {hasBadge && (
+        <span style={{
+          background: "#c0392b",
+          color: "#fff",
+          borderRadius: 999,
+          minWidth: 18,
+          height: 18,
+          padding: "0 5px",
+          fontSize: 11,
+          fontWeight: 700,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          lineHeight: 1,
+          flexShrink: 0,
+        }}>
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
     </NavLink>
   );
 };
 
-const SidebarButton = ({ label, onClick }) => (
-  <div
-    onClick={onClick}
-    style={{
-      padding: "12px 16px",
-      borderRadius: "10px",
-      background: "rgba(255,255,255,0.04)",
-      color: "#9a7d62",
-      fontSize: "14px",
-      fontWeight: "500",
-      cursor: "pointer",
-      textAlign: "center",
-    }}
-  >
-    {label}
-  </div>
-);
+// Hover en tono rojizo: es una acción de salida/negativa, tiene que
+// distinguirse claramente del resto de los links del sidebar.
+const SidebarButton = ({ label, Icon, onClick }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: "12px 16px",
+        borderRadius: "10px",
+        background: hovered ? "rgba(192,57,43,0.14)" : "rgba(255,255,255,0.04)",
+        color: hovered ? "#e5654f" : "#9a7d62",
+        fontSize: "14px",
+        fontWeight: "500",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        transition: "background 0.15s, color 0.15s",
+      }}
+    >
+      {Icon && <Icon size={16} />}
+      {label}
+    </div>
+  );
+};
 
 export default Layout;

@@ -39,3 +39,30 @@ export async function uploadUserBeerPhoto(supabase, userId, beerNombre, beerId, 
   const { data: { publicUrl } } = supabase.storage.from("user-beers").getPublicUrl(path);
   return publicUrl;
 }
+
+// Mismo patrón que uploadUserBeerPhoto, para el bucket "user-glasses" —
+// usado tanto para la foto de verificación al coleccionar una copa como
+// para la foto de referencia al sugerir una copa nueva (mismo bucket,
+// distinto prefijo, ver migración 20260801010000_glass_collection.sql).
+export async function uploadUserGlassPhoto(supabase, userId, glassNombre, glassId, blob) {
+  const safeName = slugify(glassNombre, String(glassId));
+  const path = `${userId}/${safeName}_${crypto.randomUUID()}.jpg`;
+  const { error } = await supabase.storage
+    .from("user-glasses")
+    .upload(path, blob, { contentType: "image/jpeg" });
+  if (error) throw error;
+  const { data: { publicUrl } } = supabase.storage.from("user-glasses").getPublicUrl(path);
+  return publicUrl;
+}
+
+// Para la foto de referencia de una sugerencia todavía no existe un
+// glassId (ni un nombre confirmado) — usa un prefijo fijo + uuid.
+export async function uploadGlassSuggestionPhoto(supabase, userId, blob) {
+  const path = `${userId}/suggestion_${crypto.randomUUID()}.jpg`;
+  const { error } = await supabase.storage
+    .from("user-glasses")
+    .upload(path, blob, { contentType: "image/jpeg" });
+  if (error) throw error;
+  const { data: { publicUrl } } = supabase.storage.from("user-glasses").getPublicUrl(path);
+  return publicUrl;
+}

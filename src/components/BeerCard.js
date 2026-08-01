@@ -300,15 +300,18 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
             </label>
             <textarea
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              onChange={(e) => setComment(e.target.value.slice(0, 400))}
               rows={2}
-              maxLength={500}
+              maxLength={400}
               placeholder={t("beerform.commentPlaceholder")}
               style={{ ...inputStyle, resize: "none" }}
               spellCheck="true"
               autoCorrect="on"
               autoCapitalize="sentences"
             />
+            <div style={{ fontSize: 10, color: comment.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+              {comment.length}/400
+            </div>
           </div>
 
           <div style={fieldStyle}>

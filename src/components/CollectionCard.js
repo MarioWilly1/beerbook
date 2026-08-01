@@ -35,7 +35,9 @@ const STYLES = `
 `;
 
 let stylesInjected = false;
-const injectStyles = () => {
+// Exportado para que GlassCollectionCard.js (colección de copas) reutilice
+// las mismas animaciones de rareza sin duplicar los @keyframes.
+export const injectStyles = () => {
   if (stylesInjected || typeof document === "undefined") return;
   const tag = document.createElement("style");
   tag.textContent = STYLES;
@@ -44,7 +46,9 @@ const injectStyles = () => {
 };
 
 // ── Rarity config ─────────────────────────────────────────────────────────────
-const RARITY = {
+// Exportado por el mismo motivo que injectStyles — reutilizado por
+// GlassCollectionCard.js.
+export const RARITY = {
   comun: {
     label: "Común", color: "#7a6a55", glyph: "⚪",
     card: { border: "1px solid #3a2e20", background: "#1c1409" },

@@ -549,17 +549,18 @@ const SupportTab = ({ session, t }) => {
           <label style={labelStyle}>{t("settings.support.messageLabel")}</label>
           <textarea
             value={message}
-            onChange={(e) => setMessage(e.target.value.slice(0, 1000))}
+            onChange={(e) => setMessage(e.target.value.slice(0, 400))}
             placeholder={t("settings.support.messagePlaceholder")}
             rows={4}
-            style={{ ...inputStyle, resize: "vertical", fontFamily: "Inter, sans-serif" }}
+            maxLength={400}
+            style={{ ...inputStyle, resize: "none", fontFamily: "Inter, sans-serif" }}
             disabled={sending}
             spellCheck="true"
             autoCorrect="on"
             autoCapitalize="sentences"
           />
-          <div style={{ fontSize: 11, color: message.length > 900 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
-            {message.length}/1000
+          <div style={{ fontSize: 11, color: message.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+            {message.length}/400
           </div>
         </div>
         {sent ? (

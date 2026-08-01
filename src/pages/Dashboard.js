@@ -93,14 +93,18 @@ const SuggestBeerModal = ({ onClose, t }) => {
             <label style={labelStyle}>{t("suggest.reasonLabel")}</label>
             <textarea
               value={reason}
-              onChange={(e) => setReason(e.target.value.slice(0, 500))}
+              onChange={(e) => setReason(e.target.value.slice(0, 400))}
               placeholder={t("suggest.reasonPlaceholder")}
               rows={3}
-              style={{ ...inputStyle, resize: "vertical", fontFamily: "Inter, sans-serif", marginBottom: 20 }}
+              maxLength={400}
+              style={{ ...inputStyle, resize: "none", fontFamily: "Inter, sans-serif", marginBottom: 4 }}
               spellCheck="true"
               autoCorrect="on"
               autoCapitalize="sentences"
             />
+            <div style={{ fontSize: 11, color: reason.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginBottom: 20 }}>
+              {reason.length}/400
+            </div>
 
             <button
               onClick={handleSend}

@@ -80,15 +80,18 @@ const MyBeerCard = ({ beer, onUpdated, onDeleted }) => {
 
           <textarea
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(e) => setComment(e.target.value.slice(0, 400))}
             placeholder="Comentario o anécdota"
-            maxLength={500}
+            maxLength={400}
             rows={3}
-            style={{ width: "100%", marginTop: "8px" }}
+            style={{ width: "100%", marginTop: "8px", resize: "none", boxSizing: "border-box" }}
             spellCheck="true"
             autoCorrect="on"
             autoCapitalize="sentences"
           />
+          <div style={{ fontSize: 10, color: comment.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+            {comment.length}/400
+          </div>
 
           <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
             <button

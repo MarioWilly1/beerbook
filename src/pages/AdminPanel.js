@@ -6,7 +6,7 @@ import { slugify } from "../utils/slugify";
 import { translateDescription } from "../utils/translate";
 import {
   QuestionIcon, LightBulbIcon, FlagIcon, BeakerIcon, PencilIcon, GoalIcon,
-  ZapIcon, CopyIcon, CheckIcon, PlusIcon,
+  ZapIcon, CopyIcon, CheckIcon, PlusIcon, ContainerIcon,
 } from "@primer/octicons-react";
 
 function fmtDate(ts) {
@@ -216,11 +216,15 @@ const CargarCerveza = () => {
         <Field label="Descripción técnica (pegar respuesta de Claude) — se traduce solo a EN/DE al guardar">
           <textarea
             value={form.info_detallada}
-            onChange={set("info_detallada")}
+            onChange={(e) => setForm((f) => ({ ...f, info_detallada: e.target.value.slice(0, 400) }))}
             rows={4}
+            maxLength={400}
             placeholder="Pegar aquí el párrafo de descripción..."
             style={textarea}
           />
+          <div style={{ fontSize: 11, color: form.info_detallada.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+            {form.info_detallada.length}/400
+          </div>
         </Field>
 
         <Field label="Coordenadas de origen (pegar respuesta de Claude)">
@@ -283,7 +287,7 @@ const copyBtn = {
 const textarea = {
   width: "100%", padding: "8px 10px", background: "#0d0a06",
   border: "1px solid #2e2215", borderRadius: 8, color: "#f0e4cc",
-  fontSize: 13, resize: "vertical", outline: "none",
+  fontSize: 13, resize: "none", outline: "none",
   boxSizing: "border-box", marginBottom: 0, fontFamily: "Inter, sans-serif",
 };
 
@@ -370,11 +374,15 @@ const SupportPanel = ({ t }) => {
                     <label style={labelStyle}>{t("admin.adminNote")}</label>
                     <textarea
                       rows={2}
+                      maxLength={400}
                       value={notes[tk.id] ?? tk.admin_note ?? ""}
-                      onChange={(e) => handleNoteChange(tk.id, e.target.value)}
+                      onChange={(e) => handleNoteChange(tk.id, e.target.value.slice(0, 400))}
                       placeholder={t("admin.adminNotePlaceholder")}
                       style={textareaStyle}
                     />
+                    <div style={{ fontSize: 11, color: (notes[tk.id] ?? tk.admin_note ?? "").length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", margin: "3px 0 8px" }}>
+                      {(notes[tk.id] ?? tk.admin_note ?? "").length}/400
+                    </div>
                     <button
                       onClick={() => handleResolve(tk)}
                       disabled={saving === tk.id}
@@ -403,7 +411,10 @@ const SuggestionsPanel = ({ t }) => {
     setLoading(true);
     const { data } = await supabase
       .from("beer_suggestions")
-      .select("*, profiles(nombre)")
+      // profiles!beer_suggestions_user_id_fkey: beer_suggestions tiene dos FKs
+      // a profiles (user_id y reviewed_by) — sin especificar cuál, PostgREST
+      // devuelve PGRST201 (ambigüedad) y la query falla en silencio.
+      .select("*, profiles!beer_suggestions_user_id_fkey(nombre)")
       .order("created_at", { ascending: false });
     setItems(data || []);
     setLoading(false);
@@ -472,6 +483,138 @@ const SuggestionsPanel = ({ t }) => {
 
               {isPending && (
                 <div style={{ display: "flex", gap: 6, flexShrink: 0, flexDirection: "column" }}>
+                  <button
+                    onClick={() => handleApprove(s.id)}
+                    disabled={acting === s.id}
+                    style={approveBtn}
+                  >
+                    {acting === s.id ? "..." : t("admin.approve")}
+                  </button>
+                  <button
+                    onClick={() => handleReject(s.id)}
+                    disabled={acting === s.id}
+                    style={rejectBtn}
+                  >
+                    {t("admin.reject")}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ── Sub-panel: Copas sugeridas ─────────────────────────────────────────────────
+const GLASS_RAREZA_OPTIONS = [
+  { value: "comun",      label: "⚪ Común" },
+  { value: "poco_comun", label: "🟢 Poco común" },
+  { value: "rara",       label: "🔵 Rara" },
+  { value: "epica",      label: "🟣 Épica" },
+  { value: "legendaria", label: "🟡 Legendaria" },
+  { value: "mitica",     label: "🌈 Mítica" },
+];
+
+const GlassSuggestionsPanel = ({ t }) => {
+  const [items, setItems]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [acting, setActing]   = useState(null);
+  const [rarezaById, setRarezaById] = useState({});
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("glass_suggestions")
+      // profiles!glass_suggestions_user_id_fkey: mismo motivo que en
+      // beer_suggestions — hay dos FKs a profiles (user_id y reviewed_by).
+      .select("*, profiles!glass_suggestions_user_id_fkey(nombre), beers_new(nombre)")
+      .order("created_at", { ascending: false });
+    setItems(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const handleApprove = async (id) => {
+    setActing(id);
+    await supabase.rpc("approve_glass_suggestion", {
+      p_suggestion_id: id,
+      p_rareza: rarezaById[id] || "comun",
+    });
+    await load();
+    setActing(null);
+  };
+
+  const handleReject = async (id) => {
+    setActing(id);
+    await supabase.rpc("reject_glass_suggestion", { p_suggestion_id: id });
+    await load();
+    setActing(null);
+  };
+
+  if (loading) return <p style={{ color: "#9a7d62", padding: 20 }}>{t("admin.loading")}</p>;
+  if (items.length === 0) return <p style={{ color: "#5a4535", padding: 20, textAlign: "center" }}>{t("admin.glassesEmpty")}</p>;
+
+  const pending  = items.filter((s) => s.status === "pending");
+  const reviewed = items.filter((s) => s.status !== "pending");
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {pending.length === 0 && reviewed.length > 0 && (
+        <p style={{ color: "#5a4535", fontSize: 13, textAlign: "center", margin: "0 0 8px" }}>
+          {t("admin.noPendingGlasses")}
+        </p>
+      )}
+
+      {[...pending, ...reviewed].map((s) => {
+        const isPending = s.status === "pending";
+        return (
+          <div key={s.id} style={cardStyle}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              {s.foto_url && (
+                <img src={s.foto_url} alt={s.nombre}
+                  style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                  <span style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 15 }}>🍷 {s.nombre}</span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 20, flexShrink: 0,
+                    background: isPending ? "rgba(212,175,55,0.15)" : s.status === "approved" ? "rgba(42,107,58,0.2)" : "rgba(139,32,32,0.2)",
+                    color: isPending ? "#d4af37" : s.status === "approved" ? "#4caf50" : "#c07a3f",
+                  }}>
+                    {t(`admin.status_${s.status}`)}
+                  </span>
+                </div>
+                {s.marca && (
+                  <p style={{ margin: "0 0 4px", color: "#9a7d62", fontSize: 13 }}>{s.marca}</p>
+                )}
+                {s.beers_new?.nombre && (
+                  <p style={{ margin: "0 0 4px", color: "#8b6b2e", fontSize: 12 }}>🍺 {t("admin.associatedWith")}: {s.beers_new.nombre}</p>
+                )}
+                {s.descripcion && (
+                  <p style={{ margin: "0 0 6px", color: "#9a7d62", fontSize: 13, fontStyle: "italic" }}>
+                    "{s.descripcion}"
+                  </p>
+                )}
+                <p style={{ margin: 0, color: "#5a4535", fontSize: 12 }}>
+                  {t("admin.from")}: {s.profiles?.nombre || "?"} · {fmtDate(s.created_at)}
+                </p>
+              </div>
+
+              {isPending && (
+                <div style={{ display: "flex", gap: 6, flexShrink: 0, flexDirection: "column" }}>
+                  <select
+                    value={rarezaById[s.id] || "comun"}
+                    onChange={(e) => setRarezaById((r) => ({ ...r, [s.id]: e.target.value }))}
+                    style={{ ...ctrlSelectStyle, marginBottom: 2 }}
+                  >
+                    {GLASS_RAREZA_OPTIONS.map((r) => (
+                      <option key={r.value} value={r.value}>{r.label}</option>
+                    ))}
+                  </select>
                   <button
                     onClick={() => handleApprove(s.id)}
                     disabled={acting === s.id}
@@ -893,8 +1036,12 @@ const EditarCerveza = () => {
             </p>
 
             <Field label="Descripción técnica">
-              <textarea value={form.info_detallada} onChange={set("info_detallada")}
-                rows={4} placeholder="Pegar aquí el párrafo de descripción..." style={textarea} />
+              <textarea value={form.info_detallada}
+                onChange={(e) => setForm((f) => ({ ...f, info_detallada: e.target.value.slice(0, 400) }))}
+                rows={4} maxLength={400} placeholder="Pegar aquí el párrafo de descripción..." style={textarea} />
+              <div style={{ fontSize: 11, color: form.info_detallada.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+                {form.info_detallada.length}/400
+              </div>
             </Field>
 
             <Field label="Coordenadas de origen">
@@ -1077,8 +1224,13 @@ const RetosPanel = () => {
         </Field>
 
         <Field label="Descripción (se muestra a los usuarios)">
-          <textarea value={form.descripcion} onChange={(e) => setField("descripcion", e.target.value)}
+          {/* 300, no 400: weekly_challenges_descripcion_check en la base tope a
+              300 — subir esto a 400 sin migrar la constraint rompería el save. */}
+          <textarea value={form.descripcion} onChange={(e) => setField("descripcion", e.target.value.slice(0, 300))}
             rows={2} maxLength={300} style={textarea} placeholder="Ej: Probá 3 estilos distintos esta semana" />
+          <div style={{ fontSize: 11, color: form.descripcion.length >= 270 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+            {form.descripcion.length}/300
+          </div>
         </Field>
 
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -1180,6 +1332,7 @@ const AdminPanel = ({ profile }) => {
         {[
           { key: "support",     label: t("admin.tabSupport"),     Icon: QuestionIcon },
           { key: "suggestions", label: t("admin.tabSuggestions"), Icon: LightBulbIcon },
+          { key: "glasses",     label: t("admin.tabGlasses"),     Icon: ContainerIcon },
           { key: "reportes",    label: t("admin.tabReports"),     Icon: FlagIcon },
           { key: "cargar",      label: "Cargar Cerveza",          Icon: BeakerIcon },
           { key: "editar",      label: "Editar Cerveza",          Icon: PencilIcon },
@@ -1204,8 +1357,9 @@ const AdminPanel = ({ profile }) => {
       </div>
 
       {tab === "support"     && <SupportPanel     t={t} />}
-      {tab === "suggestions" && <SuggestionsPanel t={t} />}
-      {tab === "reportes"    && <ReportsPanel     t={t} />}
+      {tab === "suggestions" && <SuggestionsPanel      t={t} />}
+      {tab === "glasses"     && <GlassSuggestionsPanel t={t} />}
+      {tab === "reportes"    && <ReportsPanel          t={t} />}
       {tab === "cargar"      && <CargarCerveza />}
       {tab === "editar"      && <EditarCerveza />}
       {tab === "retos"       && <RetosPanel />}
@@ -1225,7 +1379,7 @@ const labelStyle = {
 const textareaStyle = {
   width: "100%", padding: "8px 10px", background: "#0d0a06",
   border: "1px solid #2e2215", borderRadius: 8, color: "#f0e4cc",
-  fontSize: 13, resize: "vertical", outline: "none",
+  fontSize: 13, resize: "none", outline: "none",
   boxSizing: "border-box", marginBottom: 10, fontFamily: "Inter, sans-serif",
 };
 const approveBtn = {
@@ -1237,6 +1391,10 @@ const rejectBtn = {
   padding: "7px 16px", borderRadius: 8,
   border: "1px solid #8b2020", background: "rgba(139,32,32,0.15)",
   color: "#c07a3f", fontWeight: 700, fontSize: 13, cursor: "pointer",
+};
+const ctrlSelectStyle = {
+  padding: "5px 8px", borderRadius: 6, border: "1px solid #2e2215",
+  background: "#0d0a06", color: "#f0e4cc", fontSize: 12, cursor: "pointer",
 };
 
 export default AdminPanel;

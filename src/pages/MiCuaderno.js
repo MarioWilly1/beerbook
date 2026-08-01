@@ -23,8 +23,9 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { hashToString } from "../utils/perceptualHash";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import HideEntryModal from "../components/HideEntryModal";
+import GlassesTab from "./GlassesTab";
 import {
-  BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
+  BookIcon, DiamondIcon, ContainerIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
   CheckIcon, SearchIcon, XIcon,
 } from "@primer/octicons-react";
 
@@ -425,15 +426,18 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
             <label style={nbLabelStyle}>{t("beerform.commentLabel")} <XpBadge xp={XP_VALUES.COMMENT} /></label>
             <textarea
               value={beer.comment}
-              onChange={(e) => onChange(beer.id, "comment", e.target.value)}
+              onChange={(e) => onChange(beer.id, "comment", e.target.value.slice(0, 400))}
               rows={3}
-              maxLength={500}
+              maxLength={400}
               placeholder={t("notebook.commentPlaceholder")}
-              style={{ ...nbInputStyle, resize: "vertical" }}
+              style={{ ...nbInputStyle, resize: "none" }}
               spellCheck="true"
               autoCorrect="on"
               autoCapitalize="sentences"
             />
+            <div style={{ fontSize: 10, color: beer.comment.length >= 360 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+              {beer.comment.length}/400
+            </div>
           </div>
 
           <div style={nbFieldStyle}>
@@ -675,8 +679,6 @@ const MiCuaderno = () => {
   };
 
   if (loading) return <p style={{ color: "#9a7d62" }}>{t("notebook.loading")}</p>;
-  if (editableBeers.length === 0)
-    return <p style={{ color: "#9a7d62" }}>{t("notebook.empty")}</p>;
 
   const searchQuery  = notebookSearch.trim().toLowerCase();
   const visibleBeers = searchQuery
@@ -690,6 +692,7 @@ const MiCuaderno = () => {
         {[
           { id: "cuaderno",  label: t("notebook.title"), Icon: BookIcon },
           { id: "coleccion", label: "Colección", Icon: DiamondIcon },
+          { id: "copas",     label: "Copas", Icon: ContainerIcon },
         ].map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className="config-tab"
@@ -709,6 +712,9 @@ const MiCuaderno = () => {
 
       {/* ── CUADERNO TAB ── */}
       {activeTab === "cuaderno" && (
+        editableBeers.length === 0 ? (
+          <p style={{ color: "#9a7d62" }}>{t("notebook.empty")}</p>
+        ) : (
         <>
           {/* Buscador */}
           <div style={{ position: "relative", marginBottom: 16 }}>
@@ -770,10 +776,14 @@ const MiCuaderno = () => {
             ))}
           </div>
         </>
+        )
       )}
 
       {/* ── COLECCIÓN TAB (Pokédex) ── */}
       {activeTab === "coleccion" && <ColeccionTab />}
+
+      {/* ── COPAS TAB ── */}
+      {activeTab === "copas" && <GlassesTab />}
 
       <Lightbox src={showImage} onClose={() => setShowImage(null)} />
       {infoModal && <BeerInfoModal beer={infoModal} onClose={() => setInfoModal(null)} />}

@@ -5,7 +5,19 @@ import { compressImage, uploadUserGlassPhoto, uploadGlassSuggestionPhoto } from 
 import { hashToString } from "../utils/perceptualHash";
 import { useCollectibleGlasses } from "../hooks/useCollectibleGlasses";
 import GlassCollectionCard from "../components/GlassCollectionCard";
-import { XIcon, DeviceCameraIcon, PlusIcon } from "@primer/octicons-react";
+import { XIcon, DeviceCameraIcon, PlusIcon, SearchIcon } from "@primer/octicons-react";
+
+// Mismo helper que Dashboard.js/MiCuaderno.js/OriginMapPanel.js.
+function normalizeStr(str) {
+  if (!str) return "";
+  const nfd = str.normalize("NFD");
+  let out = "";
+  for (let i = 0; i < nfd.length; i++) {
+    const code = nfd.charCodeAt(i);
+    if (code < 0x0300 || code > 0x036f) out += nfd[i];
+  }
+  return out.toLowerCase();
+}
 
 const RAREZA_ORDER = ["mitica", "legendaria", "epica", "rara", "poco_comun", "comun"];
 const RAREZA_LABEL  = {
@@ -361,6 +373,7 @@ const SuggestGlassModal = ({ onClose }) => {
 const GlassesTab = () => {
   const { t } = useTranslation();
   const { items, loading, refetch } = useCollectibleGlasses();
+  const [nameSearch, setNameSearch]     = useState("");
   const [rarezaFilter, setRarezaFilter] = useState("all");
   const [showFilter, setShowFilter]     = useState("all");
   const [collectModal, setCollectModal] = useState(null);
@@ -375,6 +388,7 @@ const GlassesTab = () => {
   }
 
   const visible = items
+    .filter((g) => !nameSearch || normalizeStr(g.nombre).includes(normalizeStr(nameSearch)))
     .filter((g) => rarezaFilter === "all" || g.rareza === rarezaFilter)
     .filter((g) => showFilter === "all" || (showFilter === "owned" ? g.owned : !g.owned))
     .sort((a, b) => {
@@ -428,6 +442,37 @@ const GlassesTab = () => {
             </div>
           </div>
 
+          <div style={{ position: "relative", marginBottom: 12 }}>
+            <span style={{
+              position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)",
+              color: "#5a4535", pointerEvents: "none", display: "flex",
+            }}>
+              <SearchIcon size={14} />
+            </span>
+            <input
+              type="text"
+              value={nameSearch}
+              onChange={(e) => setNameSearch(e.target.value)}
+              placeholder="Buscar copa…"
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "9px 32px 9px 34px",
+                background: "#1c1409", border: "1px solid #2e2215",
+                borderRadius: 8, color: "#f0e4cc", fontSize: 14, outline: "none",
+              }}
+            />
+            {nameSearch && (
+              <button onClick={() => setNameSearch("")}
+                style={{
+                  position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                  background: "none", border: "none", color: "#5a4535",
+                  cursor: "pointer", lineHeight: 1, display: "flex",
+                }}>
+                <XIcon size={16} />
+              </button>
+            )}
+          </div>
+
           <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
             <select value={rarezaFilter} onChange={(e) => setRarezaFilter(e.target.value)} style={ctrlS}>
               <option value="all">Todas las rarezas</option>
@@ -443,7 +488,9 @@ const GlassesTab = () => {
           </div>
 
           <p style={{ fontSize: 12, color: "#5a4535", margin: "0 0 14px" }}>
-            {visible.length} de {totalCount} copa{totalCount !== 1 ? "s" : ""}
+            {/* Conseguidas DENTRO del filtro actual — mismo fix que en
+                BeerColeccionTab (MiCuaderno.js), heredaba el mismo bug. */}
+            {visible.filter((g) => g.owned).length} de {visible.length} copa{visible.length !== 1 ? "s" : ""} conseguida{visible.length !== 1 ? "s" : ""}
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(148px, 1fr))", gap: 14 }}>

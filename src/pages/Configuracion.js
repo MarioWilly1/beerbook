@@ -9,7 +9,7 @@ import HiddenStoriesManager from "../components/HiddenStoriesManager";
 import HiddenEntriesManager from "../components/HiddenEntriesManager";
 import Onboarding from "../components/Onboarding";
 import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
-import { PersonIcon, LockIcon, SlidersIcon, QuestionIcon } from "@primer/octicons-react";
+import { PersonIcon, LockIcon, SlidersIcon, QuestionIcon, EyeClosedIcon } from "@primer/octicons-react";
 
 const TABS = [
   { key: "perfil",       Icon: PersonIcon,   tKey: "settings.tabs.profile"     },
@@ -358,7 +358,7 @@ const Configuracion = ({ onProfileChange }) => {
           {/* Ocultar historias de amigos específicos */}
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid #2e2215" }}>
             <div style={{ fontWeight: 700, color: "#f0e4cc", marginBottom: 4, fontSize: 15 }}>
-              🫣 {t("settings.privacy.hiddenStories.title")}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><EyeClosedIcon size={16} /> {t("settings.privacy.hiddenStories.title")}</span>
             </div>
             <p style={{ fontSize: 13, color: "#9a7d62", margin: "0 0 14px", lineHeight: 1.5 }}>
               {t("settings.privacy.hiddenStories.description")}
@@ -369,7 +369,7 @@ const Configuracion = ({ onProfileChange }) => {
           {/* Ocultar cervezas de amigos específicos */}
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid #2e2215" }}>
             <div style={{ fontWeight: 700, color: "#f0e4cc", marginBottom: 4, fontSize: 15 }}>
-              🙈 {t("settings.privacy.hiddenEntries.title")}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><EyeClosedIcon size={16} /> {t("settings.privacy.hiddenEntries.title")}</span>
             </div>
             <p style={{ fontSize: 13, color: "#9a7d62", margin: "0 0 14px", lineHeight: 1.5 }}>
               {t("settings.privacy.hiddenEntries.description")}

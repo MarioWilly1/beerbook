@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
 import { supabase } from "../services/supabase";
@@ -16,7 +17,7 @@ import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { hashToString } from "../utils/perceptualHash";
-import { GlobeIcon, CheckIcon } from "@primer/octicons-react";
+import { GlobeIcon, CheckIcon, XIcon } from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -264,12 +265,31 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
         </div>
       </div>
 
-      {/* ── Acordeón: visible solo al expandir ── */}
-      {expanded && (
-        <div style={{
-          borderTop: "1px solid #2e2215", marginTop: 2, paddingTop: 12,
-          padding: "12px 4px 4px",
-        }}>
+      {/* ── Detalle: overlay flotante, no empuja el grid (Spotify/Untappd) ── */}
+      {expanded && ReactDOM.createPortal(
+        <div style={overlayStyle} onClick={() => setExpanded(false)}>
+        <div style={modalPanelStyle} onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+            {beer.foto_url && (
+              <img
+                src={beer.foto_url}
+                alt={beer.nombre}
+                style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", flexShrink: 0 }}
+              />
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#f0e4cc", lineHeight: 1.3 }}>
+                {beer.nombre}
+              </p>
+              <p style={{ margin: "3px 0 0", fontSize: 12, color: "#9a7d62" }}>
+                {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
+              </p>
+            </div>
+            <button onClick={() => setExpanded(false)} style={modalCloseBtnStyle}>
+              <XIcon size={18} />
+            </button>
+          </div>
+
           <div style={fieldStyle}>
             <label style={labelStyle}>{t("beerform.timesLabel")}</label>
             <input
@@ -377,6 +397,8 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
             {saving ? t("beerform.saving") : (<><CheckIcon size={14} /> {t("beerform.saveBtn", { xp: xpPreview })}</>)}
           </button>
         </div>
+        </div>,
+        document.body
       )}
 
       {infoOpen && <BeerInfoModal beer={beer} onClose={() => setInfoOpen(false)} onVerMapa={onVerMapa} />}
@@ -400,5 +422,22 @@ const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px sol
 const saveBtn          = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
 const photoBtnStyle      = { padding: "8px 12px", background: "#1c1409", border: "1.5px dashed #3a2e20", borderRadius: 8, fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600, textAlign: "center" };
 const clearPhotoBtnStyle = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
+
+// Detalle como overlay flotante (portal a document.body) en vez de acordeón
+// inline — así el grid de tarjetas colapsadas queda siempre parejo, sin que
+// una tarjeta expandida empuje a las demás (mismo patrón que BeerInfoModal.jsx).
+const overlayStyle = {
+  position: "fixed", inset: 0, background: "rgba(0,0,0,0.72)",
+  zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px",
+};
+const modalPanelStyle = {
+  background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
+  padding: "20px 18px 22px", width: "100%", maxWidth: 420, maxHeight: "85dvh",
+  overflowY: "auto", boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+};
+const modalCloseBtnStyle = {
+  background: "none", border: "none", color: "rgba(240,228,204,0.5)",
+  cursor: "pointer", padding: "2px 4px", lineHeight: 1, flexShrink: 0, display: "flex",
+};
 
 export default BeerCard;

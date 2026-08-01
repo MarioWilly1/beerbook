@@ -264,6 +264,9 @@ const Dashboard = () => {
         {t("dashboard.collectionProgressShort", { count: stats.beers, total: beers.length })}
       </p>
 
+      {/* Grilla uniforme — el detalle de BeerCard se abre como overlay
+          flotante (ver overlayStyle en BeerCard.js), no empuja el layout,
+          así que no hace falta multi-columna acá. */}
       <div
         style={{
           display: "grid",

@@ -11,7 +11,7 @@ export const useCollectibleBeers = () => {
     if (!session) { setLoading(false); return; }
 
     // Owned = cualquier cerveza que el usuario tenga registrada en su cuaderno
-    const [{ data: catalog }, { data: userBeers }] = await Promise.all([
+    const [{ data: catalog, error: catalogErr }, { data: userBeers, error: userBeersErr }] = await Promise.all([
       supabase
         .from("beers_new")
         .select("id, nombre, rareza, es_edicion_especial, motivo_edicion, foto_url, estilo, pais, familia")
@@ -21,6 +21,15 @@ export const useCollectibleBeers = () => {
         .select("beer_id")
         .eq("user_id", session.user.id),
     ]);
+
+    if (catalogErr || userBeersErr) {
+      // Si alguna de las dos falla, mejor mostrar la Pokédex vacía que un
+      // conteo mentiroso (ej. "owned" mal calculado sobre datos parciales).
+      console.error("useCollectibleBeers:", catalogErr || userBeersErr);
+      setItems([]);
+      setLoading(false);
+      return;
+    }
 
     const ownedSet = new Set((userBeers || []).map((r) => r.beer_id));
     const merged = (catalog || []).map((beer) => ({

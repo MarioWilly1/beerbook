@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import ReactDOM from "react-dom";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { getCountryName } from "../utils/countryDisplay";
 import BeerInfoModal from "../components/BeerInfoModal";
 import CollectionCard from "../components/CollectionCard";
+import BeerFilters from "../components/BeerFilters";
 import { useMyBeers } from "../hooks/useMyBeers";
 import { useCollectibleBeers } from "../hooks/useCollectibleBeers";
 import { useUserStats } from "../hooks/useUserStats";
@@ -25,9 +27,22 @@ import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import HideEntryModal from "../components/HideEntryModal";
 import GlassesTab from "./GlassesTab";
 import {
-  BookIcon, DiamondIcon, ContainerIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
+  BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
   CheckIcon, SearchIcon, XIcon,
 } from "@primer/octicons-react";
+
+// Mismo helper que Dashboard.js/OriginMapPanel.js — no está extraído a un
+// util compartido en este proyecto, se duplica igual que en esos dos.
+function normalizeStr(str) {
+  if (!str) return "";
+  const nfd = str.normalize("NFD");
+  let out = "";
+  for (let i = 0; i < nfd.length; i++) {
+    const code = nfd.charCodeAt(i);
+    if (code < 0x0300 || code > 0x036f) out += nfd[i];
+  }
+  return out.toLowerCase();
+}
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -153,9 +168,10 @@ const LockedInfoModal = ({ beer, onClose }) => (
   </div>
 );
 
-// ── ColeccionTab (Pokédex) ─────────────────────────────────────────────────────
-const ColeccionTab = () => {
+// ── BeerColeccionTab (Pokédex de cervezas) ──────────────────────────────────────
+const BeerColeccionTab = () => {
   const { items, loading } = useCollectibleBeers();
+  const [nameSearch,    setNameSearch]    = useState("");
   const [rarezaFilter,  setRarezaFilter]  = useState("all");
   const [familiaFilter, setFamiliaFilter] = useState("all");
   const [showFilter,    setShowFilter]    = useState("all");
@@ -172,6 +188,7 @@ const ColeccionTab = () => {
   const families = [...new Set(items.map((b) => b.familia).filter(Boolean))].sort();
 
   const visible = items
+    .filter((b) => !nameSearch || normalizeStr(b.nombre).includes(normalizeStr(nameSearch)))
     .filter((b) => rarezaFilter  === "all" || b.rareza  === rarezaFilter)
     .filter((b) => familiaFilter === "all" || b.familia === familiaFilter)
     .filter((b) => showFilter === "all" || (showFilter === "owned" ? b.owned : !b.owned))
@@ -229,6 +246,37 @@ const ColeccionTab = () => {
         )}
       </div>
 
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <span style={{
+          position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)",
+          color: "#5a4535", pointerEvents: "none", display: "flex",
+        }}>
+          <SearchIcon size={14} />
+        </span>
+        <input
+          type="text"
+          value={nameSearch}
+          onChange={(e) => setNameSearch(e.target.value)}
+          placeholder="Buscar en la colección…"
+          style={{
+            width: "100%", boxSizing: "border-box",
+            padding: "9px 32px 9px 34px",
+            background: "#1c1409", border: "1px solid #2e2215",
+            borderRadius: 8, color: "#f0e4cc", fontSize: 14, outline: "none",
+          }}
+        />
+        {nameSearch && (
+          <button onClick={() => setNameSearch("")}
+            style={{
+              position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+              background: "none", border: "none", color: "#5a4535",
+              cursor: "pointer", lineHeight: 1, display: "flex",
+            }}>
+            <XIcon size={16} />
+          </button>
+        )}
+      </div>
+
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
         <select value={rarezaFilter} onChange={(e) => setRarezaFilter(e.target.value)} style={ctrlS}>
           <option value="all">Todas las rarezas</option>
@@ -250,7 +298,10 @@ const ColeccionTab = () => {
       </div>
 
       <p style={{ fontSize: 12, color: "#5a4535", margin: "0 0 14px" }}>
-        {visible.length} de {totalCount} cerveza{totalCount !== 1 ? "s" : ""}
+        {/* Conseguidas DENTRO del filtro actual, no el total del catálogo —
+            antes mostraba visible.length/totalCount, que con cualquier
+            filtro "vacío" (sin nada tildado) daba siempre N/N. */}
+        {visible.filter((b) => b.owned).length} de {visible.length} cerveza{visible.length !== 1 ? "s" : ""} conseguida{visible.length !== 1 ? "s" : ""}
       </p>
 
       <div style={{
@@ -281,6 +332,28 @@ const ColeccionTab = () => {
 const ctrlS = {
   padding: "7px 10px", borderRadius: 8, border: "1px solid #2e2215",
   background: "#1c1409", color: "#f0e4cc", fontSize: 12, cursor: "pointer",
+};
+
+// ── ColeccionTab (wrapper) — desplegable Cervezas/Copas en vez de tabs
+// separadas, ambas Pokédex viven bajo la misma tab "Colección". ──────────────
+const ColeccionTab = () => {
+  const [collectionType, setCollectionType] = useState("cervezas");
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <select
+          value={collectionType}
+          onChange={(e) => setCollectionType(e.target.value)}
+          style={{ ...ctrlS, fontSize: 14, fontWeight: 700, padding: "9px 14px" }}
+        >
+          <option value="cervezas">🍺 Cervezas</option>
+          <option value="copas">🍷 Copas</option>
+        </select>
+      </div>
+      {collectionType === "cervezas" ? <BeerColeccionTab /> : <GlassesTab />}
+    </div>
+  );
 };
 
 // ── NotebookCard — accordion card for Mi Cuaderno ─────────────────────────────
@@ -385,9 +458,31 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
         </div>
       </div>
 
-      {/* Accordion: form fields */}
-      {expanded && (
-        <div style={{ borderTop: "1px solid #2e2215", marginTop: 2, padding: "12px 4px 4px" }}>
+      {/* Detalle: overlay flotante, no empuja el grid (Spotify/Untappd) */}
+      {expanded && ReactDOM.createPortal(
+        <div style={nbOverlayStyle} onClick={() => setExpanded(false)}>
+        <div style={nbModalPanelStyle} onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+            {displayPhoto && (
+              <img
+                src={displayPhoto}
+                alt={beer.nombre}
+                style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", flexShrink: 0 }}
+              />
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#f0e4cc", lineHeight: 1.3 }}>
+                {beer.nombre}
+              </p>
+              <p style={{ margin: "3px 0 0", fontSize: 12, color: "#9a7d62" }}>
+                {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
+              </p>
+            </div>
+            <button onClick={() => setExpanded(false)} style={nbModalCloseBtnStyle}>
+              <XIcon size={18} />
+            </button>
+          </div>
+
           <div style={nbFieldStyle}>
             <label style={nbLabelStyle}>{t("beerform.timesLabel")}</label>
             <input
@@ -543,6 +638,8 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
             </div>
           )}
         </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -558,7 +655,10 @@ const MiCuaderno = () => {
   const [showImage, setShowImage]         = useState(null);
   const [infoModal, setInfoModal]         = useState(null);
   const [activeTab, setActiveTab]         = useState("cuaderno");
-  const [notebookSearch, setNotebookSearch] = useState("");
+  const [search, setSearch]               = useState("");
+  const [styleFilter, setStyleFilter]     = useState(null);
+  const [countryFilter, setCountryFilter] = useState(null);
+  const [alcoholFilter, setAlcoholFilter] = useState([0, 15]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [hiddenCounts, setHiddenCounts]   = useState({}); // { beer_id: cantidad de amigos a los que se les oculta }
 
@@ -678,12 +778,36 @@ const MiCuaderno = () => {
     refetchStats();
   };
 
+  // Mismo patrón que Dashboard.js — derivados de TUS cervezas, no de todo el
+  // catálogo, para que los chips de estilo/país solo muestren lo relevante.
+  const countries = useMemo(() => {
+    if (!editableBeers.length) return [];
+    const paises = [...new Set(editableBeers.map((b) => b.pais).filter(Boolean))];
+    const roots = new Set();
+    for (const p of paises) {
+      const parent = paises.find((other) => other !== p && p.includes(other));
+      roots.add(parent !== undefined ? parent : p.split("(")[0].trim() || p);
+    }
+    return [...roots].sort();
+  }, [editableBeers]);
+
+  const styles = useMemo(
+    () => [...new Set(editableBeers.map((b) => b.estilo).filter(Boolean))].sort(),
+    [editableBeers]
+  );
+
   if (loading) return <p style={{ color: "#9a7d62" }}>{t("notebook.loading")}</p>;
 
-  const searchQuery  = notebookSearch.trim().toLowerCase();
-  const visibleBeers = searchQuery
-    ? editableBeers.filter((b) => b.nombre?.toLowerCase().includes(searchQuery))
-    : editableBeers;
+  const [minAlc, maxAlc] = alcoholFilter;
+  const visibleBeers = editableBeers
+    .filter((b) => !search || normalizeStr(b.nombre).includes(normalizeStr(search)))
+    .filter((b) => !styleFilter || normalizeStr(b.estilo).includes(normalizeStr(styleFilter)))
+    .filter((b) => !countryFilter || b.pais?.includes(countryFilter))
+    .filter((b) => {
+      if (minAlc === 0 && maxAlc === 15) return true;
+      const alc = Number(b.alcohol) || 0;
+      return alc >= minAlc && alc <= maxAlc;
+    });
 
   return (
     <div>
@@ -692,7 +816,6 @@ const MiCuaderno = () => {
         {[
           { id: "cuaderno",  label: t("notebook.title"), Icon: BookIcon },
           { id: "coleccion", label: "Colección", Icon: DiamondIcon },
-          { id: "copas",     label: "Copas", Icon: ContainerIcon },
         ].map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className="config-tab"
@@ -716,45 +839,33 @@ const MiCuaderno = () => {
           <p style={{ color: "#9a7d62" }}>{t("notebook.empty")}</p>
         ) : (
         <>
-          {/* Buscador */}
-          <div style={{ position: "relative", marginBottom: 16 }}>
-            <span style={{
-              position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)",
-              color: "#5a4535", pointerEvents: "none", display: "flex",
-            }}>
-              <SearchIcon size={14} />
-            </span>
-            <input
-              type="text"
-              value={notebookSearch}
-              onChange={(e) => setNotebookSearch(e.target.value)}
-              placeholder="Buscar en mi cuaderno…"
-              style={{
-                width: "100%", boxSizing: "border-box",
-                padding: "9px 12px 9px 34px",
-                background: "#1c1409", border: "1px solid #2e2215",
-                borderRadius: 8, color: "#f0e4cc", fontSize: 14, outline: "none",
-              }}
-            />
-            {notebookSearch && (
-              <button onClick={() => setNotebookSearch("")}
-                style={{
-                  position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                  background: "none", border: "none", color: "#5a4535",
-                  cursor: "pointer", lineHeight: 1, display: "flex",
-                }}>
-                <XIcon size={16} />
-              </button>
-            )}
-          </div>
+          {/* Mismo buscador+filtros que el Catálogo — sin Trending, no
+              aplica a "mis" cervezas (es un ranking global de actividad). */}
+          <BeerFilters
+            search={search}
+            setSearch={setSearch}
+            styleFilter={styleFilter}
+            setStyleFilter={setStyleFilter}
+            countryFilter={countryFilter}
+            setCountryFilter={setCountryFilter}
+            alcoholFilter={alcoholFilter}
+            setAlcoholFilter={setAlcoholFilter}
+            trendingFilter={false}
+            setTrendingFilter={() => {}}
+            showTrending={false}
+            styles={styles}
+            countries={countries}
+          />
 
-          {searchQuery && (
+          {search && (
             <p style={{ fontSize: 12, color: "#5a4535", margin: "-8px 0 14px" }}>
-              {visibleBeers.length} resultado{visibleBeers.length !== 1 ? "s" : ""} para &ldquo;{notebookSearch.trim()}&rdquo;
+              {visibleBeers.length} resultado{visibleBeers.length !== 1 ? "s" : ""} para &ldquo;{search.trim()}&rdquo;
             </p>
           )}
 
-          {/* 2-column grid — same pattern as catalog */}
+          {/* Grilla uniforme — el detalle de NotebookCard se abre como
+              overlay flotante (ver nbOverlayStyle), no empuja el layout,
+              así que no hace falta multi-columna acá. */}
           <div style={{
             display: "grid",
             gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(180px, 1fr))",
@@ -779,11 +890,8 @@ const MiCuaderno = () => {
         )
       )}
 
-      {/* ── COLECCIÓN TAB (Pokédex) ── */}
+      {/* ── COLECCIÓN TAB (Pokédex de cervezas o copas, según el desplegable) ── */}
       {activeTab === "coleccion" && <ColeccionTab />}
-
-      {/* ── COPAS TAB ── */}
-      {activeTab === "copas" && <GlassesTab />}
 
       <Lightbox src={showImage} onClose={() => setShowImage(null)} />
       {infoModal && <BeerInfoModal beer={infoModal} onClose={() => setInfoModal(null)} />}
@@ -807,5 +915,21 @@ const nbPhotoBtn        = { padding: "8px 12px", background: "#1c1409", border: 
 const nbClearPhotoBtn   = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
 const nbHideFromBtn     = { display: "flex", alignItems: "center", gap: 6, width: "100%", padding: "7px 10px", marginTop: 8, background: "#1c1409", border: "1px solid #2e2215", borderRadius: 8, color: "#9a7d62", cursor: "pointer", fontSize: 12, fontWeight: 600, textAlign: "left" };
 const nbHideFromBadge   = { marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "#d4af37", background: "rgba(212,175,55,0.12)", padding: "2px 7px", borderRadius: 20 };
+
+// Detalle como overlay flotante (portal a document.body) en vez de acordeón
+// inline — mismo motivo y patrón que BeerCard.js.
+const nbOverlayStyle = {
+  position: "fixed", inset: 0, background: "rgba(0,0,0,0.72)",
+  zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px",
+};
+const nbModalPanelStyle = {
+  background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
+  padding: "20px 18px 22px", width: "100%", maxWidth: 420, maxHeight: "85dvh",
+  overflowY: "auto", boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+};
+const nbModalCloseBtnStyle = {
+  background: "none", border: "none", color: "rgba(240,228,204,0.5)",
+  cursor: "pointer", padding: "2px 4px", lineHeight: 1, flexShrink: 0, display: "flex",
+};
 
 export default MiCuaderno;

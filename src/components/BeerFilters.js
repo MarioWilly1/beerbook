@@ -198,6 +198,7 @@ const BeerFilters = ({
   setTrendingFilter,
   styles,
   countries,
+  showTrending = true,
 }) => {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -257,7 +258,7 @@ const BeerFilters = ({
             style={{
               width: "100%",
               boxSizing: "border-box",
-              padding: "10px 12px 10px 36px",
+              padding: "10px 32px 10px 36px",
               border: "1.5px solid #2e2215",
               borderRadius: 10,
               fontSize: 14,
@@ -266,28 +267,42 @@ const BeerFilters = ({
               color: "#f0e4cc",
             }}
           />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              style={{
+                position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                background: "none", border: "none", color: "#5a4535",
+                cursor: "pointer", lineHeight: 1, display: "flex",
+              }}
+            >
+              <XIcon size={16} />
+            </button>
+          )}
         </div>
 
-        <button
-          onClick={() => setTrendingFilter(!trendingFilter)}
-          title={t("filters.trendingHint")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            padding: "10px 12px",
-            borderRadius: 10,
-            cursor: "pointer",
-            border: `1.5px solid ${trendingFilter ? "#d4af37" : "#2e2215"}`,
-            background: trendingFilter ? "#d4af37" : "#2a1e0f",
-            color: trendingFilter ? "#0d0a06" : "#9a7d62",
-            fontWeight: 700,
-            fontSize: 13,
-            whiteSpace: "nowrap",
-          }}
-        >
-          <FlameIcon size={14} /> {t("filters.trending")}
-        </button>
+        {showTrending && (
+          <button
+            onClick={() => setTrendingFilter(!trendingFilter)}
+            title={t("filters.trendingHint")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "10px 12px",
+              borderRadius: 10,
+              cursor: "pointer",
+              border: `1.5px solid ${trendingFilter ? "#d4af37" : "#2e2215"}`,
+              background: trendingFilter ? "#d4af37" : "#2a1e0f",
+              color: trendingFilter ? "#0d0a06" : "#9a7d62",
+              fontWeight: 700,
+              fontSize: 13,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <FlameIcon size={14} /> {t("filters.trending")}
+          </button>
+        )}
 
         <button
           onClick={() => setOpen((v) => !v)}

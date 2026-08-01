@@ -99,7 +99,12 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           color: "#f0e4cc",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          // Desktop: los dos grupos quedan anclados arriba/abajo del sidebar.
+          // Mobile: gap fijo en su lugar — con space-between, agregar el link
+          // de Admin (cuenta admin) reducía el espacio sobrante entre
+          // "Sobre nosotros" y "Configuración" hasta casi pegarlos.
+          justifyContent: isMobile ? "flex-start" : "space-between",
+          gap: isMobile ? 24 : 0,
           padding: "24px 16px",
           borderRight: "1px solid #2e2215",
           ...(isMobile ? {

@@ -203,6 +203,18 @@
     "areFriends":           "Son amigos",
     "back":                 "← Volver"
   },
+  "topTier": {
+    "label":              "Top Tier",
+    "edit":               "Editar",
+    "editTitle":          "Editar Top Tier",
+    "editHint":           "Arrastrá para reordenar. Máximo {{max}} por categoría.",
+    "categoryGlobal":     "General",
+    "emptyCategory":      "Todavía no agregaste cervezas a esta categoría.",
+    "emptyOwn":           "Todavía no armaste tu Top Tier. Tocá \"Editar\" para elegir tus favoritas.",
+    "searchPlaceholder":  "Buscar en tu cuaderno...",
+    "noMoreBeers":        "No hay más cervezas para agregar.",
+    "saving":             "Guardando..."
+  },
   "dashboard": {
     "title":        "Catálogo de Cervezas",
     "loading":      "Cargando cervezas...",
@@ -338,8 +350,17 @@
     "no":                 "No",
     "commentPlaceholder": "Comentarios o anécdotas...",
     "bonusComplete":      "+{{xp}} XP bonus — entrada completa",
-    "saveBtn":            "Guardar · {{xp}} XP",
-    "deleteBtn":          "Borrar"
+    "saveBtn":            "Guardar cambios",
+    "deleteBtn":          "Borrar",
+    "timesTriedLabel":    "Veces probada",
+    "quickTastingBtn":    "Volví a probarla (+3 XP)"
+  },
+  "tastingGallery": {
+    "title":        "Historial de catas",
+    "loading":      "Cargando historial...",
+    "empty":        "Todavía no hay catas registradas.",
+    "latest":       "Más reciente",
+    "entryNumber":  "Cata #{{n}}"
   },
   "location": {
     "addBtn":       "Añadir ubicación",
@@ -582,6 +603,16 @@
     "confirmBody":       "Tu nivel vuelve a 1, pero conservás todo tu XP histórico, tus logros e insignias. Vas a sumar el Prestigio {{n}}.",
     "confirmYes":        "Sí, prestigiar",
     "confirmNo":         "Cancelar",
+    "missionsLoading":    "Revisando misión de prestigio...",
+    "missionsLabel":      "Misión de prestigio",
+    "missionsIncomplete": "Todavía te falta completar la misión de este prestigio. Tu XP no se pierde: sigue guardado hasta que la completes.",
+    "metric": {
+      "verifiedDistinctStyles":    "Estilos distintos verificados",
+      "verifiedDistinctCountries": "Países distintos verificados",
+      "coleccionCount":            "Cervezas de colección",
+      "friendCount":                "Amigos",
+      "suggestedApprovedCount":    "Cervezas sugeridas y aprobadas"
+    },
     "ascensionTitle":    "PRESTIGIO {{n}}",
     "ascensionSubtitle": "Tu nivel vuelve a 1 — el XP histórico, los logros y las insignias siguen intactos.",
     "continue":          "Continuar",

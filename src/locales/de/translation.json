@@ -203,6 +203,18 @@
     "areFriends":          "Befreundet",
     "back":                "← Zurück"
   },
+  "topTier": {
+    "label":              "Top Tier",
+    "edit":               "Bearbeiten",
+    "editTitle":          "Top Tier bearbeiten",
+    "editHint":           "Ziehen zum Neuordnen. Max. {{max}} pro Kategorie.",
+    "categoryGlobal":     "Gesamt",
+    "emptyCategory":      "Du hast dieser Kategorie noch keine Biere hinzugefügt.",
+    "emptyOwn":           "Du hast noch kein Top Tier erstellt. Tippe auf \"Bearbeiten\", um deine Favoriten auszuwählen.",
+    "searchPlaceholder":  "In deinem Notizbuch suchen...",
+    "noMoreBeers":        "Keine weiteren Biere zum Hinzufügen.",
+    "saving":             "Wird gespeichert..."
+  },
   "dashboard": {
     "title":        "Bierkatalog",
     "loading":      "Biere werden geladen...",
@@ -338,8 +350,17 @@
     "no":                 "Nein",
     "commentPlaceholder": "Kommentare oder Anekdoten...",
     "bonusComplete":      "+{{xp}} XP Bonus — vollständiger Eintrag",
-    "saveBtn":            "Speichern · {{xp}} XP",
-    "deleteBtn":          "Löschen"
+    "saveBtn":            "Änderungen speichern",
+    "deleteBtn":          "Löschen",
+    "timesTriedLabel":    "Mal probiert",
+    "quickTastingBtn":    "Nochmal probiert (+3 XP)"
+  },
+  "tastingGallery": {
+    "title":        "Verkostungsverlauf",
+    "loading":      "Verlauf wird geladen...",
+    "empty":        "Noch keine Verkostungen erfasst.",
+    "latest":       "Neueste",
+    "entryNumber":  "Verkostung #{{n}}"
   },
   "location": {
     "addBtn":       "Standort hinzufügen",
@@ -582,6 +603,16 @@
     "confirmBody":       "Dein Level wird auf 1 zurückgesetzt, aber dein gesamter XP-Verlauf, deine Erfolge und Abzeichen bleiben erhalten. Du erreichst Prestige {{n}}.",
     "confirmYes":        "Ja, Prestige",
     "confirmNo":         "Abbrechen",
+    "missionsLoading":    "Prestige-Mission wird geprüft...",
+    "missionsLabel":      "Prestige-Mission",
+    "missionsIncomplete": "Du musst noch die Mission dieses Prestiges abschließen. Dein XP geht nicht verloren — es bleibt gespeichert, bis du sie abschließt.",
+    "metric": {
+      "verifiedDistinctStyles":    "Verschiedene verifizierte Stile",
+      "verifiedDistinctCountries": "Verschiedene verifizierte Länder",
+      "coleccionCount":            "Sammelbiere",
+      "friendCount":                "Freunde",
+      "suggestedApprovedCount":    "Vorgeschlagene und genehmigte Biere"
+    },
     "ascensionTitle":    "PRESTIGE {{n}}",
     "ascensionSubtitle": "Dein Level wird auf 1 zurückgesetzt — XP-Verlauf, Erfolge und Abzeichen bleiben erhalten.",
     "continue":          "Weiter",

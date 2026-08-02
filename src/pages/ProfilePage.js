@@ -11,6 +11,8 @@ import PrestigeAscensionModal from "../components/PrestigeAscensionModal";
 import PrestigeCloseupModal from "../components/PrestigeCloseupModal";
 import ReportEntryModal from "../components/ReportEntryModal";
 import Lightbox from "../components/Lightbox";
+import TopTierSection from "../components/TopTierSection";
+import PrestigeMissionStatus from "../components/PrestigeMissionStatus";
 import { isStreakActive } from "../utils/streak";
 import { FlagIcon, GearIcon } from "@primer/octicons-react";
 
@@ -35,6 +37,7 @@ const ProfilePage = () => {
   const [verifiedEntries, setVerifiedEntries] = useState([]);
   const [lightboxSrc, setLightboxSrc]     = useState(null);
   const [reportTarget, setReportTarget]   = useState(null);
+  const [hasMission, setHasMission]       = useState(true); // optimista hasta que llegue la respuesta del server
 
   useEffect(() => {
     const load = async () => {
@@ -244,6 +247,12 @@ const ProfilePage = () => {
           <div style={{ fontSize: 12, color: "#5a4535", textAlign: "right" }}>
             {t("profile.xpToNextLevel", { current: stats.xpIntoLevel, needed: stats.xpNeeded, next: stats.level + 1 })}
           </div>
+
+          {isSelf && (
+            <div style={{ marginTop: hasMission ? 14 : 0, paddingTop: hasMission ? 14 : 0, borderTop: hasMission ? "1px solid #2e2215" : "none" }}>
+              <PrestigeMissionStatus userId={userId} onVisibilityChange={setHasMission} />
+            </div>
+          )}
         </div>
       )}
 
@@ -293,6 +302,8 @@ const ProfilePage = () => {
               </div>
             </div>
           )}
+
+          <TopTierSection userId={userId} isSelf={isSelf} />
 
           {verifiedEntries.length > 0 && (
             <div style={{ background: "#1c1409", borderRadius: 14, border: "1px solid #2e2215", padding: "18px 20px", marginBottom: 20 }}>

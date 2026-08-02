@@ -189,7 +189,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             </div>
           )}
 
-          <UserLevelCard stats={stats} refetch={refetchStats} />
+          <UserLevelCard stats={stats} refetch={refetchStats} userId={session?.user?.id} />
 
           {/* Badge strip */}
           {badges.length > 0 && (

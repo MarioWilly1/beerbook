@@ -11,7 +11,7 @@ import { useMyBeers } from "../hooks/useMyBeers";
 import { useCollectibleBeers } from "../hooks/useCollectibleBeers";
 import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
-import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
+import { getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
 import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
 import { checkAndAwardBadges } from "../utils/badges";
@@ -24,7 +24,10 @@ import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { hashToString } from "../utils/perceptualHash";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
+import { insertTasting, updateLatestTasting } from "../utils/tastings";
 import HideEntryModal from "../components/HideEntryModal";
+import TastingGalleryModal from "../components/TastingGalleryModal";
+import QuickTastingWidget from "../components/QuickTastingWidget";
 import GlassesTab from "./GlassesTab";
 import {
   BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
@@ -357,12 +360,13 @@ const ColeccionTab = () => {
 };
 
 // ── NotebookCard — accordion card for Mi Cuaderno ─────────────────────────────
-const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoModal, userId, hiddenCount, onHiddenChange }) => {
+const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, tastingPending, onDelete, onShowImage, onInfoModal, userId, hiddenCount, onHiddenChange }) => {
   const { t, i18n } = useTranslation();
   const [expanded,  setExpanded]  = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState("");
   const [showHideModal, setShowHideModal] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const fileInputRef = useRef(null);
 
   const handlePhotoSelect = async (e) => {
@@ -387,7 +391,6 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
 
   const displayPhoto = beer.user_photo_url?.trim() || beer.foto_url;
   const hasUserPhoto = !!beer.user_photo_url?.trim();
-  const xpPreview = computeEntryXP({ rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
   const isComplete =
     beer.Rating !== "" && Number(beer.Rating) > 0 &&
     beer.comment.trim().length > 0 &&
@@ -403,7 +406,10 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
           <img
             src={displayPhoto}
             alt={beer.nombre}
-            onClick={(e) => { e.stopPropagation(); onShowImage(displayPhoto); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              hasUserPhoto ? setShowGallery(true) : onShowImage(displayPhoto);
+            }}
             style={{
               width: "100%", height: "110px", objectFit: "cover",
               borderRadius: "8px", cursor: "zoom-in", display: "block",
@@ -432,6 +438,9 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
           <p style={{ margin: "0 0 4px", fontSize: "11px", color: "#9a7d62" }}>
             {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
           </p>
+          <div style={{ margin: "0 0 4px" }}>
+            <QuickTastingWidget count={tastingCount} pending={tastingPending} onTap={() => onQuickTasting(beer)} />
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 3, minWidth: 0 }}>
             {rb && (
               <span style={{
@@ -483,13 +492,8 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
             </button>
           </div>
 
-          <div style={nbFieldStyle}>
-            <label style={nbLabelStyle}>{t("beerform.timesLabel")}</label>
-            <input
-              type="number" min="0" value={beer.times}
-              onChange={(e) => onChange(beer.id, "times", Math.max(0, parseInt(e.target.value) || 0))}
-              style={nbInputStyle}
-            />
+          <div style={{ ...nbFieldStyle, display: "flex" }}>
+            <QuickTastingWidget count={tastingCount} pending={tastingPending} onTap={() => onQuickTasting(beer)} />
           </div>
 
           <div style={nbFieldStyle}>
@@ -614,12 +618,21 @@ const NotebookCard = ({ beer, onChange, onSave, onDelete, onShowImage, onInfoMod
 
           <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
             <button onClick={() => onSave(beer)} style={{ ...nbSaveBtn, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-              <CheckIcon size={14} /> {t("notebook.saveBtn", { xp: xpPreview })}
+              <CheckIcon size={14} /> {t("notebook.saveBtn")}
             </button>
             <button onClick={() => onDelete(beer.id)} style={{ ...nbDeleteBtn, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <TrashIcon size={14} />
             </button>
           </div>
+
+          {showGallery && (
+            <TastingGalleryModal
+              userId={userId}
+              beerId={beer.id}
+              beerNombre={beer.nombre}
+              onClose={() => setShowGallery(false)}
+            />
+          )}
 
           {beer.location?.name && (
             <div style={{ marginTop: 8 }}>
@@ -661,6 +674,8 @@ const MiCuaderno = () => {
   const [alcoholFilter, setAlcoholFilter] = useState([0, 15]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [hiddenCounts, setHiddenCounts]   = useState({}); // { beer_id: cantidad de amigos a los que se les oculta }
+  const [tastingCounts, setTastingCounts] = useState({}); // { beer_id: cantidad real de catas registradas }
+  const [tastingPending, setTastingPending] = useState({}); // { beer_id: true mientras hay un guardado en curso }
 
   const loadHiddenCounts = useCallback(async (uid) => {
     const { data } = await supabase.from("entry_hidden_from").select("beer_id").eq("owner_id", uid);
@@ -669,13 +684,21 @@ const MiCuaderno = () => {
     setHiddenCounts(counts);
   }, []);
 
+  const loadTastingCounts = useCallback(async (uid) => {
+    const { data } = await supabase.from("beer_tastings").select("beer_id").eq("user_id", uid);
+    const counts = {};
+    (data || []).forEach((r) => { counts[r.beer_id] = (counts[r.beer_id] || 0) + 1; });
+    setTastingCounts(counts);
+  }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) return;
       setCurrentUserId(session.user.id);
       loadHiddenCounts(session.user.id);
+      loadTastingCounts(session.user.id);
     });
-  }, [loadHiddenCounts]);
+  }, [loadHiddenCounts, loadTastingCounts]);
 
   useEffect(() => {
     setEditableBeers(
@@ -704,22 +727,17 @@ const MiCuaderno = () => {
     );
   };
 
+  // Editar la reseña actual (representativa) — NO crea una cata nueva ni
+  // otorga XP, solo corrige lo que ya está guardado (mismo criterio que
+  // "arreglar un typo" en cualquier otro campo).
   const handleSave = async (beer) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    const xp = computeEntryXP({ rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
     const isComplete =
       beer.Rating !== "" && Number(beer.Rating) > 0 &&
       beer.comment.trim().length > 0 &&
       beer.user_photo_url.trim().length > 0;
-
-    const { data: xpRows } = await supabase
-      .from("user_beers").select('"XP"').eq("user_id", session.user.id);
-    const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
-    const newTotal   = prevTotal - (beer.XP || 0) + xp;
-    const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
-    const newLevel = getLevelInfo(newTotal).level;
 
     // photo_hash es un bigint de 64 bits — nunca se lee de vuelta desde la
     // base (perdería precisión al pasar por JSON/Number en JS), así que
@@ -733,7 +751,6 @@ const MiCuaderno = () => {
       commercialized:  beer.commercialized,
       user_photo_url:  beer.user_photo_url || null,
       Rating:          beer.Rating !== "" ? Number(beer.Rating) : null,
-      XP:              xp,
       location_lat:    beer.location?.lat    ?? null,
       location_lng:    beer.location?.lng    ?? null,
       location_name:   beer.location?.name   ?? null,
@@ -746,6 +763,13 @@ const MiCuaderno = () => {
       .eq("user_id", session.user.id).eq("beer_id", beer.id);
 
     if (error) return;
+
+    await updateLatestTasting(supabase, session.user.id, beer.id, {
+      rating: payload.Rating, comment: payload.comment || null, user_photo_url: payload.user_photo_url,
+      location_lat: payload.location_lat, location_lng: payload.location_lng, location_name: payload.location_name,
+      location_public: payload.location_public, price_paid: payload.price_paid,
+      ...(beer.photo_hash !== undefined ? { photo_hash: beer.photo_hash } : {}),
+    });
 
     await logActivity(session.user.id, beer.id, { rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
 
@@ -763,7 +787,55 @@ const MiCuaderno = () => {
 
     refetchStats();
     soundClink();
-    toastSave(xp, isComplete);
+    toastSave(0, isComplete);
+    if (newAchievements.length) { celebrateAchievement(); soundAchievement(); toastAchievements(newAchievements); }
+    if (newBadges.length)       { toastBadges(newBadges); }
+  };
+
+  // Registrar que volviste a probar esta cerveza con un solo toque: crea una
+  // fila NUEVA en blanco en el historial (beer_tastings) — sin foto/nota,
+  // eso queda opcional para completar después desde la galería — y gana +3
+  // XP fijo (siempre repetida acá, porque para llegar a Mi Cuaderno la
+  // cerveza ya tuvo su primera cata). El contador se sube optimista al
+  // toque; si el guardado falla se revierte.
+  const handleQuickTasting = async (beer) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    if (tastingPending[beer.id]) return;
+
+    setTastingPending((prev) => ({ ...prev, [beer.id]: true }));
+    setTastingCounts((prev) => ({ ...prev, [beer.id]: (prev[beer.id] || 0) + 1 }));
+
+    const { error } = await insertTasting(supabase, session.user.id, beer.id, {});
+
+    setTastingPending((prev) => ({ ...prev, [beer.id]: false }));
+
+    if (error) {
+      setTastingCounts((prev) => ({ ...prev, [beer.id]: Math.max(0, (prev[beer.id] || 1) - 1) }));
+      return;
+    }
+
+    const { data: xpRows } = await supabase
+      .from("user_beers").select('"XP"').eq("user_id", session.user.id);
+    const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
+    const newTotal   = prevTotal + 3;
+    const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
+    const newLevel   = getLevelInfo(newTotal).level;
+
+    await logActivity(session.user.id, beer.id, { rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
+
+    const [newStreak, achStats] = await Promise.all([
+      updateStreak(),
+      fetchAchievementStats(session.user.id),
+    ]);
+    const [newAchievements, newBadges] = await Promise.all([
+      achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
+      achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
+    ]);
+    fetchWeeklyChallengeProgress().then((list) => list.forEach(checkAndAwardWeeklyChallenge));
+
+    refetchStats();
+    soundClink();
     if (didLevelUp)             { celebrateLevel();       soundLevelUp();      toastLevelUp(newLevel); }
     if (newAchievements.length) { celebrateAchievement(); soundAchievement(); toastAchievements(newAchievements); }
     if (newBadges.length)       { toastBadges(newBadges); }
@@ -877,6 +949,9 @@ const MiCuaderno = () => {
                 beer={beer}
                 onChange={handleChange}
                 onSave={handleSave}
+                onQuickTasting={handleQuickTasting}
+                tastingCount={tastingCounts[beer.id] ?? 1}
+                tastingPending={!!tastingPending[beer.id]}
                 onDelete={handleDelete}
                 onShowImage={setShowImage}
                 onInfoModal={setInfoModal}

@@ -203,6 +203,18 @@
     "areFriends":          "Friends",
     "back":                "← Back"
   },
+  "topTier": {
+    "label":              "Top Tier",
+    "edit":               "Edit",
+    "editTitle":          "Edit Top Tier",
+    "editHint":           "Drag to reorder. Max {{max}} per category.",
+    "categoryGlobal":     "Overall",
+    "emptyCategory":      "You haven't added any beers to this category yet.",
+    "emptyOwn":           "You haven't built your Top Tier yet. Tap \"Edit\" to pick your favorites.",
+    "searchPlaceholder":  "Search your notebook...",
+    "noMoreBeers":        "No more beers to add.",
+    "saving":             "Saving..."
+  },
   "dashboard": {
     "title":        "Beer Catalog",
     "loading":      "Loading beers...",
@@ -338,8 +350,17 @@
     "no":                 "No",
     "commentPlaceholder": "Comments or anecdotes...",
     "bonusComplete":      "+{{xp}} XP bonus — complete entry",
-    "saveBtn":            "Save · {{xp}} XP",
-    "deleteBtn":          "Delete"
+    "saveBtn":            "Save changes",
+    "deleteBtn":          "Delete",
+    "timesTriedLabel":    "Times tried",
+    "quickTastingBtn":    "Tried it again (+3 XP)"
+  },
+  "tastingGallery": {
+    "title":        "Tasting history",
+    "loading":      "Loading history...",
+    "empty":        "No tastings logged yet.",
+    "latest":       "Most recent",
+    "entryNumber":  "Tasting #{{n}}"
   },
   "location": {
     "addBtn":       "Add location",
@@ -582,6 +603,16 @@
     "confirmBody":       "Your level resets to 1, but you keep all your lifetime XP, achievements and badges. You'll earn Prestige {{n}}.",
     "confirmYes":        "Yes, prestige",
     "confirmNo":         "Cancel",
+    "missionsLoading":    "Checking prestige mission...",
+    "missionsLabel":      "Prestige mission",
+    "missionsIncomplete": "You still need to complete this prestige's mission. Your XP isn't lost — it stays saved until you complete it.",
+    "metric": {
+      "verifiedDistinctStyles":    "Distinct verified styles",
+      "verifiedDistinctCountries": "Distinct verified countries",
+      "coleccionCount":            "Collectible beers",
+      "friendCount":                "Friends",
+      "suggestedApprovedCount":    "Suggested beers approved"
+    },
     "ascensionTitle":    "PRESTIGE {{n}}",
     "ascensionSubtitle": "Your level resets to 1 — lifetime XP, achievements and badges stay untouched.",
     "continue":          "Continue",

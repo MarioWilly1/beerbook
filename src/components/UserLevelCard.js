@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import PrestigeAscensionModal from "./PrestigeAscensionModal";
+import PrestigeMissionStatus from "./PrestigeMissionStatus";
 
 // Nivel/XP completos viven ahora únicamente en ProfilePage.js — esta card
 // del sidebar es solo racha + acciones de Prestigio (nada de HUD ambiental).
 // El botón de repetir la animación vive en el Perfil, no acá.
-const UserLevelCard = ({ stats, refetch }) => {
+const UserLevelCard = ({ stats, refetch, userId }) => {
   const { t } = useTranslation();
   const [confirming, setConfirming] = useState(false);
   const [prestiging, setPrestiging] = useState(false);
   const [ascension, setAscension] = useState(null); // número de prestigio a mostrar en el modal, o null
+  const [missionsMet, setMissionsMet] = useState(true); // optimista hasta que llegue la respuesta del server
+
+  const handleMissionStatusChange = useCallback((met) => setMissionsMet(met), []);
 
   const handlePrestige = async () => {
     setPrestiging(true);
@@ -29,7 +33,7 @@ const UserLevelCard = ({ stats, refetch }) => {
   return (
     <div style={cardStyle}>
       {stats.canPrestige && !confirming && (
-        <button onClick={() => setConfirming(true)} style={prestigeBtnStyle}>
+        <button onClick={() => { setMissionsMet(true); setConfirming(true); }} style={prestigeBtnStyle}>
           {t("prestige.cta")}
         </button>
       )}
@@ -39,8 +43,17 @@ const UserLevelCard = ({ stats, refetch }) => {
           <p style={{ margin: "0 0 8px", fontSize: 11, color: "#f0e4cc", lineHeight: 1.5 }}>
             {t("prestige.confirmBody", { n: stats.prestige + 1 })}
           </p>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={handlePrestige} disabled={prestiging} style={confirmYesStyle}>
+
+          {userId && <PrestigeMissionStatus userId={userId} onStatusChange={handleMissionStatusChange} />}
+
+          {!missionsMet && (
+            <p style={{ margin: "6px 0 0", fontSize: 11, color: "#c07a3f" }}>
+              {t("prestige.missionsIncomplete")}
+            </p>
+          )}
+
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button onClick={handlePrestige} disabled={prestiging || !missionsMet} style={{ ...confirmYesStyle, opacity: (prestiging || !missionsMet) ? 0.5 : 1, cursor: (prestiging || !missionsMet) ? "not-allowed" : "pointer" }}>
               {prestiging ? "…" : t("prestige.confirmYes")}
             </button>
             <button onClick={() => setConfirming(false)} disabled={prestiging} style={confirmNoStyle}>

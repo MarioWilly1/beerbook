@@ -91,3 +91,22 @@ button:active:not(:disabled) {
   0%, 100% { opacity: 0.4; }
   50%       { opacity: 0.8; }
 }
+
+/* ── QuickTastingWidget: "+3 XP" flotando al re-catar una cerveza ───────────── */
+@keyframes quick-tasting-float-up {
+  0%   { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
+  15%  { opacity: 1; transform: translate(-50%, -4px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -28px) scale(1); }
+}
+.quick-tasting-float {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  font-size: 11px;
+  font-weight: 700;
+  color: #d4af37;
+  pointer-events: none;
+  animation: quick-tasting-float-up 0.9s ease-out forwards;
+  white-space: nowrap;
+}

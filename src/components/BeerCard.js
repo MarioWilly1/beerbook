@@ -17,6 +17,7 @@ import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
 import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { hashToString } from "../utils/perceptualHash";
+import { insertTasting, updateLatestTasting } from "../utils/tastings";
 import { GlobeIcon, CheckIcon, XIcon } from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
@@ -82,7 +83,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
 
   const isColeccionable = beer.es_edicion_especial || RAREZA_COLECCIONABLE.has(beer.rareza);
   const collectionBonus = (!isInMyBeers && isColeccionable) ? 20 : 0;
-  const xpPreview  = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
+  const xpPreview  = isInMyBeers ? 0 : computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
   const isComplete =
     rating !== "" && Number(rating) > 0 &&
     comment.trim().length > 0 &&
@@ -93,12 +94,15 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     if (!session) return;
 
     setSaving(true);
+    // El XP real lo computa el server (trigger de beer_tastings) — esto es
+    // solo la estimación para el toast/animación de nivel, que coincide
+    // exactamente con la fórmula server-side para una primera cata.
     const xp = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
 
     const { data: xpRows } = await supabase
       .from("user_beers").select('"XP"').eq("user_id", session.user.id);
     const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
-    const newTotal   = prevTotal - (myBeerData?.XP || 0) + xp;
+    const newTotal   = prevTotal + (isInMyBeers ? 0 : xp);
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
     const newLevel = getLevelInfo(newTotal).level;
 
@@ -107,25 +111,48 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     // manda cuando esta sesión lo calculó (subida nueva) o lo limpió
     // (quitar foto); si no cambió, se omite y Postgres deja intacto el
     // valor ya guardado (mismo criterio que MiCuaderno.js).
-    const payload = {
-      user_id:         session.user.id,
-      beer_id:         beer.id,
-      times,
-      comment,
-      Rating:          rating !== "" ? Number(rating) : null,
-      user_photo_url:  photoUrl || null,
-      XP:              xp,
-      location_lat:    location?.lat    ?? null,
-      location_lng:    location?.lng    ?? null,
-      location_name:   location?.name   ?? null,
-      location_public: location?.isPublic ?? true,
-      price_paid:      location?.price  ?? null,
+    const tastingFields = {
+      rating:           rating !== "" ? Number(rating) : null,
+      comment:          comment || null,
+      user_photo_url:   photoUrl || null,
+      location_lat:     location?.lat    ?? null,
+      location_lng:     location?.lng    ?? null,
+      location_name:    location?.name   ?? null,
+      location_public:  location?.isPublic ?? true,
+      price_paid:       location?.price  ?? null,
     };
-    if (photoHash !== undefined) payload.photo_hash = photoHash;
+    if (photoHash !== undefined) tastingFields.photo_hash = photoHash;
 
-    const { error } = await supabase.from("user_beers").upsert(payload);
-
-    if (error) { setSaving(false); return; }
+    if (!isInMyBeers) {
+      // Primera vez que se agrega esta cerveza al cuaderno: crear la fila
+      // resumen (arranca en XP=0) y registrar la primera cata, que es la
+      // que efectivamente le suma el XP real vía trigger.
+      const { error } = await supabase.from("user_beers").upsert({
+        user_id: session.user.id, beer_id: beer.id, times,
+        comment: comment || "", Rating: tastingFields.rating,
+        user_photo_url: tastingFields.user_photo_url,
+        location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
+        location_name: tastingFields.location_name, location_public: tastingFields.location_public,
+        price_paid: tastingFields.price_paid,
+        ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
+      });
+      if (error) { setSaving(false); return; }
+      const { error: tastingError } = await insertTasting(supabase, session.user.id, beer.id, tastingFields);
+      if (tastingError) { setSaving(false); return; }
+    } else {
+      // Ya está en el cuaderno: esto es una EDICIÓN de la reseña actual,
+      // no una cata nueva — no otorga XP adicional.
+      const { error } = await supabase.from("user_beers").update({
+        times, comment: comment || "", Rating: tastingFields.rating,
+        user_photo_url: tastingFields.user_photo_url,
+        location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
+        location_name: tastingFields.location_name, location_public: tastingFields.location_public,
+        price_paid: tastingFields.price_paid,
+        ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
+      }).eq("user_id", session.user.id).eq("beer_id", beer.id);
+      if (error) { setSaving(false); return; }
+      await updateLatestTasting(supabase, session.user.id, beer.id, tastingFields);
+    }
 
     await logActivity(session.user.id, beer.id, { rating, comment, photo: photoUrl });
 
@@ -145,7 +172,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     onSaved && onSaved();
 
     soundClink();
-    toastSave(xp, isComplete);
+    toastSave(isInMyBeers ? 0 : xp, isComplete);
     if (collectionBonus > 0) toastAchievements([{ emoji: "💎", nombre: "¡Cerveza coleccionable!", descripcion: "Primera vez que la registrás", xpBonus: collectionBonus }]);
 
     if (didLevelUp) {

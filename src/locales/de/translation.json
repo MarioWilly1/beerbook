@@ -611,7 +611,8 @@
       "verifiedDistinctCountries": "Verschiedene verifizierte Länder",
       "coleccionCount":            "Sammelbiere",
       "friendCount":                "Freunde",
-      "suggestedApprovedCount":    "Vorgeschlagene und genehmigte Biere"
+      "suggestedApprovedCount":    "Vorgeschlagene und genehmigte Biere",
+      "totalBeers":                "Erfasste Biere"
     },
     "ascensionTitle":    "PRESTIGE {{n}}",
     "ascensionSubtitle": "Dein Level wird auf 1 zurückgesetzt — XP-Verlauf, Erfolge und Abzeichen bleiben erhalten.",
@@ -667,6 +668,7 @@
     "completed": "Geschafft! +{{xp}} XP",
     "daysLeft_one": "Noch {{count}} Tag",
     "daysLeft_other": "Noch {{count}} Tage",
-    "endsToday": "Endet heute"
+    "endsToday": "Endet heute",
+    "modalTitle": "Aktive Herausforderungen"
   }
 }

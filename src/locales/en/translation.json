@@ -611,7 +611,8 @@
       "verifiedDistinctCountries": "Distinct verified countries",
       "coleccionCount":            "Collectible beers",
       "friendCount":                "Friends",
-      "suggestedApprovedCount":    "Suggested beers approved"
+      "suggestedApprovedCount":    "Suggested beers approved",
+      "totalBeers":                "Beers logged"
     },
     "ascensionTitle":    "PRESTIGE {{n}}",
     "ascensionSubtitle": "Your level resets to 1 — lifetime XP, achievements and badges stay untouched.",
@@ -667,6 +668,7 @@
     "completed": "Completed! +{{xp}} XP",
     "daysLeft_one": "{{count}} day left",
     "daysLeft_other": "{{count}} days left",
-    "endsToday": "Ends today"
+    "endsToday": "Ends today",
+    "modalTitle": "Active challenges"
   }
 }

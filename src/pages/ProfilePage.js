@@ -13,6 +13,7 @@ import ReportEntryModal from "../components/ReportEntryModal";
 import Lightbox from "../components/Lightbox";
 import TopTierSection from "../components/TopTierSection";
 import PrestigeMissionStatus from "../components/PrestigeMissionStatus";
+import BeerLevelBar from "../components/BeerLevelBar";
 import { isStreakActive } from "../utils/streak";
 import { FlagIcon, GearIcon } from "@primer/octicons-react";
 
@@ -237,12 +238,8 @@ const ProfilePage = () => {
             </span>
             <span style={{ fontSize: 13, color: "#9a7d62" }}>⭐ {stats.totalXP.toLocaleString()} XP</span>
           </div>
-          <div style={{ height: 7, background: "rgba(255,255,255,0.08)", borderRadius: 10, overflow: "hidden", margin: "8px 0 6px" }}>
-            <div style={{
-              width: `${stats.progressPct}%`, height: "100%",
-              background: "linear-gradient(90deg, #8b6b2e, #d4af37)",
-              borderRadius: 10, transition: "width 0.6s ease",
-            }} />
+          <div style={{ margin: "8px 0 6px" }}>
+            <BeerLevelBar pct={stats.progressPct} />
           </div>
           <div style={{ fontSize: 12, color: "#5a4535", textAlign: "right" }}>
             {t("profile.xpToNextLevel", { current: stats.xpIntoLevel, needed: stats.xpNeeded, next: stats.level + 1 })}

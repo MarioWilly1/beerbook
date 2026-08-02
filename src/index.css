@@ -110,3 +110,17 @@ button:active:not(:disabled) {
   animation: quick-tasting-float-up 0.9s ease-out forwards;
   white-space: nowrap;
 }
+
+/* ── BeerLevelBar: superficie ondulante de la barra de XP ────────────────── */
+@keyframes beer-wave-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Burbujas: nacen abajo, suben y se desvanecen antes de llegar a la espuma. */
+@keyframes beer-bubble-rise {
+  0%   { bottom: 0%;  opacity: 0;    transform: scale(0.7); }
+  10%  { opacity: 0.85; transform: scale(1); }
+  80%  { opacity: 0.4; }
+  100% { bottom: 78%; opacity: 0;   transform: scale(0.8); }
+}

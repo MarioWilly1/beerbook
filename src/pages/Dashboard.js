@@ -9,7 +9,7 @@ import { supabase } from "../services/supabase";
 import OriginMapPanel from "../components/OriginMapPanel";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useTrendingBeers } from "../hooks/useTrendingBeers";
-import WeeklyChallengeBanner from "../components/WeeklyChallengeBanner";
+import ChallengesBellButton from "../components/ChallengesBellButton";
 import { XIcon, GlobeIcon, ChevronUpIcon, ChevronDownIcon } from "@primer/octicons-react";
 import { STYLE_KEYWORDS, normalizeStr } from "../utils/styleCategories";
 
@@ -194,8 +194,6 @@ const Dashboard = () => {
     <div>
       <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>
 
-      <WeeklyChallengeBanner />
-
       {/* Map toggle + suggest row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
         <button
@@ -248,9 +246,12 @@ const Dashboard = () => {
         countries={countries}
       />
 
-      <p style={{ color: "#5a4535", fontSize: 13, margin: "0 0 14px" }}>
-        {t("dashboard.collectionProgressShort", { count: stats.beers, total: beers.length })}
-      </p>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+        <p style={{ color: "#5a4535", fontSize: 13, margin: 0 }}>
+          {t("dashboard.collectionProgressShort", { count: stats.beers, total: beers.length })}
+        </p>
+        <ChallengesBellButton />
+      </div>
 
       {/* Grilla uniforme — el detalle de BeerCard se abre como overlay
           flotante (ver overlayStyle en BeerCard.js), no empuja el layout,

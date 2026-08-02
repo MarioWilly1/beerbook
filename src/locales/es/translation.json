@@ -611,7 +611,8 @@
       "verifiedDistinctCountries": "Países distintos verificados",
       "coleccionCount":            "Cervezas de colección",
       "friendCount":                "Amigos",
-      "suggestedApprovedCount":    "Cervezas sugeridas y aprobadas"
+      "suggestedApprovedCount":    "Cervezas sugeridas y aprobadas",
+      "totalBeers":                "Cervezas registradas"
     },
     "ascensionTitle":    "PRESTIGIO {{n}}",
     "ascensionSubtitle": "Tu nivel vuelve a 1 — el XP histórico, los logros y las insignias siguen intactos.",
@@ -667,6 +668,7 @@
     "completed": "¡Completado! +{{xp}} XP",
     "daysLeft_one": "Queda {{count}} día",
     "daysLeft_other": "Quedan {{count}} días",
-    "endsToday": "Termina hoy"
+    "endsToday": "Termina hoy",
+    "modalTitle": "Retos activos"
   }
 }

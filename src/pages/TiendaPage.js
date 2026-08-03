@@ -6,7 +6,7 @@ import { ACHIEVEMENTS } from "../utils/achievements";
 import AvatarFrame from "../components/AvatarFrame";
 import EquippedTag from "../components/EquippedTag";
 import ChapaIcon from "../components/ChapaIcon";
-import { CheckCircleFillIcon, LockIcon, TagIcon } from "@primer/octicons-react";
+import { CheckCircleFillIcon, LockIcon } from "@primer/octicons-react";
 import { toastError, toastSave } from "../utils/toast";
 
 const ACH_BY_SLUG = new Map(ACHIEVEMENTS.map((a) => [a.slug, a]));
@@ -132,6 +132,14 @@ const ItemCard = ({
   const meetsGate = item.unlock_achievement_slug ? hasAchievement : (item.unlock_min_prestige ? prestige >= item.unlock_min_prestige : true);
   const canAfford = chapas >= item.cost;
 
+  // Preview con la identidad real del usuario (avatar/nombre propios,
+  // estilo "probador" de Rocket League) — si el ítem que se mira es un
+  // marco/etiqueta, se previsualiza ESE; el otro slot muestra lo que el
+  // usuario ya tiene equipado, para ver el combo completo tal cual
+  // quedaría en sidebar/feed/perfil.
+  const previewFrameSlug = item.category === "frame" ? item.slug : profile?.equipped_frame_slug;
+  const previewTagSlug   = item.category === "tag"   ? item.slug : profile?.equipped_tag_slug;
+
   return (
     <div style={{
       background: "#1c1409", borderRadius: 14, padding: "16px 18px",
@@ -139,21 +147,12 @@ const ItemCard = ({
       display: "flex", flexDirection: "column", gap: 10,
       boxShadow: equipped ? "0 0 0 1px rgba(212,175,55,0.3)" : "none",
     }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "6px 0" }}>
-        {item.category === "frame" ? (
-          <AvatarFrame frameSlug={item.slug} avatarUrl={profile?.avatar_url} nombre={profile?.nombre} size={56} />
-        ) : (
-          <>
-            <div style={{
-              width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: rb.bg, border: `2px solid ${rb.color}`,
-            }}>
-              <TagIcon size={24} fill={rb.color} />
-            </div>
-            <EquippedTag slug={item.slug} size="lg" />
-          </>
-        )}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "6px 0" }}>
+        <AvatarFrame frameSlug={previewFrameSlug} avatarUrl={profile?.avatar_url} nombre={profile?.nombre} size={56} />
+        <p style={{ margin: 0, fontWeight: 700, fontSize: 13, color: "#f0e4cc", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {profile?.nombre}
+        </p>
+        {previewTagSlug && <EquippedTag slug={previewTagSlug} size="sm" />}
       </div>
 
       <div style={{ textAlign: "center" }}>

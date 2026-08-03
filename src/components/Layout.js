@@ -3,7 +3,8 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import UserLevelCard from "./UserLevelCard";
-import Avatar from "./Avatar";
+import AvatarFrame from "./AvatarFrame";
+import EquippedTag from "./EquippedTag";
 import PrestigeBadge from "./PrestigeBadge";
 import PrestigeCloseupModal from "./PrestigeCloseupModal";
 import AvatarSelector from "./AvatarSelector";
@@ -14,8 +15,8 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { useUserStats } from "../hooks/useUserStats";
 import ConfirmModal from "./ConfirmModal";
 import {
-  ThreeBarsIcon, RssIcon, PeopleIcon, CommentIcon, GearIcon, ToolsIcon,
-  SignOutIcon, PencilIcon,
+  ThreeBarsIcon, RssIcon, CommentIcon, GearIcon, ToolsIcon,
+  SignOutIcon, PencilIcon, TagIcon,
 } from "@primer/octicons-react";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
@@ -68,7 +69,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             <ThreeBarsIcon size={22} />
           </button>
           <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#d4af37", fontWeight: 700 }}>
-            🍺 BeerBook
+            🍺 RiBeer's
           </span>
           {totalUnread > 0 ? (
             <span style={{ background: "#c0392b", color: "#fff", borderRadius: 999, minWidth: 20, height: 20, padding: "0 5px", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -132,7 +133,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
               fontFamily: "'Playfair Display', serif",
               color: "#d4af37",
             }}>
-              🍺 BeerBook
+              🍺 RiBeer's
             </h1>
           )}
 
@@ -144,7 +145,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
               title={t("sidebar.viewProfile")}
               style={{ position: "relative", cursor: "pointer" }}
             >
-              <Avatar avatarUrl={profile?.avatar_url} nombre={username} size={60} />
+              <AvatarFrame frameSlug={profile?.equipped_frame_slug} avatarUrl={profile?.avatar_url} nombre={username} size={60} />
               <span
                 onClick={(e) => { e.stopPropagation(); setShowAvatarSelector(true); closeDrawer(); }}
                 title={t("sidebar.changeAvatar")}
@@ -178,6 +179,11 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
             >
               {username}
             </p>
+            {profile?.equipped_tag_slug && (
+              <div style={{ marginTop: 4 }}>
+                <EquippedTag slug={profile.equipped_tag_slug} />
+              </div>
+            )}
           </div>
 
           {stats.prestige > 0 && (
@@ -234,10 +240,10 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <SidebarLink to="/" label={t("nav.catalog")} onClick={closeDrawer} />
             <SidebarLink to="/cuaderno" label={t("nav.notebook")} onClick={closeDrawer} />
-            <SidebarLink to="/feed" label={t("nav.feed")} Icon={RssIcon} onClick={closeDrawer} />
-            <SidebarLink to="/amigos" label={t("nav.friends")} Icon={PeopleIcon} onClick={closeDrawer} />
+            <SidebarLink to="/feed" label={t("nav.social")} Icon={RssIcon} onClick={closeDrawer} />
             <SidebarLink to="/chats" label={t("nav.messages")} Icon={CommentIcon} badge={totalUnread} onClick={closeDrawer} />
             <SidebarLink to="/logros" label={t("nav.achievements")} onClick={closeDrawer} />
+            <SidebarLink to="/tienda" label={t("nav.shop")} Icon={TagIcon} onClick={closeDrawer} />
             <SidebarLink to="/ranking" label={t("nav.ranking")} onClick={closeDrawer} />
             <SidebarLink to="/sobre-nosotros" label={t("nav.about")} onClick={closeDrawer} />
           </nav>

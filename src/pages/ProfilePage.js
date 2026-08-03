@@ -5,7 +5,8 @@ import { supabase } from "../services/supabase";
 import { BADGE_DEFS, TIER_META, TIERS } from "../utils/badges";
 import { ACHIEVEMENTS } from "../utils/achievements";
 import { getLevelInfo } from "../utils/xp";
-import Avatar from "../components/Avatar";
+import AvatarFrame from "../components/AvatarFrame";
+import EquippedTag from "../components/EquippedTag";
 import PrestigeBadge from "../components/PrestigeBadge";
 import PrestigeAscensionModal from "../components/PrestigeAscensionModal";
 import PrestigeCloseupModal from "../components/PrestigeCloseupModal";
@@ -39,6 +40,7 @@ const ProfilePage = () => {
   const [lightboxSrc, setLightboxSrc]     = useState(null);
   const [reportTarget, setReportTarget]   = useState(null);
   const [hasMission, setHasMission]       = useState(true); // optimista hasta que llegue la respuesta del server
+  const [friendsCount, setFriendsCount]   = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -51,7 +53,7 @@ const ProfilePage = () => {
 
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline")
+        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline, equipped_tag_slug, equipped_frame_slug")
         .eq("id", userId)
         .single();
 
@@ -82,6 +84,17 @@ const ProfilePage = () => {
       setHasSentReq(sentStatus);
 
       const canSeeStats = isSelf || (prof.perfil_publico ?? true) || friendStatus;
+
+      // Contador de amigos estilo redes sociales, al lado del nombre — se
+      // muestra con la misma regla de privacidad que el resto de las
+      // stats (dueño / perfil público / amigos), no depende de canSeeStats
+      // para leerse (get_friends_count es pública, ver
+      // 20260805000000_friends_count_rpc.sql) pero sí para mostrarse.
+      if (canSeeStats) {
+        supabase.rpc("get_friends_count", { p_user_id: userId }).then(({ data }) => {
+          setFriendsCount(data ?? 0);
+        });
+      }
 
       if (canSeeStats) {
         const [beersRes, achRes, badgesRes, challengesRes, entriesRes] = await Promise.all([
@@ -182,9 +195,24 @@ const ProfilePage = () => {
       {/* Header */}
       <div style={{ marginBottom: 20, padding: 24, background: "#1c1409", borderRadius: 16, border: "1px solid #2e2215" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <Avatar avatarUrl={profileData.avatar_url} nombre={profileData.nombre} size={72} />
+          <AvatarFrame frameSlug={profileData.equipped_frame_slug} avatarUrl={profileData.avatar_url} nombre={profileData.nombre} size={72} />
           <div style={{ flex: 1 }}>
-            <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{profileData.nombre}</h2>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+              <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{profileData.nombre}</h2>
+              {canSeeStats && friendsCount != null && (
+                <span
+                  onClick={isSelf ? () => navigate("/amigos") : undefined}
+                  style={{ fontSize: 13, color: "#9a7d62", cursor: isSelf ? "pointer" : "default" }}
+                >
+                  {t("friends.count", { count: friendsCount })}
+                </span>
+              )}
+            </div>
+            {profileData.equipped_tag_slug && (
+              <div style={{ margin: "0 0 6px" }}>
+                <EquippedTag slug={profileData.equipped_tag_slug} size="lg" />
+              </div>
+            )}
             {profileData.pais_origen && (
               <p style={{ margin: "0 0 6px", fontSize: 13, color: "#9a7d62" }}>
                 📍 {profileData.pais_origen}

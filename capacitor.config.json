@@ -1,6 +1,6 @@
 {
   "appId": "com.mariowilly.beerbook",
-  "appName": "BeerBook",
+  "appName": "RiBeer's",
   "webDir": "build",
   "server": {
     "androidScheme": "https"

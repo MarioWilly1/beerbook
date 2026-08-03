@@ -123,7 +123,7 @@ const LugarPage = () => {
 
 const TopBar = () => (
   <div style={topBarStyle}>
-    <Link to="/" style={brandLinkStyle}>🍺 BeerBook</Link>
+    <Link to="/" style={brandLinkStyle}>🍺 RiBeer's</Link>
   </div>
 );
 

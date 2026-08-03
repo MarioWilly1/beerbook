@@ -13,8 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import MiCuaderno from "./pages/MiCuaderno";
 import Logros from "./pages/Logros";
 import Ranking from "./pages/Ranking";
-import Feed from "./pages/Feed";
-import Amigos from "./pages/Amigos";
+import Social from "./pages/Social";
 import SobreNosotros from "./pages/SobreNosotros";
 import Configuracion from "./pages/Configuracion";
 import ProfilePage from "./pages/ProfilePage";
@@ -25,12 +24,13 @@ import LugarPage from "./pages/LugarPage";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 import AdminPanel from "./pages/AdminPanel";
+import TiendaPage from "./pages/TiendaPage";
 import Onboarding from "./components/Onboarding";
 
 function App() {
   const location = useLocation();
   const { session, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading, setProfile } = useProfile(session);
+  const { profile, loading: profileLoading, error: profileError, setProfile } = useProfile(session);
   const [showRegister, setShowRegister] = useState(false);
   const [registerEmail, setRegisterEmail] = useState("");
 
@@ -139,6 +139,35 @@ function App() {
     );
   }
 
+  // La carga del perfil falló de forma persistente (red / caché de esquema
+  // recién desplegada) y NO es un "0 filas" confirmado — no hay que
+  // mandar a un usuario ya registrado a la pantalla de verificación de
+  // edad como si fuera nuevo. Se ofrece reintentar en vez de perder la
+  // sesión de hecho.
+  if (!profile && profileError) {
+    return (
+      <div style={{
+        display: "flex", flexDirection: "column", gap: 16,
+        height: "100vh", alignItems: "center", justifyContent: "center",
+        background: "#1c1410", color: "#f0e4cc", padding: 24, textAlign: "center",
+      }}>
+        <span style={{ fontSize: 40 }}>🍺</span>
+        <p style={{ margin: 0, maxWidth: 320, color: "#9a7d62" }}>
+          No pudimos cargar tu perfil. Puede ser un problema momentáneo de conexión.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 24px", borderRadius: 8, border: "none",
+            background: "#d4af37", color: "#0d0a06", fontWeight: 700, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
   // Logged in but no profile → age verification
   if (!profile) {
     return <AgeVerificationPage session={session} onComplete={setProfile} />;
@@ -180,8 +209,9 @@ function App() {
         <Route path="/cuaderno" element={<MiCuaderno />} />
         <Route path="/logros" element={<Logros />} />
         <Route path="/ranking" element={<Ranking />} />
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/amigos" element={<Amigos />} />
+        <Route path="/feed" element={<Social defaultTab="feed" />} />
+        <Route path="/amigos" element={<Social defaultTab="amigos" />} />
+        <Route path="/tienda" element={<TiendaPage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotros />} />
         <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
         <Route path="/perfil/:userId" element={<ProfilePage />} />

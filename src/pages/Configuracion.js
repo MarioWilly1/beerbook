@@ -9,6 +9,7 @@ import HiddenStoriesManager from "../components/HiddenStoriesManager";
 import HiddenEntriesManager from "../components/HiddenEntriesManager";
 import Onboarding from "../components/Onboarding";
 import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { PersonIcon, LockIcon, SlidersIcon, QuestionIcon, EyeClosedIcon } from "@primer/octicons-react";
 
 const TABS = [
@@ -50,6 +51,7 @@ const Toggle = ({ value, onChange, label, description }) => (
 
 const Configuracion = ({ onProfileChange }) => {
   const { t, i18n } = useTranslation();
+  const isMobile = useIsMobile();
   const [tab, setTab] = useState("perfil");
   const [session, setSession] = useState(null);
   const [localProfile, setLocalProfile] = useState(null);
@@ -166,23 +168,31 @@ const Configuracion = ({ onProfileChange }) => {
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
       <h2 style={{ margin: "0 0 24px" }}>⚙️ {t("settings.pageTitle")}</h2>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #2e2215", overflowX: "auto" }}>
+      {/* Tabs — flex:1 en cada botón reparte el ancho disponible entre las 4
+          pestañas para que siempre entren sin necesitar scroll horizontal
+          (antes, en pantallas angostas, el ancho fijo de los botones se
+          desbordaba y aparecía una barra de scroll horizontal confusa). */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 28, borderBottom: "2px solid #2e2215" }}>
         {TABS.map(({ key, Icon, tKey }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
             className="config-tab"
             style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "10px 22px", border: "none", background: "none",
-              cursor: "pointer", fontWeight: 700, fontSize: 14,
+              flex: 1, minWidth: 0,
+              display: "flex", flexDirection: isMobile ? "column" : "row",
+              alignItems: "center", justifyContent: "center", gap: isMobile ? 3 : 6,
+              padding: isMobile ? "8px 4px" : "10px 22px", border: "none", background: "none",
+              cursor: "pointer", fontWeight: 700, fontSize: isMobile ? 10 : 14,
               color: tab === key ? "#d4af37" : "#5a4535",
               borderBottom: tab === key ? "3px solid #d4af37" : "3px solid transparent",
               marginBottom: -2, transition: "all 0.15s",
             }}
           >
-            <Icon size={14} /> {t(tKey)}
+            <Icon size={isMobile ? 15 : 14} />
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
+              {t(tKey)}
+            </span>
           </button>
         ))}
       </div>

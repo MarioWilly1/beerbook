@@ -31,7 +31,7 @@ const LogoVisual = ({ active }) => {
     <div ref={ref} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
       <div style={{ fontSize: 72, lineHeight: 1 }}>🍺</div>
       <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 30, fontWeight: 700, color: "#d4af37" }}>
-        BeerBook
+        RiBeer's
       </div>
     </div>
   );

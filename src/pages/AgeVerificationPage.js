@@ -48,7 +48,7 @@ const AgeCheckboxLabel = ({ ageConfirmed, onChange }) => {
       />
       <span style={{ fontSize: "14px", color: "#444", lineHeight: "1.6" }}>
         <strong>Confirmo que soy mayor de 18 años</strong> y entiendo que
-        BeerBook es una app sobre consumo de alcohol.
+        RiBeer's es una app sobre consumo de alcohol.
       </span>
     </label>
   );
@@ -130,11 +130,11 @@ const AgeVerificationPage = ({ session, onComplete }) => {
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
           <div style={{ fontSize: "48px" }}>🍺</div>
           <HoverTitle style={{ margin: "10px 0 6px", fontSize: "22px", color: "#111", fontWeight: 800 }}>
-            Bienvenido/a a BeerBook
+            Bienvenido/a a RiBeer's
           </HoverTitle>
           <p style={{ color: "#666", fontSize: "14px", margin: 0, lineHeight: "1.6" }}>
             Antes de continuar, necesitamos confirmar que eres mayor de edad.
-            BeerBook es una app sobre cerveza y consumo de alcohol.
+            RiBeer's es una app sobre cerveza y consumo de alcohol.
           </p>
         </div>
 
@@ -172,7 +172,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
               cursor: !ageConfirmed || loading ? "not-allowed" : "pointer",
             }}
           >
-            {loading ? "Entrando..." : "Entrar a BeerBook"}
+            {loading ? "Entrando..." : "Entrar a RiBeer's"}
           </button>
 
           <ExitButton onClick={handleExit} />

@@ -54,7 +54,7 @@ const LoginPage = ({ onSwitchToRegister }) => {
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <div style={{ fontSize: "52px" }}>🍺</div>
           <h1 style={{ margin: "10px 0 4px", fontSize: "28px", color: "#111", fontWeight: 800 }}>
-            BeerBook
+            RiBeer's
           </h1>
           <p style={{ color: "#888", fontSize: "14px", margin: 0 }}>
             Tu catálogo personal de cervezas

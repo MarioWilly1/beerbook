@@ -49,7 +49,7 @@ const AgeCheckboxLabel = ({ ageConfirmed, onChange }) => {
       />
       <span style={{ fontSize: "14px", color: "#444", lineHeight: "1.6" }}>
         <strong>Confirmo que soy mayor de 18 años</strong> y entiendo que
-        BeerBook es una app sobre consumo de alcohol.
+        RiBeer's es una app sobre consumo de alcohol.
       </span>
     </label>
   );
@@ -147,7 +147,7 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
             Crear cuenta
           </HoverTitle>
           <p style={{ color: "#888", fontSize: "14px", margin: 0 }}>
-            Únite a BeerBook
+            Únite a RiBeer's
           </p>
         </div>
 

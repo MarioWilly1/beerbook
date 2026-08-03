@@ -42,7 +42,7 @@ const BeerInfoModal = ({ beer, onClose, onVerMapa }) => {
               )}
             </div>
           </div>
-          <button onClick={onClose} style={closeBtnStyle} title="Cerrar"><XIcon size={16} /></button>
+          <button onClick={onClose} style={closeBtnStyle} title={t("beerInfo.closeBtn")}><XIcon size={16} /></button>
         </div>
 
         <div style={dividerStyle} />

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 // ── Keyframe CSS injected once ────────────────────────────────────────────────
 const STYLES = `
@@ -48,28 +49,30 @@ export const injectStyles = () => {
 // ── Rarity config ─────────────────────────────────────────────────────────────
 // Exportado por el mismo motivo que injectStyles — reutilizado por
 // GlassCollectionCard.js.
+// label ya no vive acá — el texto sale de t(`rareza.${slug}`) en cada
+// componente que consume RARITY (CollectionCard, GlassCollectionCard).
 export const RARITY = {
   comun: {
-    label: "Común", color: "#7a6a55", glyph: "⚪",
+    color: "#7a6a55", glyph: "⚪",
     card: { border: "1px solid #3a2e20", background: "#1c1409" },
     badge: { background: "rgba(122,106,85,0.2)", color: "#7a6a55", border: "1px solid rgba(122,106,85,0.35)" },
     animation: null,
   },
   poco_comun: {
-    label: "Poco común", color: "#4a9e6a", glyph: "🟢",
+    color: "#4a9e6a", glyph: "🟢",
     card: { border: "1.5px solid #2d6645", background: "#111d16" },
     badge: { background: "rgba(74,158,106,0.15)", color: "#4a9e6a", border: "1px solid rgba(74,158,106,0.4)" },
     animation: null,
   },
   rara: {
-    label: "Rara", color: "#4a90d9", glyph: "🔵",
+    color: "#4a90d9", glyph: "🔵",
     card: { border: "2px solid #1a6fa8", background: "#0e1520",
             animation: "cc-pulse 3s ease-in-out infinite" },
     badge: { background: "rgba(74,144,217,0.15)", color: "#4a90d9", border: "1px solid rgba(74,144,217,0.4)" },
     animation: "cc-pulse 3s ease-in-out infinite",
   },
   epica: {
-    label: "Épica", color: "#a366e8", glyph: "🟣",
+    color: "#a366e8", glyph: "🟣",
     card: { border: "2px solid #7c3aed", background: "#130d1e" },
     badge: { background: "rgba(163,102,232,0.15)", color: "#a366e8", border: "1px solid rgba(163,102,232,0.4)" },
     shimmer: {
@@ -79,7 +82,7 @@ export const RARITY = {
     },
   },
   legendaria: {
-    label: "Legendaria", color: "#d4af37", glyph: "🟡",
+    color: "#d4af37", glyph: "🟡",
     card: { border: "2px solid #c09a20", background: "#1a1405",
             animation: "cc-glow-leg 2.5s ease-in-out infinite" },
     badge: { background: "rgba(212,175,55,0.15)", color: "#d4af37", border: "1px solid rgba(212,175,55,0.5)" },
@@ -90,7 +93,7 @@ export const RARITY = {
     },
   },
   mitica: {
-    label: "Mítica", color: "#e040fb", glyph: "🌈",
+    color: "#e040fb", glyph: "🌈",
     card: { border: "2px solid transparent", background: "#0d0a12",
             animation: "cc-glow-myth 4s ease-in-out infinite" },
     badge: { background: "rgba(224,64,251,0.15)", color: "#e040fb", border: "1px solid rgba(224,64,251,0.5)" },
@@ -100,9 +103,11 @@ export const RARITY = {
 
 // ── CollectionCard ─────────────────────────────────────────────────────────────
 const CollectionCard = ({ beer }) => {
+  const { t } = useTranslation();
   injectStyles();
 
-  const rarity = RARITY[beer.rareza] || RARITY.comun;
+  const rarezaKey = RARITY[beer.rareza] ? beer.rareza : "comun";
+  const rarity = RARITY[rarezaKey];
   const isMitica = beer.rareza === "mitica";
   const hasShimmer = !!rarity.shimmer;
 
@@ -147,7 +152,7 @@ const CollectionCard = ({ beer }) => {
           <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)",
             padding: "3px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "#f0d060",
             border: "1px solid rgba(240,208,96,0.5)", zIndex: 3 }}>
-            ✨ {beer.motivo_edicion || "Ed. Especial"}
+            ✨ {beer.motivo_edicion || t("coleccion.specialEdition")}
           </div>
         )}
 
@@ -155,14 +160,14 @@ const CollectionCard = ({ beer }) => {
         <div style={{ position: "absolute", top: 8, right: 8, padding: "3px 9px", borderRadius: 20,
           fontSize: 10, fontWeight: 800, zIndex: 3, backdropFilter: "blur(4px)",
           background: "rgba(0,0,0,0.65)", ...rarity.badge }}>
-          {rarity.glyph} {rarity.label}
+          {rarity.glyph} {t(`rareza.${rarezaKey}`)}
         </div>
 
         {/* Badge "conseguida" */}
         <div style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.7)",
           padding: "3px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "#d4af37",
           border: "1px solid rgba(212,175,55,0.4)", zIndex: 3 }}>
-          ✓ Conseguida
+          ✓ {t("coleccion.obtainedBadge")}
         </div>
       </div>
 

@@ -18,14 +18,11 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { hashToString } from "../utils/perceptualHash";
 import { insertTasting, updateLatestTasting } from "../utils/tastings";
+import { RAREZA_EMOJI } from "../utils/rareza";
 import { GlobeIcon, CheckIcon, XIcon } from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
-const RAREZA_LABEL = {
-  comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
-  epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
-};
 const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
 const RAREZA_BADGE = {
   comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.2)"   },
@@ -254,7 +251,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
                 border: `1px solid ${rb.border}`, flexShrink: 0,
                 maxWidth: "60%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>
-                {RAREZA_LABEL[beer.rareza] || beer.rareza}
+                {RAREZA_EMOJI[beer.rareza] ? `${RAREZA_EMOJI[beer.rareza]} ${t(`rareza.${beer.rareza}`)}` : beer.rareza}
               </span>
             )}
             <span style={{ flex: 1 }} />

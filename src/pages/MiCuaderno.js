@@ -29,6 +29,7 @@ import HideEntryModal from "../components/HideEntryModal";
 import TastingGalleryModal from "../components/TastingGalleryModal";
 import QuickTastingWidget from "../components/QuickTastingWidget";
 import GlassesTab from "./GlassesTab";
+import { RAREZA_EMOJI } from "../utils/rareza";
 import {
   BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
   CheckIcon, SearchIcon, XIcon,
@@ -50,10 +51,6 @@ function normalizeStr(str) {
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 const RAREZA_ORDER  = ["mitica", "legendaria", "epica", "rara", "poco_comun", "comun"];
-const RAREZA_LABEL  = {
-  comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
-  epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
-};
 const RAREZA_BADGE = {
   comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.25)"  },
   poco_comun: { color: "#4a9e6a", bg: "rgba(74,158,106,0.12)",  border: "rgba(74,158,106,0.3)"   },
@@ -82,8 +79,11 @@ const panelS = {
 
 // ── LockedCard ─────────────────────────────────────────────────────────────────
 const LockedCard = ({ beer, onClick }) => {
+  const { t } = useTranslation();
   const rs = RAREZA_STYLE[beer.rareza] || RAREZA_STYLE.comun;
-  const label = RAREZA_LABEL[beer.rareza] || "⚪";
+  const label = RAREZA_EMOJI[beer.rareza]
+    ? `${RAREZA_EMOJI[beer.rareza]} ${t(`rareza.${beer.rareza}`)}`
+    : "⚪";
 
   return (
     <div
@@ -137,42 +137,46 @@ const LockedCard = ({ beer, onClick }) => {
 };
 
 // ── LockedInfoModal ────────────────────────────────────────────────────────────
-const LockedInfoModal = ({ beer, onClose }) => (
-  <div style={overlayS} onClick={onClose}>
-    <div style={{ ...panelS, textAlign: "center", padding: "36px 28px" }} onClick={(e) => e.stopPropagation()}>
-      <div style={{ fontSize: 56, marginBottom: 14 }}>🔒</div>
-      <p style={{
-        margin: "0 0 6px", fontSize: 15, fontWeight: 700, color: "#5a4535",
-        fontFamily: "'Playfair Display', serif",
-      }}>
-        {beer.nombre}
-      </p>
-      <span style={{
-        display: "inline-block", padding: "3px 10px", borderRadius: 20,
-        fontSize: 11, fontWeight: 700, marginBottom: 20,
-        background: "rgba(90,70,50,0.15)", color: "#5a4535", border: "1px solid rgba(90,70,50,0.3)",
-      }}>
-        {RAREZA_LABEL[beer.rareza] || "Desconocida"}
-      </span>
-      <p style={{ color: "#8b6b2e", fontSize: 14, lineHeight: 1.6, margin: "0 0 8px" }}>
-        Todavía no la conseguiste.
-      </p>
-      <p style={{ color: "#5a4535", fontSize: 12, lineHeight: 1.6, margin: "0 0 24px" }}>
-        Conseguila y registrala en tu cuaderno para desbloquearla en la colección.
-      </p>
-      <button onClick={onClose}
-        style={{
-          padding: "10px 28px", borderRadius: 8, border: "none",
-          background: "#2a1e0f", color: "#8b6b2e", fontWeight: 700, fontSize: 14, cursor: "pointer",
+const LockedInfoModal = ({ beer, onClose }) => {
+  const { t } = useTranslation();
+  return (
+    <div style={overlayS} onClick={onClose}>
+      <div style={{ ...panelS, textAlign: "center", padding: "36px 28px" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ fontSize: 56, marginBottom: 14 }}>🔒</div>
+        <p style={{
+          margin: "0 0 6px", fontSize: 15, fontWeight: 700, color: "#5a4535",
+          fontFamily: "'Playfair Display', serif",
         }}>
-        Cerrar
-      </button>
+          {beer.nombre}
+        </p>
+        <span style={{
+          display: "inline-block", padding: "3px 10px", borderRadius: 20,
+          fontSize: 11, fontWeight: 700, marginBottom: 20,
+          background: "rgba(90,70,50,0.15)", color: "#5a4535", border: "1px solid rgba(90,70,50,0.3)",
+        }}>
+          {beer.rareza ? t(`rareza.${beer.rareza}`) : t("rareza.unknown")}
+        </span>
+        <p style={{ color: "#8b6b2e", fontSize: 14, lineHeight: 1.6, margin: "0 0 8px" }}>
+          {t("coleccion.lockedNotYet")}
+        </p>
+        <p style={{ color: "#5a4535", fontSize: 12, lineHeight: 1.6, margin: "0 0 24px" }}>
+          {t("coleccion.lockedHint")}
+        </p>
+        <button onClick={onClose}
+          style={{
+            padding: "10px 28px", borderRadius: 8, border: "none",
+            background: "#2a1e0f", color: "#8b6b2e", fontWeight: 700, fontSize: 14, cursor: "pointer",
+          }}>
+          {t("coleccion.closeBtn")}
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ── BeerColeccionTab (Pokédex de cervezas) ──────────────────────────────────────
 const BeerColeccionTab = () => {
+  const { t } = useTranslation();
   const { items, loading } = useCollectibleBeers();
   const [nameSearch,    setNameSearch]    = useState("");
   const [rarezaFilter,  setRarezaFilter]  = useState("all");
@@ -183,7 +187,7 @@ const BeerColeccionTab = () => {
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "60px 20px", color: "#5a4535" }}>
-        <p style={{ fontSize: 14 }}>Cargando Pokédex…</p>
+        <p style={{ fontSize: 14 }}>{t("coleccion.loadingBeers")}</p>
       </div>
     );
   }
@@ -214,10 +218,10 @@ const BeerColeccionTab = () => {
       }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: "#d4af37", fontFamily: "'Playfair Display', serif" }}>
-            🎴 Colección
+            🎴 {t("coleccion.titleBeers")}
           </span>
           <span style={{ fontSize: 13, color: "#9a7d62" }}>
-            <strong style={{ color: "#f0e4cc" }}>{ownedCount}</strong> / {totalCount} conseguidas
+            <strong style={{ color: "#f0e4cc" }}>{ownedCount}</strong> / {totalCount} {t("coleccion.obtainedSuffix")}
           </span>
           <span style={{ fontSize: 12, color: "#5a4535", marginLeft: "auto" }}>{pct}%</span>
         </div>
@@ -241,7 +245,7 @@ const BeerColeccionTab = () => {
                   background: "rgba(0,0,0,0.3)", color: got === tot ? "#d4af37" : "#5a4535",
                   border: "1px solid #2e2215",
                 }}>
-                  {RAREZA_LABEL[r].split(" ")[0]} {got}/{tot}
+                  {RAREZA_EMOJI[r]} {got}/{tot}
                 </span>
               );
             })}
@@ -260,7 +264,7 @@ const BeerColeccionTab = () => {
           type="text"
           value={nameSearch}
           onChange={(e) => setNameSearch(e.target.value)}
-          placeholder="Buscar en la colección…"
+          placeholder={t("coleccion.searchBeersPlaceholder")}
           style={{
             width: "100%", boxSizing: "border-box",
             padding: "9px 32px 9px 34px",
@@ -282,21 +286,21 @@ const BeerColeccionTab = () => {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
         <select value={rarezaFilter} onChange={(e) => setRarezaFilter(e.target.value)} style={ctrlS}>
-          <option value="all">Todas las rarezas</option>
+          <option value="all">{t("coleccion.filterAllRareza")}</option>
           {RAREZA_ORDER.filter((r) => items.some((b) => b.rareza === r)).map((r) => (
-            <option key={r} value={r}>{RAREZA_LABEL[r]}</option>
+            <option key={r} value={r}>{t(`rareza.${r}`)}</option>
           ))}
         </select>
         {families.length > 0 && (
           <select value={familiaFilter} onChange={(e) => setFamiliaFilter(e.target.value)} style={ctrlS}>
-            <option value="all">Todas las familias</option>
+            <option value="all">{t("coleccion.filterAllFamilia")}</option>
             {families.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
         )}
         <select value={showFilter} onChange={(e) => setShowFilter(e.target.value)} style={ctrlS}>
-          <option value="all">Ver todas</option>
-          <option value="owned">✅ Conseguidas</option>
-          <option value="locked">🔒 Pendientes</option>
+          <option value="all">{t("coleccion.filterAllShow")}</option>
+          <option value="owned">{t("coleccion.filterOwned")}</option>
+          <option value="locked">{t("coleccion.filterLocked")}</option>
         </select>
       </div>
 
@@ -304,7 +308,7 @@ const BeerColeccionTab = () => {
         {/* Conseguidas DENTRO del filtro actual, no el total del catálogo —
             antes mostraba visible.length/totalCount, que con cualquier
             filtro "vacío" (sin nada tildado) daba siempre N/N. */}
-        {visible.filter((b) => b.owned).length} de {visible.length} cerveza{visible.length !== 1 ? "s" : ""} conseguida{visible.length !== 1 ? "s" : ""}
+        {t("coleccion.countBeers", { got: visible.filter((b) => b.owned).length, count: visible.length })}
       </p>
 
       <div style={{
@@ -323,7 +327,7 @@ const BeerColeccionTab = () => {
 
       {visible.length === 0 && (
         <div style={{ textAlign: "center", padding: "40px 0", color: "#5a4535" }}>
-          <p>No hay cervezas con ese filtro.</p>
+          <p>{t("coleccion.emptyFilterBeers")}</p>
         </div>
       )}
 
@@ -340,6 +344,7 @@ const ctrlS = {
 // ── ColeccionTab (wrapper) — desplegable Cervezas/Copas en vez de tabs
 // separadas, ambas Pokédex viven bajo la misma tab "Colección". ──────────────
 const ColeccionTab = () => {
+  const { t } = useTranslation();
   const [collectionType, setCollectionType] = useState("cervezas");
 
   return (
@@ -350,8 +355,8 @@ const ColeccionTab = () => {
           onChange={(e) => setCollectionType(e.target.value)}
           style={{ ...ctrlS, fontSize: 14, fontWeight: 700, padding: "9px 14px" }}
         >
-          <option value="cervezas">🍺 Cervezas</option>
-          <option value="copas">🍷 Copas</option>
+          <option value="cervezas">{t("coleccion.optionBeers")}</option>
+          <option value="copas">{t("coleccion.optionGlasses")}</option>
         </select>
       </div>
       {collectionType === "cervezas" ? <BeerColeccionTab /> : <GlassesTab />}
@@ -382,7 +387,7 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
       onChange(beer.id, "user_photo_url", publicUrl);
       onChange(beer.id, "photo_hash", hashToString(hash));
     } catch {
-      setUploadErr("Error al subir la foto. Intentá de nuevo.");
+      setUploadErr(t("beerform.uploadError"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -449,7 +454,7 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
                 border: `1px solid ${rb.border}`, flexShrink: 0,
                 maxWidth: "60%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>
-                {RAREZA_LABEL[beer.rareza] || beer.rareza}
+                {RAREZA_EMOJI[beer.rareza] ? `${RAREZA_EMOJI[beer.rareza]} ${t(`rareza.${beer.rareza}`)}` : beer.rareza}
               </span>
             )}
             <span style={{ flex: 1 }} />
@@ -887,7 +892,7 @@ const MiCuaderno = () => {
       <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215" }}>
         {[
           { id: "cuaderno",  label: t("notebook.title"), Icon: BookIcon },
-          { id: "coleccion", label: "Colección", Icon: DiamondIcon },
+          { id: "coleccion", label: t("coleccion.titleBeers"), Icon: DiamondIcon },
         ].map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className="config-tab"

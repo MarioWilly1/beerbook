@@ -4,8 +4,10 @@
     "notebook":     "Mein Notizbuch",
     "feed":         "Feed",
     "friends":      "Freunde",
+    "social":       "Feed & Freunde",
     "messages":     "Nachrichten",
     "achievements": "Erfolge",
+    "shop":         "Shop",
     "ranking":      "Ranking",
     "about":        "Über uns",
     "settings":     "Einstellungen",
@@ -17,7 +19,7 @@
     "changeAvatar": "Avatar ändern →",
     "viewProfile":  "Mein Profil ansehen",
     "logoutConfirmTitle":   "Bist du sicher?",
-    "logoutConfirmMessage": "Du meldest dich von BeerBook ab.",
+    "logoutConfirmMessage": "Du meldest dich von RiBeer's ab.",
     "cancel":               "Abbrechen"
   },
   "toast": {
@@ -99,7 +101,7 @@
       "audioNote":     "Audioeinstellungen werden auf diesem Gerät gespeichert.",
       "languageTitle": "Sprache",
       "languageNote":  "Die Einstellung wird mit deinem Konto synchronisiert.",
-      "onboardingTitle": "BeerBook-Einführung",
+      "onboardingTitle": "RiBeer's-Einführung",
       "onboardingBtn":   "🎬 Einführung erneut ansehen"
     }
   },
@@ -167,7 +169,7 @@
     "statusSent":          "Anfrage gesendet",
     "addBtn":              "Hinzufügen",
     "myFriends":           "Meine Freunde",
-    "empty":               "Du hast noch keine Freunde in BeerBook. Suche oben!",
+    "empty":               "Du hast noch keine Freunde in RiBeer's. Suche oben!",
     "removeBtn":           "Entfernen",
     "sentRequests":        "Gesendete Anfragen ({{count}})",
     "pending":             "Ausstehend...",
@@ -355,6 +357,38 @@
     "timesTriedLabel":    "Mal probiert",
     "quickTastingBtn":    "Nochmal probiert (+3 XP)"
   },
+  "coleccion": {
+    "loadingBeers":             "Pokédex wird geladen…",
+    "loadingGlasses":           "Gläser werden geladen…",
+    "titleBeers":                "Sammlung",
+    "titleGlasses":              "Gläser",
+    "obtainedSuffix":            "gesammelt",
+    "searchBeersPlaceholder":    "Sammlung durchsuchen…",
+    "searchGlassesPlaceholder":  "Glas suchen…",
+    "filterAllRareza":           "Alle Seltenheiten",
+    "filterAllFamilia":          "Alle Familien",
+    "filterAllShow":             "Alle anzeigen",
+    "filterOwned":               "✅ Gesammelt",
+    "filterLocked":              "🔒 Ausstehend",
+    "countBeers_one":            "{{got}} von {{count}} Bier gesammelt",
+    "countBeers_other":          "{{got}} von {{count}} Bieren gesammelt",
+    "countGlasses_one":          "{{got}} von {{count}} Glas gesammelt",
+    "countGlasses_other":        "{{got}} von {{count}} Gläsern gesammelt",
+    "emptyFilterBeers":          "Keine Biere mit diesem Filter.",
+    "emptyFilterGlasses":        "Keine Gläser mit diesem Filter.",
+    "emptyGlasses":              "Noch keine Gläser im Katalog. Schlag das erste vor!",
+    "optionBeers":               "🍺 Biere",
+    "optionGlasses":             "🍷 Gläser",
+    "lockedNotYet":              "Das hast du noch nicht.",
+    "lockedHint":                "Hol es dir und trag es in dein Notizbuch ein, um es in der Sammlung freizuschalten.",
+    "closeBtn":                  "Schließen",
+    "glassUploadHint":           "Um dieses Glas zu sammeln, lade ein echtes Foto von dir damit hoch (Kamera oder Galerie).",
+    "glassUploading":            "Wird hochgeladen…",
+    "glassUploadBtn":            "Mein Foto hochladen",
+    "uploadError":               "Foto konnte nicht hochgeladen werden. Versuch es noch mal.",
+    "specialEdition":            "Sonderedition",
+    "obtainedBadge":             "Gesammelt"
+  },
   "tastingGallery": {
     "title":        "Verkostungsverlauf",
     "loading":      "Verlauf wird geladen...",
@@ -376,7 +410,7 @@
     "pricePlaceholder": "Z.B: 5.50"
   },
   "ranking": {
-    "title":               "BeerBook Rangliste",
+    "title":               "RiBeer's Rangliste",
     "loading":             "Rangliste wird geladen...",
     "self":                "← du",
     "verifiedLabel":       "verifiziert",
@@ -531,7 +565,8 @@
   "beerInfo": {
     "btnTitle":     "Technische Beschreibung anzeigen",
     "sectionLabel": "Technische Beschreibung",
-    "unavailable":  "Beschreibung noch nicht verfügbar."
+    "unavailable":  "Beschreibung noch nicht verfügbar.",
+    "closeBtn":     "Schließen"
   },
   "stories": {
     "myStory": "Deine Story",
@@ -644,7 +679,7 @@
     "next":  "Weiter",
     "start": "Loslegen",
     "slide1": {
-      "title": "🍺 Willkommen bei BeerBook",
+      "title": "🍺 Willkommen bei RiBeer's",
       "text":  "Dein persönliches Bier-Tagebuch, jetzt mit noch mehr. Entdecke, sammle und tritt gegen Freunde an."
     },
     "slide2": {
@@ -670,5 +705,70 @@
     "daysLeft_other": "Noch {{count}} Tage",
     "endsToday": "Endet heute",
     "modalTitle": "Aktive Herausforderungen"
+  },
+  "rareza": {
+    "comun":       "Gewöhnlich",
+    "poco_comun":  "Ungewöhnlich",
+    "rara":        "Selten",
+    "epica":       "Episch",
+    "legendaria":  "Legendär",
+    "mitica":      "Mythisch",
+    "unknown":     "Unbekannt"
+  },
+  "shop": {
+    "title":              "Shop",
+    "chapas":              "Chapas",
+    "loading":             "Shop wird geladen...",
+    "needLogin":           "Melde dich an, um den Shop zu sehen.",
+    "tabTags":             "Etiketten",
+    "tabFrames":           "Rahmen",
+    "equipped":            "Ausgerüstet",
+    "equipBtn":            "Ausrüsten",
+    "buyBtn":              "Kaufen · {{cost}}",
+    "claimBtn":            "Abholen",
+    "lockedAchievement":   "Erfordert den Erfolg: {{name}}",
+    "lockedPrestige":      "Erfordert Prestige {{n}}",
+    "item": {
+      "tag_novato": {
+        "label": "Begeisterter Neuling",
+        "description": "Gerade erst angefangen, mit viel Lust alles zu probieren."
+      },
+      "tag_explorador": {
+        "label": "Entdecker",
+        "description": "Immer auf der Suche nach dem nächsten Bier."
+      },
+      "tag_cazador_rarezas": {
+        "label": "Raritätenjäger",
+        "description": "Du sammelst, was schwer zu finden ist."
+      },
+      "tag_paladar_oro": {
+        "label": "Goldener Gaumen",
+        "description": "Deine Meinung zu einem Bier ist Gold wert."
+      },
+      "tag_maestro_catador": {
+        "label": "Meisterverkoster",
+        "description": "Exklusive Belohnung für die Meisterschaft der Verkostung."
+      },
+      "frame_madera": {
+        "label": "Holzrahmen",
+        "description": "Einfach und warm, wie eine gute Bar."
+      },
+      "frame_bronce": {
+        "label": "Bronzerahmen",
+        "description": "Der erste Schritt zur Auszeichnung."
+      },
+      "frame_cobre": {
+        "label": "Kupferrahmen",
+        "description": "Ein warmer Glanz für dein Profilfoto."
+      },
+      "frame_dorado": {
+        "label": "Goldener Rahmen",
+        "description": "Die Farbe von RiBeer's, für deinen Avatar."
+      },
+      "frame_prestigio": {
+        "label": "Prestige-Rahmen",
+        "description": "Exklusiv für alle, die bereits Prestige erreicht haben."
+      }
+    }
   }
 }

@@ -1,13 +1,16 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { RARITY, injectStyles } from "./CollectionCard";
 
 // Espejo de CollectionCard.js (misma rareza/animaciones, reexportadas
 // desde ahí) pero muestra la foto PROPIA del usuario en vez de la del
 // catálogo — acá "conseguida" significa literalmente "subiste tu foto".
 const GlassCollectionCard = ({ glass }) => {
+  const { t } = useTranslation();
   injectStyles();
 
-  const rarity = RARITY[glass.rareza] || RARITY.comun;
+  const rarezaKey = RARITY[glass.rareza] ? glass.rareza : "comun";
+  const rarity = RARITY[rarezaKey];
   const isMitica = glass.rareza === "mitica";
   const hasShimmer = !!rarity.shimmer;
   const photo = glass.userPhotoUrl || glass.foto_url;
@@ -47,13 +50,13 @@ const GlassCollectionCard = ({ glass }) => {
         <div style={{ position: "absolute", top: 8, right: 8, padding: "3px 9px", borderRadius: 20,
           fontSize: 10, fontWeight: 800, zIndex: 3, backdropFilter: "blur(4px)",
           background: "rgba(0,0,0,0.65)", ...rarity.badge }}>
-          {rarity.glyph} {rarity.label}
+          {rarity.glyph} {t(`rareza.${rarezaKey}`)}
         </div>
 
         <div style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.7)",
           padding: "3px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, color: "#d4af37",
           border: "1px solid rgba(212,175,55,0.4)", zIndex: 3 }}>
-          ✓ Conseguida
+          ✓ {t("coleccion.obtainedBadge")}
         </div>
       </div>
 

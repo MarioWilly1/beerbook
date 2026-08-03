@@ -5,6 +5,7 @@ import { compressImage, uploadUserGlassPhoto, uploadGlassSuggestionPhoto } from 
 import { hashToString } from "../utils/perceptualHash";
 import { useCollectibleGlasses } from "../hooks/useCollectibleGlasses";
 import GlassCollectionCard from "../components/GlassCollectionCard";
+import { RAREZA_EMOJI } from "../utils/rareza";
 import { XIcon, DeviceCameraIcon, PlusIcon, SearchIcon } from "@primer/octicons-react";
 
 // Mismo helper que Dashboard.js/MiCuaderno.js/OriginMapPanel.js.
@@ -20,10 +21,6 @@ function normalizeStr(str) {
 }
 
 const RAREZA_ORDER = ["mitica", "legendaria", "epica", "rara", "poco_comun", "comun"];
-const RAREZA_LABEL  = {
-  comun: "⚪ Común", poco_comun: "🟢 Poco común", rara: "🔵 Rara",
-  epica: "🟣 Épica", legendaria: "🟡 Legendaria", mitica: "🌈 Mítica",
-};
 const RAREZA_STYLE = {
   comun:      { border: "1px solid #2e2215",      glow: "none" },
   poco_comun: { border: "1.5px solid #2d6645",    glow: "none" },
@@ -58,8 +55,11 @@ const labelS = {
 
 // ── GlassLockedCard ──────────────────────────────────────────────────────────
 const GlassLockedCard = ({ glass, onClick }) => {
+  const { t } = useTranslation();
   const rs = RAREZA_STYLE[glass.rareza] || RAREZA_STYLE.comun;
-  const label = RAREZA_LABEL[glass.rareza] || "⚪";
+  const label = RAREZA_EMOJI[glass.rareza]
+    ? `${RAREZA_EMOJI[glass.rareza]} ${t(`rareza.${glass.rareza}`)}`
+    : "⚪";
 
   return (
     <div
@@ -111,6 +111,7 @@ const GlassLockedCard = ({ glass, onClick }) => {
 
 // ── CollectGlassModal — subir tu propia foto para coleccionar ────────────────
 const CollectGlassModal = ({ glass, onClose, onCollected }) => {
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [error, setError]         = useState("");
   const fileInputRef = useRef(null);
@@ -134,7 +135,7 @@ const CollectGlassModal = ({ glass, onClose, onCollected }) => {
       if (insErr) throw insErr;
       onCollected();
     } catch {
-      setError("Error al subir la foto. Intentá de nuevo.");
+      setError(t("coleccion.uploadError"));
     } finally {
       setUploading(false);
     }
@@ -156,10 +157,10 @@ const CollectGlassModal = ({ glass, onClose, onCollected }) => {
           {glass.nombre}
         </p>
         <p style={{ margin: "0 0 20px", fontSize: 13, color: "#9a7d62" }}>
-          {RAREZA_LABEL[glass.rareza]}
+          {t(`rareza.${glass.rareza}`)}
         </p>
         <p style={{ margin: "0 0 18px", fontSize: 13, color: "#9a7d62", lineHeight: 1.6 }}>
-          Para coleccionar esta copa, subí una foto real tuya con ella (cámara o galería).
+          {t("coleccion.glassUploadHint")}
         </p>
 
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
@@ -175,7 +176,7 @@ const CollectGlassModal = ({ glass, onClose, onCollected }) => {
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
           }}
         >
-          {uploading ? "Subiendo…" : (<><DeviceCameraIcon size={16} /> Subir mi foto</>)}
+          {uploading ? t("coleccion.glassUploading") : (<><DeviceCameraIcon size={16} /> {t("coleccion.glassUploadBtn")}</>)}
         </button>
       </div>
     </div>
@@ -382,7 +383,7 @@ const GlassesTab = () => {
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "60px 20px", color: "#5a4535" }}>
-        <p style={{ fontSize: 14 }}>Cargando copas…</p>
+        <p style={{ fontSize: 14 }}>{t("coleccion.loadingGlasses")}</p>
       </div>
     );
   }
@@ -419,17 +420,17 @@ const GlassesTab = () => {
 
       {totalCount === 0 ? (
         <div style={{ textAlign: "center", padding: "40px 0", color: "#5a4535" }}>
-          <p>Todavía no hay copas en el catálogo. ¡Sugerí la primera!</p>
+          <p>{t("coleccion.emptyGlasses")}</p>
         </div>
       ) : (
         <>
           <div style={{ background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: "16px 18px", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
               <span style={{ fontSize: 18, fontWeight: 800, color: "#d4af37", fontFamily: "'Playfair Display', serif" }}>
-                🍷 Copas
+                🍷 {t("coleccion.titleGlasses")}
               </span>
               <span style={{ fontSize: 13, color: "#9a7d62" }}>
-                <strong style={{ color: "#f0e4cc" }}>{ownedCount}</strong> / {totalCount} conseguidas
+                <strong style={{ color: "#f0e4cc" }}>{ownedCount}</strong> / {totalCount} {t("coleccion.obtainedSuffix")}
               </span>
               <span style={{ fontSize: 12, color: "#5a4535", marginLeft: "auto" }}>{pct}%</span>
             </div>
@@ -453,7 +454,7 @@ const GlassesTab = () => {
               type="text"
               value={nameSearch}
               onChange={(e) => setNameSearch(e.target.value)}
-              placeholder="Buscar copa…"
+              placeholder={t("coleccion.searchGlassesPlaceholder")}
               style={{
                 width: "100%", boxSizing: "border-box",
                 padding: "9px 32px 9px 34px",
@@ -475,22 +476,22 @@ const GlassesTab = () => {
 
           <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
             <select value={rarezaFilter} onChange={(e) => setRarezaFilter(e.target.value)} style={ctrlS}>
-              <option value="all">Todas las rarezas</option>
+              <option value="all">{t("coleccion.filterAllRareza")}</option>
               {RAREZA_ORDER.filter((r) => items.some((g) => g.rareza === r)).map((r) => (
-                <option key={r} value={r}>{RAREZA_LABEL[r]}</option>
+                <option key={r} value={r}>{t(`rareza.${r}`)}</option>
               ))}
             </select>
             <select value={showFilter} onChange={(e) => setShowFilter(e.target.value)} style={ctrlS}>
-              <option value="all">Ver todas</option>
-              <option value="owned">✅ Conseguidas</option>
-              <option value="locked">🔒 Pendientes</option>
+              <option value="all">{t("coleccion.filterAllShow")}</option>
+              <option value="owned">{t("coleccion.filterOwned")}</option>
+              <option value="locked">{t("coleccion.filterLocked")}</option>
             </select>
           </div>
 
           <p style={{ fontSize: 12, color: "#5a4535", margin: "0 0 14px" }}>
             {/* Conseguidas DENTRO del filtro actual — mismo fix que en
                 BeerColeccionTab (MiCuaderno.js), heredaba el mismo bug. */}
-            {visible.filter((g) => g.owned).length} de {visible.length} copa{visible.length !== 1 ? "s" : ""} conseguida{visible.length !== 1 ? "s" : ""}
+            {t("coleccion.countGlasses", { got: visible.filter((g) => g.owned).length, count: visible.length })}
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(148px, 1fr))", gap: 14 }}>
@@ -505,7 +506,7 @@ const GlassesTab = () => {
 
           {visible.length === 0 && (
             <div style={{ textAlign: "center", padding: "40px 0", color: "#5a4535" }}>
-              <p>No hay copas con ese filtro.</p>
+              <p>{t("coleccion.emptyFilterGlasses")}</p>
             </div>
           )}
         </>

@@ -1,0 +1,500 @@
+-- ============================================================
+-- Sistema de recompensas cosméticas: Chapas (moneda virtual) + tienda
+-- de etiquetas de texto y marcos de avatar. Fase 1 — backend completo
+-- (moneda, catálogo, propiedad, equipar). La UI (tienda + mostrar en
+-- sidebar/feed/ranking/perfil) queda para las fases 2 y 3.
+--
+-- Ganancia de Chapas:
+--   - Subir de nivel: 10 por nivel, +40 extra cada 10 niveles (hito).
+--   - Reto diario/semanal: xp_bonus del reto / 5 (redondeado, mínimo 1).
+--   - Prestigiar: 300/400/550/750/1000 según el tier alcanzado (1000
+--     flat desde el 5 en adelante).
+--
+-- Todo cambio de saldo pasa por chapas_ledger (nunca se escribe
+-- profiles.chapas directo) — mismo patrón que beer_tastings/user_beers.XP:
+-- una tabla-fuente-de-verdad con un trigger AFTER INSERT que aplica el
+-- cambio, y profiles protegido con pg_trigger_depth() para que un
+-- UPDATE directo del cliente no pueda falsear el saldo.
+-- ============================================================
+
+-- ────────────────────────────────────────────────────────────
+-- 1. Columnas nuevas en profiles
+-- ────────────────────────────────────────────────────────────
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS chapas bigint NOT NULL DEFAULT 0 CHECK (chapas >= 0);
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS chapas_synced_level int NOT NULL DEFAULT 1;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS equipped_tag_slug text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS equipped_frame_slug text;
+
+-- ────────────────────────────────────────────────────────────
+-- 2. Catálogo de la tienda
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE public.cosmetic_items (
+  slug                     text PRIMARY KEY,
+  category                 text NOT NULL CHECK (category IN ('tag', 'frame')),
+  rarity                   text NOT NULL CHECK (rarity IN ('comun', 'poco_comun', 'rara', 'epica', 'legendaria', 'mitica')),
+  cost                     int NOT NULL DEFAULT 0 CHECK (cost >= 0),
+  -- Ítems exclusivos: gratis, se auto-otorgan al cumplir la condición
+  -- (no aparecen "comprables" hasta entonces). Nulos = ítem normal de tienda.
+  unlock_achievement_slug  text,
+  unlock_min_prestige      int CHECK (unlock_min_prestige IS NULL OR unlock_min_prestige > 0),
+  active                   boolean NOT NULL DEFAULT true
+);
+
+ALTER TABLE public.profiles
+  ADD CONSTRAINT profiles_equipped_tag_fkey FOREIGN KEY (equipped_tag_slug) REFERENCES public.cosmetic_items(slug),
+  ADD CONSTRAINT profiles_equipped_frame_fkey FOREIGN KEY (equipped_frame_slug) REFERENCES public.cosmetic_items(slug);
+
+ALTER TABLE public.cosmetic_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "cosmetic_items_read" ON public.cosmetic_items
+  FOR SELECT TO authenticated, anon USING (true);
+
+-- Texto visible (nombre/descripción) vive en i18n del frontend, no acá
+-- — mismo criterio que achievements/badges.
+INSERT INTO public.cosmetic_items (slug, category, rarity, cost, unlock_achievement_slug, unlock_min_prestige) VALUES
+  ('tag_novato',            'tag',   'comun',       80,  NULL,              NULL),
+  ('tag_explorador',        'tag',   'poco_comun',  150, NULL,              NULL),
+  ('tag_cazador_rarezas',   'tag',   'rara',        300, NULL,              NULL),
+  ('tag_paladar_oro',       'tag',   'epica',       450, NULL,              NULL),
+  ('tag_maestro_catador',   'tag',   'legendaria',  0,   'maestro-catador', NULL),
+  ('frame_madera',          'frame', 'comun',       100, NULL,              NULL),
+  ('frame_bronce',          'frame', 'poco_comun',  180, NULL,              NULL),
+  ('frame_cobre',           'frame', 'rara',        320, NULL,              NULL),
+  ('frame_dorado',          'frame', 'epica',       500, NULL,              NULL),
+  ('frame_prestigio',       'frame', 'legendaria',  0,   NULL,              1);
+
+-- ────────────────────────────────────────────────────────────
+-- 3. Propiedad de ítems
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE public.user_cosmetics (
+  user_id     uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  item_slug   text NOT NULL REFERENCES public.cosmetic_items(slug),
+  acquired_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, item_slug)
+);
+
+ALTER TABLE public.user_cosmetics ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "user_cosmetics_read_own" ON public.user_cosmetics
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+-- Sin policies de INSERT/UPDATE/DELETE a propósito: solo se escribe vía
+-- las funciones SECURITY DEFINER de abajo (compra o auto-otorgado).
+
+-- ────────────────────────────────────────────────────────────
+-- 4. Ledger de Chapas — única fuente de verdad de cambios de saldo
+-- ────────────────────────────────────────────────────────────
+CREATE TABLE public.chapas_ledger (
+  id         bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  user_id    uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  amount     int NOT NULL,
+  source     text NOT NULL CHECK (source IN ('level_up', 'prestige', 'challenge', 'shop_purchase')),
+  reference  text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX chapas_ledger_user_idx ON public.chapas_ledger (user_id, created_at DESC);
+
+ALTER TABLE public.chapas_ledger ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "chapas_ledger_read_own" ON public.chapas_ledger
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+-- Sin policy de INSERT: solo se escribe vía las funciones de abajo.
+
+-- ────────────────────────────────────────────────────────────
+-- 5. Protección de profiles.chapas / chapas_synced_level — mismo patrón
+-- pg_trigger_depth() que protege user_beers."XP": un UPDATE directo del
+-- cliente (depth <= 1) preserva el valor existente; solo la cascada
+-- interna desde chapas_ledger (depth > 1) puede cambiarlo.
+-- ────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.protect_chapas_columns()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path TO 'public'
+AS $$
+BEGIN
+  IF pg_trigger_depth() <= 1 THEN
+    NEW.chapas := OLD.chapas;
+    NEW.chapas_synced_level := OLD.chapas_synced_level;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_protect_chapas_columns ON public.profiles;
+CREATE TRIGGER trg_protect_chapas_columns
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.protect_chapas_columns();
+
+CREATE OR REPLACE FUNCTION public.apply_chapas_ledger_entry()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path TO 'public'
+AS $$
+BEGIN
+  UPDATE public.profiles SET
+    chapas = chapas + NEW.amount,
+    -- Un prestigio exitoso arranca un ciclo nuevo (mismo criterio que
+    -- prestige_xp_baseline): el contador de "hasta qué nivel ya se
+    -- pagó" vuelve a 1 para no perder los pagos de niveles futuros.
+    chapas_synced_level = CASE WHEN NEW.source = 'prestige' THEN 1 ELSE chapas_synced_level END
+  WHERE id = NEW.user_id;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_apply_chapas_ledger_entry ON public.chapas_ledger;
+CREATE TRIGGER trg_apply_chapas_ledger_entry
+  AFTER INSERT ON public.chapas_ledger
+  FOR EACH ROW EXECUTE FUNCTION public.apply_chapas_ledger_entry();
+
+-- ────────────────────────────────────────────────────────────
+-- 6. Validación de equipped_tag_slug / equipped_frame_slug: solo se
+-- puede equipar un ítem que realmente se posee y de la categoría
+-- correcta — protege contra un UPDATE directo del cliente además de
+-- equip_cosmetic() (que ya valida esto mismo antes de escribir).
+-- ────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.validate_equipped_cosmetics()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path TO 'public'
+AS $$
+BEGIN
+  IF NEW.equipped_tag_slug IS DISTINCT FROM OLD.equipped_tag_slug AND NEW.equipped_tag_slug IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.user_cosmetics uc JOIN public.cosmetic_items ci ON ci.slug = uc.item_slug
+      WHERE uc.user_id = NEW.id AND uc.item_slug = NEW.equipped_tag_slug AND ci.category = 'tag'
+    ) THEN
+      RAISE EXCEPTION 'No podés equipar una etiqueta que no tenés';
+    END IF;
+  END IF;
+
+  IF NEW.equipped_frame_slug IS DISTINCT FROM OLD.equipped_frame_slug AND NEW.equipped_frame_slug IS NOT NULL THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM public.user_cosmetics uc JOIN public.cosmetic_items ci ON ci.slug = uc.item_slug
+      WHERE uc.user_id = NEW.id AND uc.item_slug = NEW.equipped_frame_slug AND ci.category = 'frame'
+    ) THEN
+      RAISE EXCEPTION 'No podés equipar un marco que no tenés';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_validate_equipped_cosmetics ON public.profiles;
+CREATE TRIGGER trg_validate_equipped_cosmetics
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.validate_equipped_cosmetics();
+
+-- ────────────────────────────────────────────────────────────
+-- 7. sync_chapas_for_user(): recalcula el nivel real (misma fórmula
+-- que useUserStats.js: XP de user_beers + achievements + badges +
+-- challenges, menos prestige_xp_baseline) y paga la diferencia contra
+-- profiles.chapas_synced_level. Idempotente — llamarla sin haber
+-- subido de nivel no hace nada. SECURITY DEFINER porque necesita
+-- insertar en chapas_ledger; opera siempre sobre auth.uid(), nunca
+-- sobre un user_id arbitrario, así que exponerla como RPC es inofensivo
+-- (a lo sumo alguien se "sincroniza" a sí mismo antes de tiempo).
+-- ────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.sync_chapas_for_user()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  me         uuid := auth.uid();
+  v_cycle_xp bigint;
+  v_new_level int;
+  v_old_level int;
+  v_milestones int;
+  v_gain     int;
+BEGIN
+  IF me IS NULL THEN RETURN; END IF;
+
+  SELECT
+    COALESCE((SELECT SUM("XP")       FROM public.user_beers               WHERE user_id = me), 0) +
+    COALESCE((SELECT SUM(xp_awarded) FROM public.user_achievements        WHERE user_id = me), 0) +
+    COALESCE((SELECT SUM(xp_awarded) FROM public.user_badges              WHERE user_id = me), 0) +
+    COALESCE((SELECT SUM(xp_awarded) FROM public.user_challenge_completions WHERE user_id = me), 0)
+    - COALESCE((SELECT prestige_xp_baseline FROM public.profiles WHERE id = me), 0)
+  INTO v_cycle_xp;
+
+  v_cycle_xp  := GREATEST(0, v_cycle_xp);
+  v_new_level := public.level_for_xp(v_cycle_xp);
+
+  SELECT chapas_synced_level INTO v_old_level FROM public.profiles WHERE id = me;
+
+  IF v_new_level > v_old_level THEN
+    v_milestones := (v_new_level / 10) - (v_old_level / 10);
+    v_gain := (v_new_level - v_old_level) * 10 + v_milestones * 40;
+
+    INSERT INTO public.chapas_ledger (user_id, amount, source, reference)
+    VALUES (me, v_gain, 'level_up', 'level:' || v_old_level || '->' || v_new_level);
+
+    UPDATE public.profiles SET chapas_synced_level = v_new_level WHERE id = me;
+  END IF;
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.sync_chapas_for_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.sync_chapas_for_user() FROM anon;
+GRANT EXECUTE ON FUNCTION public.sync_chapas_for_user() TO authenticated;
+
+-- Disparadores: cualquier evento que pueda mover el XP total dispara el
+-- recálculo (no-op si no hubo cambio de nivel real).
+CREATE OR REPLACE FUNCTION public.trg_fn_sync_chapas()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path TO 'public'
+AS $$
+BEGIN
+  PERFORM public.sync_chapas_for_user();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_sync_chapas_from_beers ON public.user_beers;
+CREATE TRIGGER trg_sync_chapas_from_beers
+  AFTER INSERT OR UPDATE OF "XP" ON public.user_beers
+  FOR EACH ROW EXECUTE FUNCTION public.trg_fn_sync_chapas();
+
+DROP TRIGGER IF EXISTS trg_sync_chapas_from_achievements ON public.user_achievements;
+CREATE TRIGGER trg_sync_chapas_from_achievements
+  AFTER INSERT ON public.user_achievements
+  FOR EACH ROW EXECUTE FUNCTION public.trg_fn_sync_chapas();
+
+DROP TRIGGER IF EXISTS trg_sync_chapas_from_badges ON public.user_badges;
+CREATE TRIGGER trg_sync_chapas_from_badges
+  AFTER INSERT ON public.user_badges
+  FOR EACH ROW EXECUTE FUNCTION public.trg_fn_sync_chapas();
+
+-- ────────────────────────────────────────────────────────────
+-- 8. Chapas por reto completado (xp_bonus / 5, mínimo 1) + sync de
+-- nivel por si ese XP también cruza un nivel.
+-- ────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.trg_fn_challenge_chapas()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  v_chapas int;
+BEGIN
+  v_chapas := GREATEST(1, ROUND(NEW.xp_awarded / 5.0));
+
+  INSERT INTO public.chapas_ledger (user_id, amount, source, reference)
+  VALUES (NEW.user_id, v_chapas, 'challenge', NEW.challenge_id::text);
+
+  PERFORM public.sync_chapas_for_user();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_challenge_chapas ON public.user_challenge_completions;
+CREATE TRIGGER trg_challenge_chapas
+  AFTER INSERT ON public.user_challenge_completions
+  FOR EACH ROW EXECUTE FUNCTION public.trg_fn_challenge_chapas();
+
+-- ────────────────────────────────────────────────────────────
+-- 9. Auto-otorgado de cosméticos exclusivos por logro
+-- ────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.trg_fn_grant_achievement_cosmetics()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  INSERT INTO public.user_cosmetics (user_id, item_slug)
+  SELECT NEW.user_id, slug FROM public.cosmetic_items
+  WHERE unlock_achievement_slug = NEW.slug AND active
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_grant_achievement_cosmetics ON public.user_achievements;
+CREATE TRIGGER trg_grant_achievement_cosmetics
+  AFTER INSERT ON public.user_achievements
+  FOR EACH ROW EXECUTE FUNCTION public.trg_fn_grant_achievement_cosmetics();
+
+-- ────────────────────────────────────────────────────────────
+-- 10. do_prestige(): otorga Chapas + auto-otorga cosméticos exclusivos
+-- de prestigio, además de todo lo que ya hacía (umbral de XP/nivel +
+-- gate de misiones del Bloque 3).
+-- ────────────────────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.do_prestige()
+RETURNS TABLE(new_prestige integer, new_baseline bigint)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  me          uuid := auth.uid();
+  v_total_xp  bigint;
+  v_baseline  bigint;
+  v_prestige  int;
+  v_level     int;
+  v_threshold int;
+  v_target    int;
+  req         record;
+  v_current   int;
+  v_chapas    int;
+BEGIN
+  IF me IS NULL THEN
+    RAISE EXCEPTION 'No autenticado';
+  END IF;
+
+  SELECT
+    COALESCE((SELECT SUM("XP")         FROM user_beers        WHERE user_id = me), 0) +
+    COALESCE((SELECT SUM(xp_awarded)   FROM user_achievements WHERE user_id = me), 0) +
+    COALESCE((SELECT SUM(xp_awarded)   FROM user_badges       WHERE user_id = me), 0)
+  INTO v_total_xp;
+
+  SELECT prestige, prestige_xp_baseline INTO v_prestige, v_baseline FROM profiles WHERE id = me;
+  v_level     := public.level_for_xp(v_total_xp - COALESCE(v_baseline, 0));
+  v_threshold := public.get_prestige_threshold(COALESCE(v_prestige, 0));
+
+  IF v_level < v_threshold THEN
+    RAISE EXCEPTION 'Todavía no llegaste al nivel % (estás en nivel %)', v_threshold, v_level;
+  END IF;
+
+  v_target := COALESCE(v_prestige, 0) + 1;
+
+  FOR req IN SELECT metric, min_required FROM public.prestige_missions WHERE tier = v_target LOOP
+    v_current := public.compute_metric_for_user(me, req.metric, '1900-01-01', current_date, 'discovery');
+    IF v_current < req.min_required THEN
+      RAISE EXCEPTION 'Todavía no completaste la misión de prestigio %: % (tenés %, necesitás %)',
+        v_target, req.metric, v_current, req.min_required;
+    END IF;
+  END LOOP;
+
+  UPDATE profiles
+  SET prestige = prestige + 1,
+      prestige_xp_baseline = v_total_xp
+  WHERE id = me
+  RETURNING prestige, prestige_xp_baseline INTO new_prestige, new_baseline;
+
+  v_chapas := CASE
+    WHEN new_prestige <= 1 THEN 300
+    WHEN new_prestige = 2 THEN 400
+    WHEN new_prestige = 3 THEN 550
+    WHEN new_prestige = 4 THEN 750
+    ELSE 1000
+  END;
+
+  INSERT INTO public.chapas_ledger (user_id, amount, source, reference)
+  VALUES (me, v_chapas, 'prestige', 'prestige:' || new_prestige);
+
+  INSERT INTO public.user_cosmetics (user_id, item_slug)
+  SELECT me, slug FROM public.cosmetic_items
+  WHERE unlock_min_prestige IS NOT NULL AND unlock_min_prestige <= new_prestige AND active
+  ON CONFLICT DO NOTHING;
+
+  RETURN NEXT;
+END;
+$$;
+
+-- ────────────────────────────────────────────────────────────
+-- 11. purchase_cosmetic() / equip_cosmetic()
+-- ────────────────────────────────────────────────────────────
+CREATE FUNCTION public.purchase_cosmetic(p_slug text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  me               uuid := auth.uid();
+  v_item           record;
+  v_balance        bigint;
+  v_has_achievement boolean;
+  v_prestige       int;
+BEGIN
+  IF me IS NULL THEN
+    RAISE EXCEPTION 'No autenticado';
+  END IF;
+
+  SELECT * INTO v_item FROM public.cosmetic_items WHERE slug = p_slug AND active;
+  IF v_item IS NULL THEN
+    RAISE EXCEPTION 'Ítem no encontrado';
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM public.user_cosmetics WHERE user_id = me AND item_slug = p_slug) THEN
+    RAISE EXCEPTION 'Ya tenés este ítem';
+  END IF;
+
+  IF v_item.unlock_achievement_slug IS NOT NULL THEN
+    SELECT EXISTS(
+      SELECT 1 FROM public.user_achievements WHERE user_id = me AND slug = v_item.unlock_achievement_slug
+    ) INTO v_has_achievement;
+    IF NOT v_has_achievement THEN
+      RAISE EXCEPTION 'Este ítem requiere el logro %', v_item.unlock_achievement_slug;
+    END IF;
+  END IF;
+
+  IF v_item.unlock_min_prestige IS NOT NULL THEN
+    SELECT prestige INTO v_prestige FROM public.profiles WHERE id = me;
+    IF COALESCE(v_prestige, 0) < v_item.unlock_min_prestige THEN
+      RAISE EXCEPTION 'Este ítem requiere Prestige %', v_item.unlock_min_prestige;
+    END IF;
+  END IF;
+
+  SELECT chapas INTO v_balance FROM public.profiles WHERE id = me;
+  IF COALESCE(v_balance, 0) < v_item.cost THEN
+    RAISE EXCEPTION 'No te alcanzan las Chapas (tenés %, necesitás %)', v_balance, v_item.cost;
+  END IF;
+
+  IF v_item.cost > 0 THEN
+    INSERT INTO public.chapas_ledger (user_id, amount, source, reference)
+    VALUES (me, -v_item.cost, 'shop_purchase', p_slug);
+  END IF;
+
+  INSERT INTO public.user_cosmetics (user_id, item_slug) VALUES (me, p_slug);
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.purchase_cosmetic(text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.purchase_cosmetic(text) FROM anon;
+GRANT EXECUTE ON FUNCTION public.purchase_cosmetic(text) TO authenticated;
+
+CREATE FUNCTION public.equip_cosmetic(p_category text, p_slug text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  me               uuid := auth.uid();
+  v_item_category  text;
+BEGIN
+  IF me IS NULL THEN
+    RAISE EXCEPTION 'No autenticado';
+  END IF;
+
+  IF p_category NOT IN ('tag', 'frame') THEN
+    RAISE EXCEPTION 'Categoría inválida';
+  END IF;
+
+  IF p_slug IS NOT NULL THEN
+    SELECT category INTO v_item_category FROM public.cosmetic_items WHERE slug = p_slug;
+    IF v_item_category IS NULL THEN
+      RAISE EXCEPTION 'Ítem no encontrado';
+    END IF;
+    IF v_item_category != p_category THEN
+      RAISE EXCEPTION 'El ítem no es de la categoría %', p_category;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM public.user_cosmetics WHERE user_id = me AND item_slug = p_slug) THEN
+      RAISE EXCEPTION 'No tenés este ítem';
+    END IF;
+  END IF;
+
+  IF p_category = 'tag' THEN
+    UPDATE public.profiles SET equipped_tag_slug = p_slug WHERE id = me;
+  ELSE
+    UPDATE public.profiles SET equipped_frame_slug = p_slug WHERE id = me;
+  END IF;
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.equip_cosmetic(text, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.equip_cosmetic(text, text) FROM anon;
+GRANT EXECUTE ON FUNCTION public.equip_cosmetic(text, text) TO authenticated;

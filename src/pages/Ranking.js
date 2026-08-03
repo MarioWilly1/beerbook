@@ -6,7 +6,8 @@ import { useUserStats } from "../hooks/useUserStats";
 import { supabase } from "../services/supabase";
 import { getLevelInfo } from "../utils/xp";
 import { prestigeTierFor } from "../utils/prestigeTiers";
-import Avatar from "../components/Avatar";
+import AvatarFrame from "../components/AvatarFrame";
+import EquippedTag from "../components/EquippedTag";
 import PrestigeBadge from "../components/PrestigeBadge";
 import ReportUserEntriesModal from "../components/ReportUserEntriesModal";
 import { TrophyIcon, CalendarIcon, PeopleIcon, StarIcon, BeakerIcon, FlagIcon } from "@primer/octicons-react";
@@ -129,7 +130,7 @@ const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onRepo
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
-      <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
+      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           <PrestigeBadge prestige={entry.prestige} size="icon" cupSize={24} />
@@ -137,6 +138,11 @@ const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onRepo
           {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
         <div style={{ fontSize: 12, color: isSelf ? "#3a2a10" : "#9a7d62" }}>Nivel {level}</div>
+        {entry.equipped_tag_slug && (
+          <div style={{ marginTop: 2 }}>
+            <EquippedTag slug={entry.equipped_tag_slug} />
+          </div>
+        )}
       </div>
       <div style={{ textAlign: "right" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: isSelf ? "#8b6b2e" : "#d4af37" }}>
@@ -156,13 +162,18 @@ const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onR
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
-      <Avatar avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
+      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           <PrestigeBadge prestige={entry.prestige} size="icon" cupSize={24} />
           {entry.nombre || "Usuario"}
           {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
+        {entry.equipped_tag_slug && (
+          <div style={{ marginTop: 2 }}>
+            <EquippedTag slug={entry.equipped_tag_slug} />
+          </div>
+        )}
       </div>
       <div style={{ textAlign: "right" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#2a6b3a" }}>🍺 {entry.total_beers}</div>

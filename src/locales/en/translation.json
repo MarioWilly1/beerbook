@@ -331,6 +331,7 @@
   "filters": {
     "searchPlaceholder": "Search beers...",
     "filtersBtn":        "Filters",
+    "applyBtn":          "Apply",
     "clearBtn":          "Clear filters",
     "styleSection":      "STYLE",
     "countrySection":    "COUNTRY",

@@ -331,6 +331,7 @@
   "filters": {
     "searchPlaceholder": "Buscar cervezas...",
     "filtersBtn":        "Filtros",
+    "applyBtn":          "Aplicar",
     "clearBtn":          "Limpiar filtros",
     "styleSection":      "ESTILO",
     "countrySection":    "PAÍS",

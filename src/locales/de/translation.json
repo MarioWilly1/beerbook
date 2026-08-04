@@ -331,6 +331,7 @@
   "filters": {
     "searchPlaceholder": "Biere suchen...",
     "filtersBtn":        "Filter",
+    "applyBtn":          "Anwenden",
     "clearBtn":          "Filter löschen",
     "styleSection":      "STIL",
     "countrySection":    "LAND",

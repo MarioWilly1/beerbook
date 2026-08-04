@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
-import { XIcon, SearchIcon, FlameIcon } from "@primer/octicons-react";
+import { XIcon, SearchIcon, FlameIcon, FilterIcon } from "@primer/octicons-react";
 
 const RANGE_CSS = `
   .bf-thumb {
@@ -158,8 +158,8 @@ const RangeSlider = ({ low, high, onChange }) => {
 };
 
 const selectStyle = {
-  flex: "1 1 140px",
-  minWidth: 0,
+  width: "100%",
+  boxSizing: "border-box",
   padding: "9px 10px",
   border: "1.5px solid #2e2215",
   borderRadius: 10,
@@ -170,10 +170,8 @@ const selectStyle = {
   cursor: "pointer",
 };
 
-// Desplegable compacto y siempre visible — reemplaza las nubes de chips
-// que vivían adentro del panel colapsable "Filtros". Solo se muestra si
-// hay opciones (dinámico según el catálogo actual, mismo criterio que
-// antes con estilos/países).
+// Selects compactos usados adentro del panel "Filtros". Solo se muestran si
+// hay opciones (dinámico según el catálogo actual).
 const SelectFilter = ({ value, onChange, options, allLabel, getLabel }) => (
   <select
     value={value ?? "all"}
@@ -206,10 +204,14 @@ const BeerFilters = ({
   showTrending = true,
 }) => {
   const { t, i18n } = useTranslation();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const panelRef = useRef(null);
 
   const [low, high] = alcoholFilter;
   const alcActive = low > 0 || high < 15;
-  const hasActive = styleFilter || countryFilter || familiaFilter || alcActive || trendingFilter;
+  const filtersActive = !!(styleFilter || countryFilter || familiaFilter || alcActive);
+  const hasActive = filtersActive || trendingFilter;
+  const hasFilterOptions = countries.length > 0 || styles.length > 0 || familias.length > 0;
 
   const clearAll = () => {
     setStyleFilter(null);
@@ -218,6 +220,18 @@ const BeerFilters = ({
     setAlcoholFilter([0, 15]);
     setTrendingFilter(false);
   };
+
+  // Cierra el panel al tocar afuera (botón o desplegable).
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const onClickOutside = (e) => {
+      if (panelRef.current && !panelRef.current.contains(e.target)) {
+        setFiltersOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [filtersOpen]);
 
   return (
     <div
@@ -301,45 +315,102 @@ const BeerFilters = ({
             <FlameIcon size={14} /> {t("filters.trending")}
           </button>
         )}
-      </div>
 
-      {/* País / Estilo / Familia — siempre visibles, combinables entre sí */}
-      {(countries.length > 0 || styles.length > 0 || familias.length > 0) && (
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
-          {countries.length > 0 && (
-            <SelectFilter
-              value={countryFilter}
-              onChange={setCountryFilter}
-              options={countries}
-              allLabel={t("filters.allCountries")}
-              getLabel={(c) => getCountryName(c, i18n.language)}
-            />
-          )}
-          {styles.length > 0 && (
-            <SelectFilter
-              value={styleFilter}
-              onChange={setStyleFilter}
-              options={styles}
-              allLabel={t("filters.allStyles")}
-            />
-          )}
-          {familias.length > 0 && (
-            <SelectFilter
-              value={familiaFilter}
-              onChange={setFamiliaFilter}
-              options={familias}
-              allLabel={t("filters.allFamilies")}
-            />
-          )}
-        </div>
-      )}
+        {/* País / Estilo / Familia / Alcohol — agrupados en un único
+            desplegable compacto para no saturar la barra de filtros. */}
+        {hasFilterOptions && (
+          <div style={{ position: "relative", flex: "0 0 auto" }} ref={panelRef}>
+            <button
+              onClick={() => setFiltersOpen((o) => !o)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "10px 12px",
+                borderRadius: 10,
+                cursor: "pointer",
+                border: `1.5px solid ${filtersActive ? "#d4af37" : "#2e2215"}`,
+                background: filtersActive ? "rgba(212,175,55,0.14)" : "#2a1e0f",
+                color: filtersActive ? "#d4af37" : "#9a7d62",
+                fontWeight: 700,
+                fontSize: 13,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <FilterIcon size={14} /> {t("filters.filtersBtn")}
+            </button>
 
-      {/* Alcohol — slider fino, siempre visible (no se reduce bien a un select) */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#5a4535", flexShrink: 0 }}>
-          {t("filters.alcoholLabel")}
-        </span>
-        <RangeSlider low={low} high={high} onChange={(l, h) => setAlcoholFilter([l, h])} />
+            {filtersOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 6px)",
+                  right: 0,
+                  zIndex: 20,
+                  width: 260,
+                  maxWidth: "calc(100vw - 40px)",
+                  background: "#1c1409",
+                  border: "1px solid #2e2215",
+                  borderRadius: 12,
+                  padding: 14,
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                {countries.length > 0 && (
+                  <SelectFilter
+                    value={countryFilter}
+                    onChange={setCountryFilter}
+                    options={countries}
+                    allLabel={t("filters.allCountries")}
+                    getLabel={(c) => getCountryName(c, i18n.language)}
+                  />
+                )}
+                {styles.length > 0 && (
+                  <SelectFilter
+                    value={styleFilter}
+                    onChange={setStyleFilter}
+                    options={styles}
+                    allLabel={t("filters.allStyles")}
+                  />
+                )}
+                {familias.length > 0 && (
+                  <SelectFilter
+                    value={familiaFilter}
+                    onChange={setFamiliaFilter}
+                    options={familias}
+                    allLabel={t("filters.allFamilies")}
+                  />
+                )}
+
+                <div>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#5a4535" }}>
+                    {t("filters.alcoholLabel")}
+                  </span>
+                  <RangeSlider low={low} high={high} onChange={(l, h) => setAlcoholFilter([l, h])} />
+                </div>
+
+                <button
+                  onClick={() => setFiltersOpen(false)}
+                  style={{
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: "#d4af37",
+                    color: "#0d0a06",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("filters.applyBtn")}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Chips de filtros activos + limpiar todo */}

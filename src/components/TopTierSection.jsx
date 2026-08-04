@@ -58,6 +58,10 @@ const TopTierEditModal = ({ userId, pool, initialByCategory, categories, onClose
   const currentBeers = currentIds.map((id) => pool.find((b) => b.id === id)).filter(Boolean);
   const availableBeers = pool
     .filter((b) => !currentIds.includes(b.id))
+    // Solo cervezas cuyo estilo coincide con la categoría elegida — mismo
+    // criterio usado para armar la lista de categorías más abajo, si no
+    // se puede colar cualquier estilo en un top que no le corresponde.
+    .filter((b) => category === "global" || normalizeStr(b.estilo).includes(normalizeStr(category)))
     .filter((b) => !search || normalizeStr(b.nombre).includes(normalizeStr(search)));
 
   const persist = useCallback(async (cat, ids) => {

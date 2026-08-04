@@ -729,25 +729,81 @@
     "lockedAchievement":   "Requires achievement: {{name}}",
     "lockedPrestige":      "Requires Prestige {{n}}",
     "item": {
+      "tag_recien_llegado": {
+        "label": "Newcomer",
+        "description": "Still learning where the bottle opener is."
+      },
       "tag_novato": {
         "label": "Eager Newbie",
         "description": "Just getting started, eager to try everything."
+      },
+      "tag_sediento": {
+        "label": "Thirsty",
+        "description": "You're already eyeing the next round."
+      },
+      "tag_sofa": {
+        "label": "Couch Brewer",
+        "description": "Your favorite bar has a remote control."
       },
       "tag_explorador": {
         "label": "Explorer",
         "description": "Always looking for the next beer to discover."
       },
+      "tag_ultima_cuenta": {
+        "label": "This Round's the Last One",
+        "description": "You said 'last one' three beers ago."
+      },
       "tag_cazador_rarezas": {
         "label": "Rarity Hunter",
         "description": "You collect what's hard to find."
+      },
+      "tag_alma_barril": {
+        "label": "Barrel Soul",
+        "description": "Born with foam in your veins."
+      },
+      "tag_sin_hielo": {
+        "label": "On the Rocks, Please (Never)",
+        "description": "Ice is for cocktails, not beer."
       },
       "tag_paladar_oro": {
         "label": "Golden Palate",
         "description": "Your opinion on a beer is worth its weight in gold."
       },
+      "tag_doctor_lupulo": {
+        "label": "Doctor of Hops",
+        "description": "You can tell IBUs apart with your eyes closed."
+      },
+      "tag_nunca_falla_ronda": {
+        "label": "Never Misses a Round",
+        "description": "Punctual as clockwork, as long as beer's involved."
+      },
+      "tag_mas_espuma": {
+        "label": "More Foam Than Beer",
+        "description": "You pour at a 45° angle and it still happens."
+      },
+      "tag_coleccionista": {
+        "label": "Compulsive Collector",
+        "description": "Your Collection won't complete itself (though you try daily)."
+      },
+      "tag_leyenda_liquida": {
+        "label": "Liquid Legend",
+        "description": "Bars already tell stories about you."
+      },
+      "tag_maestro_cervecero": {
+        "label": "Certified Beer Master",
+        "description": "Certified by no one in particular, but very convinced."
+      },
+      "tag_bebi_antes_cool": {
+        "label": "I Drank It Before It Was Cool",
+        "description": "You went to that craft brewery before it had a line out the door."
+      },
       "tag_maestro_catador": {
         "label": "Master Taster",
         "description": "Exclusive reward for mastering the art of tasting."
+      },
+      "frame_corcho": {
+        "label": "Cork Ring",
+        "description": "Rustic, simple, smells like a cellar."
       },
       "frame_madera": {
         "label": "Wooden Frame",
@@ -757,6 +813,10 @@
         "label": "Bronze Frame",
         "description": "The first step toward distinction."
       },
+      "frame_hojas_lupulo": {
+        "label": "Hop Leaf Ring",
+        "description": "A green, aromatic touch for your avatar."
+      },
       "frame_cobre": {
         "label": "Copper Frame",
         "description": "A warm glow for your profile photo."
@@ -764,6 +824,22 @@
       "frame_dorado": {
         "label": "Golden Frame",
         "description": "RiBeer's own color, for your avatar."
+      },
+      "frame_espuma_fresca": {
+        "label": "Fresh Foam Ring",
+        "description": "Just poured, hasn't settled yet."
+      },
+      "frame_corona_espigas": {
+        "label": "Golden Wheat Crown",
+        "description": "For those who built their reputation from the malt up."
+      },
+      "frame_espuma_animada": {
+        "label": "Subtle Animated Foam Ring",
+        "description": "The foam moves on its own — nobody's quite sure why, but it looks great."
+      },
+      "frame_gemas": {
+        "label": "Gem-Studded Ring",
+        "description": "Liquid luxury, now on your profile photo too."
       },
       "frame_prestigio": {
         "label": "Prestige Frame",

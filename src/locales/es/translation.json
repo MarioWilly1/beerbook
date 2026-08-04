@@ -729,25 +729,81 @@
     "lockedAchievement":   "Requiere el logro: {{name}}",
     "lockedPrestige":      "Requiere Prestige {{n}}",
     "item": {
+      "tag_recien_llegado": {
+        "label": "Recién Llegado",
+        "description": "Todavía estás aprendiendo dónde queda el sacacorchos."
+      },
       "tag_novato": {
         "label": "Novato Entusiasta",
         "description": "Recién empezando, con muchas ganas de probar todo."
+      },
+      "tag_sediento": {
+        "label": "Sediento",
+        "description": "La próxima ronda ya la estás pidiendo con la mirada."
+      },
+      "tag_sofa": {
+        "label": "Cervecero de Sofá",
+        "description": "Tu bar favorito tiene control remoto."
       },
       "tag_explorador": {
         "label": "Explorador",
         "description": "Siempre buscando la próxima cerveza para descubrir."
       },
+      "tag_ultima_cuenta": {
+        "label": "La Última Es la Que Cuenta",
+        "description": "Dijiste 'esta es la última' hace tres cervezas."
+      },
       "tag_cazador_rarezas": {
         "label": "Cazador de Rarezas",
         "description": "Coleccionás lo difícil de encontrar."
+      },
+      "tag_alma_barril": {
+        "label": "Alma de Barril",
+        "description": "Naciste con espuma en las venas."
+      },
+      "tag_sin_hielo": {
+        "label": "Con Hielo, Por Favor (Nunca)",
+        "description": "El hielo es para los cócteles, no para la cerveza."
       },
       "tag_paladar_oro": {
         "label": "Paladar de Oro",
         "description": "Tu opinión sobre una cerveza vale oro."
       },
+      "tag_doctor_lupulo": {
+        "label": "Doctor en Lúpulo",
+        "description": "Podés diferenciar un IBU de otro con los ojos cerrados."
+      },
+      "tag_nunca_falla_ronda": {
+        "label": "El Que Nunca Falla a una Ronda",
+        "description": "Puntual como un reloj, siempre que haya cerveza de por medio."
+      },
+      "tag_mas_espuma": {
+        "label": "Más Espuma Que Cerveza",
+        "description": "Servís con el vaso a 45° y aun así pasa."
+      },
+      "tag_coleccionista": {
+        "label": "Coleccionista Compulsivo",
+        "description": "Tu Colección no se completa sola (aunque lo intentás cada día)."
+      },
+      "tag_leyenda_liquida": {
+        "label": "Leyenda Líquida",
+        "description": "En los bares ya cuentan historias sobre vos."
+      },
+      "tag_maestro_cervecero": {
+        "label": "Maestro Cervecero Certificado",
+        "description": "Certificado por nadie en particular, pero con mucha convicción."
+      },
+      "tag_bebi_antes_cool": {
+        "label": "Bebí Antes de Que Fuera Cool",
+        "description": "Ibas a esa cervecería artesanal antes de que tuviera cola en la puerta."
+      },
       "tag_maestro_catador": {
         "label": "Maestro Catador",
         "description": "Recompensa exclusiva por dominar el arte de catar."
+      },
+      "frame_corcho": {
+        "label": "Aro de Corcho",
+        "description": "Rústico, simple y con olor a bodega."
       },
       "frame_madera": {
         "label": "Marco de Madera",
@@ -757,6 +813,10 @@
         "label": "Marco de Bronce",
         "description": "El primer paso hacia la distinción."
       },
+      "frame_hojas_lupulo": {
+        "label": "Aro con Hojas de Lúpulo",
+        "description": "Un toque verde y aromático para tu avatar."
+      },
       "frame_cobre": {
         "label": "Marco de Cobre",
         "description": "Un brillo cálido para tu foto de perfil."
@@ -764,6 +824,22 @@
       "frame_dorado": {
         "label": "Marco Dorado",
         "description": "El color de RiBeer's, para tu avatar."
+      },
+      "frame_espuma_fresca": {
+        "label": "Aro de Espuma Fresca",
+        "description": "Recién servida, todavía no se asentó."
+      },
+      "frame_corona_espigas": {
+        "label": "Corona de Espigas Dorada",
+        "description": "Para quienes cultivaron su reputación desde la malta."
+      },
+      "frame_espuma_animada": {
+        "label": "Aro con Espuma Animada Sutil",
+        "description": "La espuma se mueve sola — nadie sabe bien por qué, pero queda bien."
+      },
+      "frame_gemas": {
+        "label": "Aro con Gemas Engastadas",
+        "description": "El lujo líquido, ahora también en tu foto de perfil."
       },
       "frame_prestigio": {
         "label": "Marco de Prestigio",

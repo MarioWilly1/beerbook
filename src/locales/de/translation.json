@@ -729,25 +729,81 @@
     "lockedAchievement":   "Erfordert den Erfolg: {{name}}",
     "lockedPrestige":      "Erfordert Prestige {{n}}",
     "item": {
+      "tag_recien_llegado": {
+        "label": "Neuankömmling",
+        "description": "Weißt noch nicht genau, wo der Flaschenöffner liegt."
+      },
       "tag_novato": {
         "label": "Begeisterter Neuling",
         "description": "Gerade erst angefangen, mit viel Lust alles zu probieren."
+      },
+      "tag_sediento": {
+        "label": "Durstig",
+        "description": "Die nächste Runde bestellst du schon mit den Augen."
+      },
+      "tag_sofa": {
+        "label": "Sofa-Brauer",
+        "description": "Deine Stammkneipe hat eine Fernbedienung."
       },
       "tag_explorador": {
         "label": "Entdecker",
         "description": "Immer auf der Suche nach dem nächsten Bier."
       },
+      "tag_ultima_cuenta": {
+        "label": "Die Letzte Zählt",
+        "description": "Du hast vor drei Bier schon 'die Letzte' gesagt."
+      },
       "tag_cazador_rarezas": {
         "label": "Raritätenjäger",
         "description": "Du sammelst, was schwer zu finden ist."
+      },
+      "tag_alma_barril": {
+        "label": "Fassseele",
+        "description": "Mit Schaum in den Adern geboren."
+      },
+      "tag_sin_hielo": {
+        "label": "Mit Eis, Bitte (Niemals)",
+        "description": "Eis ist für Cocktails, nicht für Bier."
       },
       "tag_paladar_oro": {
         "label": "Goldener Gaumen",
         "description": "Deine Meinung zu einem Bier ist Gold wert."
       },
+      "tag_doctor_lupulo": {
+        "label": "Doktor des Hopfens",
+        "description": "Du erkennst IBU-Werte mit geschlossenen Augen."
+      },
+      "tag_nunca_falla_ronda": {
+        "label": "Verpasst Nie Eine Runde",
+        "description": "Pünktlich wie ein Uhrwerk, solange Bier im Spiel ist."
+      },
+      "tag_mas_espuma": {
+        "label": "Mehr Schaum Als Bier",
+        "description": "Du schenkst im 45°-Winkel ein und trotzdem passiert's."
+      },
+      "tag_coleccionista": {
+        "label": "Zwanghafter Sammler",
+        "description": "Deine Sammlung füllt sich nicht von selbst (auch wenn du es täglich versuchst)."
+      },
+      "tag_leyenda_liquida": {
+        "label": "Flüssige Legende",
+        "description": "In den Kneipen erzählt man sich schon Geschichten über dich."
+      },
+      "tag_maestro_cervecero": {
+        "label": "Zertifizierter Biermeister",
+        "description": "Zertifiziert von niemand Bestimmtem, aber mit viel Überzeugung."
+      },
+      "tag_bebi_antes_cool": {
+        "label": "Ich Hab's Getrunken, Bevor Es Cool War",
+        "description": "Du warst schon in der Craft-Brauerei, bevor sich davor eine Schlange bildete."
+      },
       "tag_maestro_catador": {
         "label": "Meisterverkoster",
         "description": "Exklusive Belohnung für die Meisterschaft der Verkostung."
+      },
+      "frame_corcho": {
+        "label": "Korkring",
+        "description": "Rustikal, einfach, riecht nach Weinkeller."
       },
       "frame_madera": {
         "label": "Holzrahmen",
@@ -757,6 +813,10 @@
         "label": "Bronzerahmen",
         "description": "Der erste Schritt zur Auszeichnung."
       },
+      "frame_hojas_lupulo": {
+        "label": "Hopfenblatt-Ring",
+        "description": "Ein grüner, aromatischer Akzent für deinen Avatar."
+      },
       "frame_cobre": {
         "label": "Kupferrahmen",
         "description": "Ein warmer Glanz für dein Profilfoto."
@@ -764,6 +824,22 @@
       "frame_dorado": {
         "label": "Goldener Rahmen",
         "description": "Die Farbe von RiBeer's, für deinen Avatar."
+      },
+      "frame_espuma_fresca": {
+        "label": "Frischer Schaum-Ring",
+        "description": "Gerade eingeschenkt, noch nicht abgesetzt."
+      },
+      "frame_corona_espigas": {
+        "label": "Goldene Ährenkrone",
+        "description": "Für alle, die sich ihren Ruf von der Malz an aufgebaut haben."
+      },
+      "frame_espuma_animada": {
+        "label": "Ring mit Dezent Animiertem Schaum",
+        "description": "Der Schaum bewegt sich von allein — keiner weiß so genau, warum, aber es sieht gut aus."
+      },
+      "frame_gemas": {
+        "label": "Ring Mit Eingefassten Edelsteinen",
+        "description": "Flüssiger Luxus, jetzt auch auf deinem Profilbild."
       },
       "frame_prestigio": {
         "label": "Prestige-Rahmen",

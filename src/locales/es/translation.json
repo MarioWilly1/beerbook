@@ -114,7 +114,11 @@
     "badgesSummary":        "{{unlocked}}/{{total}} categorías con insignia",
     "achievementsTitle":    "Logros",
     "achievementsSummary":  "{{unlocked}}/{{total}} desbloqueados",
-    "xpEarned":             "· +{{xp}} XP ganados"
+    "xpEarned":             "· +{{xp}} XP ganados",
+    "seriesTitle":          "Series Completas",
+    "seriesSummary":        "{{unlocked}}/{{total}} desbloqueadas",
+    "seriesTag":            "SERIE",
+    "seriesDesc":           "Conseguí todas las cervezas de la familia {{familia}}"
   },
   "feed": {
     "loading":      "Cargando feed...",

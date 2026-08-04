@@ -5,7 +5,7 @@ import { getCountryName } from "../utils/countryDisplay";
 import { supabase } from "../services/supabase";
 import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
 import { updateStreak } from "../utils/streak";
-import { fetchAchievementStats, checkAndAwardAchievements } from "../utils/achievements";
+import { fetchAchievementStats, checkAndAwardAchievements, checkSeriesAchievements } from "../utils/achievements";
 import { logActivity } from "../utils/activity";
 import { checkAndAwardBadges } from "../utils/badges";
 import { fetchWeeklyChallengeProgress, checkAndAwardWeeklyChallenge } from "../utils/weeklyChallenge";
@@ -160,10 +160,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     // fire-and-forget, el banner del Dashboard refleja el resultado — puede
     // haber hasta 2 retos activos (diario + semanal) para chequear
     fetchWeeklyChallengeProgress().then((list) => list.forEach(checkAndAwardWeeklyChallenge));
-    const [newAchievements, newBadges] = await Promise.all([
+    const [ordinaryAchievements, newBadges, seriesAchievements] = await Promise.all([
       achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
       achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
+      checkSeriesAchievements(session.user.id),
     ]);
+    const newAchievements = [...ordinaryAchievements, ...seriesAchievements];
 
     setSaving(false);
     onSaved && onSaved();

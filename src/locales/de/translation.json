@@ -114,7 +114,11 @@
     "badgesSummary":       "{{unlocked}}/{{total}} Kategorien mit Abzeichen",
     "achievementsTitle":   "Erfolge",
     "achievementsSummary": "{{unlocked}}/{{total}} freigeschaltet",
-    "xpEarned":            "· +{{xp}} XP verdient"
+    "xpEarned":            "· +{{xp}} XP verdient",
+    "seriesTitle":         "Vollständige Serien",
+    "seriesSummary":       "{{unlocked}}/{{total}} freigeschaltet",
+    "seriesTag":           "SERIE",
+    "seriesDesc":          "Sammle alle Biere der Familie {{familia}}"
   },
   "feed": {
     "loading":      "Feed wird geladen...",

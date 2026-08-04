@@ -114,7 +114,11 @@
     "badgesSummary":       "{{unlocked}}/{{total}} categories with badge",
     "achievementsTitle":   "Achievements",
     "achievementsSummary": "{{unlocked}}/{{total}} unlocked",
-    "xpEarned":            "· +{{xp}} XP earned"
+    "xpEarned":            "· +{{xp}} XP earned",
+    "seriesTitle":         "Complete Series",
+    "seriesSummary":       "{{unlocked}}/{{total}} unlocked",
+    "seriesTag":           "SERIES",
+    "seriesDesc":          "Collect every beer in the {{familia}} family"
   },
   "feed": {
     "loading":      "Loading feed...",

@@ -1,12 +1,39 @@
 import { supabase } from "../services/supabase";
 
-function slugify(str) {
+export function slugify(str) {
   return str
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+// Familias del catálogo con ≥2 cervezas (las únicas que pueden "completarse").
+// Compartido entre checkSeriesAchievements (para otorgar) y Logros.js (para
+// mostrar el estado de todas, incluidas las no desbloqueadas).
+export async function getTrackableFamilies() {
+  const { data: famBeers } = await supabase
+    .from("beers_new")
+    .select("id, familia")
+    .not("familia", "is", null);
+
+  if (!famBeers?.length) return [];
+
+  const families = {};
+  for (const b of famBeers) {
+    if (!families[b.familia]) families[b.familia] = [];
+    families[b.familia].push(b.id);
+  }
+
+  return Object.entries(families)
+    .filter(([, ids]) => ids.length >= 2)
+    .map(([familia, ids]) => ({
+      familia,
+      slug: `serie-${slugify(familia)}`,
+      ids,
+      xpBonus: 50 * ids.length,
+    }));
 }
 
 // ── 8 categories, ~45 achievements total ──────────────────────────────────────
@@ -448,22 +475,7 @@ export async function checkSocialAchievements(userId) {
 // Dynamically awards "serie completa" achievements — no pre-registration needed.
 // Slug pattern: "serie-{slugified-familia}", stored directly in user_achievements.
 export async function checkSeriesAchievements(userId) {
-  const { data: famBeers } = await supabase
-    .from("beers_new")
-    .select("id, familia")
-    .not("familia", "is", null);
-
-  if (!famBeers?.length) return [];
-
-  // Group by familia
-  const families = {};
-  for (const b of famBeers) {
-    if (!families[b.familia]) families[b.familia] = [];
-    families[b.familia].push(b.id);
-  }
-
-  // Only families with ≥2 beers can be "completed"
-  const trackable = Object.entries(families).filter(([, ids]) => ids.length >= 2);
+  const trackable = await getTrackableFamilies();
   if (!trackable.length) return [];
 
   const { data: userCol } = await supabase
@@ -473,10 +485,10 @@ export async function checkSeriesAchievements(userId) {
 
   const collectedIds = new Set((userCol || []).map((r) => r.beer_id));
 
-  const completed = trackable.filter(([, ids]) => ids.every((id) => collectedIds.has(id)));
+  const completed = trackable.filter((f) => f.ids.every((id) => collectedIds.has(id)));
   if (!completed.length) return [];
 
-  const slugs = completed.map(([fam]) => `serie-${slugify(fam)}`);
+  const slugs = completed.map((f) => f.slug);
   const { data: existing } = await supabase
     .from("user_achievements")
     .select("slug")
@@ -484,24 +496,25 @@ export async function checkSeriesAchievements(userId) {
     .in("slug", slugs);
 
   const existingSlugs = new Set((existing || []).map((a) => a.slug));
-  const toAward = completed.filter(([fam]) => !existingSlugs.has(`serie-${slugify(fam)}`));
+  const toAward = completed.filter((f) => !existingSlugs.has(f.slug));
   if (!toAward.length) return [];
 
   await supabase.from("user_achievements").insert(
-    toAward.map(([fam, ids]) => ({
+    toAward.map((f) => ({
       user_id:     userId,
-      slug:        `serie-${slugify(fam)}`,
-      xp_awarded:  50 * ids.length,
-      nombre:      `Serie "${fam}" completa`,
+      slug:        f.slug,
+      xp_awarded:  f.xpBonus,
+      nombre:      `Serie "${f.familia}" completa`,
     }))
   );
 
-  return toAward.map(([fam, ids]) => ({
-    slug:        `serie-${slugify(fam)}`,
+  return toAward.map((f) => ({
+    slug:        f.slug,
     emoji:       "🎖️",
-    nombre:      `Serie "${fam}" completa`,
-    descripcion: `Conseguiste todas las cervezas de la familia ${fam}`,
-    xpBonus:     50 * ids.length,
+    nombre:      `Serie "${f.familia}" completa`,
+    descripcion: `Conseguiste todas las cervezas de la familia ${f.familia}`,
+    xpBonus:     f.xpBonus,
+    familia:     f.familia,
   }));
 }
 

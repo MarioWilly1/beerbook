@@ -221,9 +221,9 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
         </form>
 
         <p style={{ textAlign: "center", marginTop: "20px", fontSize: "14px", color: "#888" }}>
-          ¿Ya tenés cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <button type="button" onClick={onSwitchToLogin} style={inlineLinkStyle}>
-            Iniciá sesión
+            Inicia sesión
           </button>
         </p>
       </div>

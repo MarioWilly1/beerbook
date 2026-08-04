@@ -112,7 +112,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
       .single();
 
     if (error) {
-      setError("No pudimos guardar tu perfil. Intentá de nuevo.");
+      setError("No pudimos guardar tu perfil. Inténtalo de nuevo.");
       setLoading(false);
       return;
     }
@@ -139,7 +139,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <Field label="¿Cómo querés que te llamemos?">
+          <Field label="¿Cómo quieres que te llamemos?">
             <input
               type="text"
               value={nombre}

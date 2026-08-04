@@ -101,7 +101,7 @@ const LoginPage = ({ onSwitchToRegister }) => {
                     onClick={() => onSwitchToRegister(email)}
                     style={inlineLinkStyle}
                   >
-                    ¿No tenés cuenta? Registrate
+                    ¿No tienes cuenta? Regístrate
                   </button>
                 </>
               ) : (
@@ -123,13 +123,13 @@ const LoginPage = ({ onSwitchToRegister }) => {
         </button>
 
         <p style={{ textAlign: "center", marginTop: "24px", fontSize: "14px", color: "#888" }}>
-          ¿No tenés cuenta?{" "}
+          ¿No tienes cuenta?{" "}
           <button
             type="button"
             onClick={() => onSwitchToRegister(email)}
             style={inlineLinkStyle}
           >
-            Registrate
+            Regístrate
           </button>
         </p>
       </div>

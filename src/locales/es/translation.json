@@ -62,7 +62,7 @@
       "bioLabel":             "Biografía",
       "bioPlaceholder":       "Cuenta algo sobre ti como amante de la cerveza...",
       "countryLabel":         "País de origen",
-      "countryPlaceholder":   "Seleccioná un país...",
+      "countryPlaceholder":   "Selecciona un país...",
       "featuredBadgesLabel":  "Insignias destacadas",
       "featuredBadgesCount":  "({{count}}/3 seleccionadas)",
       "noBadgesHint":         "Desbloquea insignias en Logros para poder destacarlas aquí.",
@@ -91,9 +91,9 @@
       },
       "hiddenEntries": {
         "title":       "Ocultar cervezas",
-        "description": "Repasá qué entradas de tu cuaderno están ocultas y de quién. Para elegir a quién ocultarle una entrada nueva, hacelo desde esa entrada en Mi Cuaderno.",
+        "description": "Repasa qué entradas de tu cuaderno están ocultas y de quién. Para elegir a quién ocultarle una entrada nueva, hazlo desde esa entrada en Mi Cuaderno.",
         "loading":     "Cargando...",
-        "empty":       "No tenés ninguna entrada oculta de nadie.",
+        "empty":       "No tienes ninguna entrada oculta de nadie.",
         "unhide":      "Dejar de ocultar"
       }
     },
@@ -151,8 +151,8 @@
       "sent":              "Reporte enviado. Gracias por ayudar a mantener el ranking justo.",
       "close":              "Cerrar",
       "alreadyReported":   "Ya reportaste esta entrada.",
-      "error":             "No se pudo enviar el reporte. Intentá de nuevo.",
-      "pickEntryTitle":    "Elegí qué entrada de {{nombre}} querés reportar",
+      "error":             "No se pudo enviar el reporte. Inténtalo de nuevo.",
+      "pickEntryTitle":    "Elige qué entrada de {{nombre}} quieres reportar",
       "noEntries":         "No hay entradas visibles de este usuario para reportar."
     }
   },
@@ -212,10 +212,10 @@
     "label":              "Top Tier",
     "edit":               "Editar",
     "editTitle":          "Editar Top Tier",
-    "editHint":           "Arrastrá para reordenar. Máximo {{max}} por categoría.",
+    "editHint":           "Arrastra para reordenar. Máximo {{max}} por categoría.",
     "categoryGlobal":     "General",
     "emptyCategory":      "Todavía no agregaste cervezas a esta categoría.",
-    "emptyOwn":           "Todavía no armaste tu Top Tier. Tocá \"Editar\" para elegir tus favoritas.",
+    "emptyOwn":           "Todavía no armaste tu Top Tier. Toca \"Editar\" para elegir tus favoritas.",
     "searchPlaceholder":  "Buscar en tu cuaderno...",
     "noMoreBeers":        "No hay más cervezas para agregar.",
     "saving":             "Guardando..."
@@ -229,7 +229,7 @@
   },
   "community": {
     "comingSoonTitle": "Próximamente",
-    "comingSoonBody":  "Acá vas a poder ver las copas más originales que suba la comunidad, aprobadas antes de sumarse a la Colección de todos."
+    "comingSoonBody":  "Aquí podrás ver las copas más originales que suba la comunidad, aprobadas antes de sumarse a la Colección de todos."
   },
   "suggest": {
     "title":         "Sugerir cerveza",
@@ -268,7 +268,7 @@
     "sent":          "¡Gracias! Revisaremos tu sugerencia.",
     "errorNombre":   "El nombre es obligatorio.",
     "errorFoto":     "La foto de referencia es obligatoria.",
-    "errorGeneric":  "No se pudo enviar la sugerencia. Intentá de nuevo."
+    "errorGeneric":  "No se pudo enviar la sugerencia. Inténtalo de nuevo."
   },
   "beercard": {
     "suggestedBy": "Sugerida por {{nombre}}"
@@ -331,7 +331,7 @@
     "changePhotoBtn":     "📷 Cambiar foto",
     "removePhotoBtn":     "🗑️ Quitar foto",
     "uploading":          "⏳ Subiendo…",
-    "uploadError":        "Error al subir la foto. Intentá de nuevo.",
+    "uploadError":        "Error al subir la foto. Inténtalo de nuevo.",
     "bonusComplete":      "+{{xp}} XP bonus por entrada completa",
     "saving":             "Guardando...",
     "saveBtn":            "Guardar · +{{xp}} XP",
@@ -342,8 +342,8 @@
     "hiddenCount_one":   "oculta de {{count}}",
     "hiddenCount_other": "oculta de {{count}}",
     "title":             "Ocultar esta cerveza de...",
-    "subtitle":          "Elegí qué amigos NO van a ver esta entrada ({{beer}}) en el feed ni en tu perfil. El resto la sigue viendo normal.",
-    "noFriends":         "Todavía no tenés amigos para ocultarles nada.",
+    "subtitle":          "Elige qué amigos NO van a ver esta entrada ({{beer}}) en el feed ni en tu perfil. El resto la sigue viendo normal.",
+    "noFriends":         "Todavía no tienes amigos para ocultarles nada.",
     "searchPlaceholder": "Buscar amigo...",
     "noResults":         "Sin resultados.",
     "save":              "Guardar"
@@ -363,7 +363,7 @@
     "saveBtn":            "Guardar cambios",
     "deleteBtn":          "Borrar",
     "timesTriedLabel":    "Veces probada",
-    "quickTastingBtn":    "Volví a probarla (+3 XP)"
+    "quickTastingBtn":    "Vuelve a probarla (+3 XP)"
   },
   "coleccion": {
     "loadingBeers":             "Cargando Pokédex…",
@@ -384,16 +384,16 @@
     "countGlasses_other":        "{{got}} de {{count}} copas conseguidas",
     "emptyFilterBeers":          "No hay cervezas con ese filtro.",
     "emptyFilterGlasses":        "No hay copas con ese filtro.",
-    "emptyGlasses":              "Todavía no hay copas en el catálogo. ¡Sugerí la primera!",
+    "emptyGlasses":              "Todavía no hay copas en el catálogo. ¡Sugiere la primera!",
     "optionBeers":               "🍺 Cervezas",
     "optionGlasses":             "🍷 Copas",
     "lockedNotYet":              "Todavía no la conseguiste.",
-    "lockedHint":                "Conseguila y registrala en tu cuaderno para desbloquearla en la colección.",
+    "lockedHint":                "Consíguela y regístrala en tu cuaderno para desbloquearla en la colección.",
     "closeBtn":                  "Cerrar",
-    "glassUploadHint":           "Para coleccionar esta copa, subí una foto real tuya con ella (cámara o galería).",
+    "glassUploadHint":           "Para coleccionar esta copa, sube una foto real tuya con ella (cámara o galería).",
     "glassUploading":            "Subiendo…",
     "glassUploadBtn":            "Subir mi foto",
-    "uploadError":               "Error al subir la foto. Intentá de nuevo.",
+    "uploadError":               "Error al subir la foto. Inténtalo de nuevo.",
     "specialEdition":            "Ed. Especial",
     "obtainedBadge":             "Conseguida"
   },
@@ -643,7 +643,7 @@
   "prestige": {
     "label":             "Prestigio",
     "cta":               "✨ Hacer Prestigio",
-    "confirmBody":       "Tu nivel vuelve a 1, pero conservás todo tu XP histórico, tus logros e insignias. Vas a sumar el Prestigio {{n}}.",
+    "confirmBody":       "Tu nivel vuelve a 1, pero conservas todo tu XP histórico, tus logros e insignias. Vas a sumar el Prestigio {{n}}.",
     "confirmYes":        "Sí, prestigiar",
     "confirmNo":         "Cancelar",
     "missionsLoading":    "Revisando misión de prestigio...",
@@ -675,7 +675,7 @@
       "3": "El peltre no brilla solo — lo pule cada cerveza que probaste.",
       "4": "Tu paladar ya distingue matices que otros ni notan. Bienvenido al cristal.",
       "5": "Pocos llegan tan lejos. Tu copa brilla ahora como el mejor lager al sol.",
-      "6": "Ya no coleccionás cervezas: coleccionás leyendas. Esta copa es de otro nivel."
+      "6": "Ya no coleccionas cervezas: coleccionas leyendas. Esta copa es de otro nivel."
     },
     "closeup": {
       "percentile": "🏆 Solo el {{pct}}% de la comunidad alcanzó esta liga o una superior",
@@ -727,7 +727,7 @@
     "title":              "Tienda",
     "chapas":              "Chapas",
     "loading":             "Cargando tienda...",
-    "needLogin":           "Iniciá sesión para ver la tienda.",
+    "needLogin":           "Inicia sesión para ver la tienda.",
     "tabTags":             "Etiquetas",
     "tabFrames":           "Marcos",
     "equipped":            "Equipado",
@@ -763,7 +763,7 @@
       },
       "tag_cazador_rarezas": {
         "label": "Cazador de Rarezas",
-        "description": "Coleccionás lo difícil de encontrar."
+        "description": "Coleccionas lo difícil de encontrar."
       },
       "tag_alma_barril": {
         "label": "Alma de Barril",
@@ -779,7 +779,7 @@
       },
       "tag_doctor_lupulo": {
         "label": "Doctor en Lúpulo",
-        "description": "Podés diferenciar un IBU de otro con los ojos cerrados."
+        "description": "Puedes diferenciar un IBU de otro con los ojos cerrados."
       },
       "tag_nunca_falla_ronda": {
         "label": "El Que Nunca Falla a una Ronda",
@@ -787,15 +787,15 @@
       },
       "tag_mas_espuma": {
         "label": "Más Espuma Que Cerveza",
-        "description": "Servís con el vaso a 45° y aun así pasa."
+        "description": "Sirves con el vaso a 45° y aun así pasa."
       },
       "tag_coleccionista": {
         "label": "Coleccionista Compulsivo",
-        "description": "Tu Colección no se completa sola (aunque lo intentás cada día)."
+        "description": "Tu Colección no se completa sola (aunque lo intentas cada día)."
       },
       "tag_leyenda_liquida": {
         "label": "Leyenda Líquida",
-        "description": "En los bares ya cuentan historias sobre vos."
+        "description": "En los bares ya cuentan historias sobre ti."
       },
       "tag_maestro_cervecero": {
         "label": "Maestro Cervecero Certificado",

@@ -1,19 +1,22 @@
 {
   "nav": {
-    "catalog":      "Katalog",
-    "notebook":     "Mein Notizbuch",
+    "catalog":      "Die Theke",
+    "notebook":     "Mein Fass",
     "feed":         "Feed",
     "friends":      "Freunde",
-    "social":       "Feed & Freunde",
+    "social":       "Die Taverne",
     "messages":     "Nachrichten",
-    "achievements": "Erfolge",
-    "shop":         "Shop",
-    "ranking":      "Ranking",
-    "about":        "Über uns",
+    "achievements": "Die Trophäenwand",
+    "shop":         "Die Hinterstube",
+    "ranking":      "Ligen",
+    "about":        "Geschichte",
     "settings":     "Einstellungen",
     "logout":       "Abmelden",
     "admin":        "Admin-Panel",
-    "map":          "Weltkarte"
+    "map":          "Weltkarte",
+    "tabCatalog":   "Katalog",
+    "tabCommunity": "Community",
+    "tabChat":      "Chat"
   },
   "sidebar": {
     "changeAvatar": "Avatar ändern →",
@@ -224,6 +227,10 @@
     "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →",
     "mapBtn":       "Herkunftskarte anzeigen"
   },
+  "community": {
+    "comingSoonTitle": "Demnächst",
+    "comingSoonBody":  "Hier siehst du bald die originellsten Gläser der Community, freigegeben, bevor sie in die gemeinsame Sammlung aufgenommen werden."
+  },
   "suggest": {
     "title":             "Bier vorschlagen",
     "subtitle":          "Fehlt ein Bier im Katalog? Lass es uns wissen und wir prüfen es.",
@@ -343,6 +350,7 @@
   },
   "notebook": {
     "title":              "Mein Notizbuch",
+    "tabCuaderno":        "Notizbuch",
     "loading":            "Notizbuch wird geladen...",
     "empty":              "Du hast noch keine Biere gespeichert.",
     "confirmDelete":      "Möchtest du dieses Bier wirklich löschen?",

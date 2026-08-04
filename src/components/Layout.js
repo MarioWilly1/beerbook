@@ -15,8 +15,9 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { useUserStats } from "../hooks/useUserStats";
 import ConfirmModal from "./ConfirmModal";
 import {
-  ThreeBarsIcon, RssIcon, CommentIcon, GearIcon, ToolsIcon,
+  ThreeBarsIcon, RssIcon, GearIcon, ToolsIcon,
   SignOutIcon, PencilIcon, TagIcon,
+  ListUnorderedIcon, BookIcon, TrophyIcon, ShieldIcon, InfoIcon,
 } from "@primer/octicons-react";
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
@@ -238,14 +239,16 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           )}
 
           <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <SidebarLink to="/" label={t("nav.catalog")} onClick={closeDrawer} />
-            <SidebarLink to="/cuaderno" label={t("nav.notebook")} onClick={closeDrawer} />
-            <SidebarLink to="/feed" label={t("nav.social")} Icon={RssIcon} onClick={closeDrawer} />
-            <SidebarLink to="/chats" label={t("nav.messages")} Icon={CommentIcon} badge={totalUnread} onClick={closeDrawer} />
-            <SidebarLink to="/logros" label={t("nav.achievements")} onClick={closeDrawer} />
+            <SidebarLink to="/" label={t("nav.catalog")} Icon={ListUnorderedIcon} onClick={closeDrawer} />
+            <SidebarLink to="/cuaderno" label={t("nav.notebook")} Icon={BookIcon} onClick={closeDrawer} />
+            {/* Chat vive ahora como 3ra pestaña interna de La Taberna
+                (Social.js) — el badge de no-leídos se muestra acá para no
+                perder esa señal al sacar el link suelto de /chats. */}
+            <SidebarLink to="/feed" label={t("nav.social")} Icon={RssIcon} badge={totalUnread} onClick={closeDrawer} />
+            <SidebarLink to="/logros" label={t("nav.achievements")} Icon={TrophyIcon} onClick={closeDrawer} />
+            <SidebarLink to="/ranking" label={t("nav.ranking")} Icon={ShieldIcon} onClick={closeDrawer} />
             <SidebarLink to="/tienda" label={t("nav.shop")} Icon={TagIcon} onClick={closeDrawer} />
-            <SidebarLink to="/ranking" label={t("nav.ranking")} onClick={closeDrawer} />
-            <SidebarLink to="/sobre-nosotros" label={t("nav.about")} onClick={closeDrawer} />
+            <SidebarLink to="/sobre-nosotros" label={t("nav.about")} Icon={InfoIcon} onClick={closeDrawer} />
           </nav>
         </div>
 

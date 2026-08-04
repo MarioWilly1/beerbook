@@ -9,7 +9,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useProfile } from "./hooks/useProfile";
 import { supabase } from "./services/supabase";
 import Layout from "./components/Layout";
-import Dashboard from "./pages/Dashboard";
+import LaBarra from "./pages/LaBarra";
 import MiCuaderno from "./pages/MiCuaderno";
 import Logros from "./pages/Logros";
 import Ranking from "./pages/Ranking";
@@ -21,7 +21,6 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
 import LugarPage from "./pages/LugarPage";
-import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 import AdminPanel from "./pages/AdminPanel";
 import TiendaPage from "./pages/TiendaPage";
@@ -205,17 +204,17 @@ function App() {
     />
     <Layout session={session} profile={profile} onAvatarChange={(url) => setProfile((p) => ({ ...p, avatar_url: url }))}>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<LaBarra />} />
         <Route path="/cuaderno" element={<MiCuaderno />} />
         <Route path="/logros" element={<Logros />} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/feed" element={<Social defaultTab="feed" />} />
         <Route path="/amigos" element={<Social defaultTab="amigos" />} />
+        <Route path="/chats" element={<Social defaultTab="chat" />} />
         <Route path="/tienda" element={<TiendaPage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotros />} />
         <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
         <Route path="/perfil/:userId" element={<ProfilePage />} />
-        <Route path="/chats" element={<Chats />} />
         <Route path="/chats/:id" element={<ChatPage />} />
         <Route path="/admin" element={<AdminPanel profile={profile} />} />
         <Route path="*" element={<Navigate to="/" replace />} />

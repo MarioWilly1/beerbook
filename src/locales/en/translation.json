@@ -1,19 +1,22 @@
 {
   "nav": {
-    "catalog":      "Catalog",
-    "notebook":     "My Notebook",
+    "catalog":      "The Bar",
+    "notebook":     "My Keg",
     "feed":         "Feed",
     "friends":      "Friends",
-    "social":       "Feed & Friends",
+    "social":       "The Tavern",
     "messages":     "Messages",
-    "achievements": "Achievements",
-    "shop":         "Shop",
-    "ranking":      "Ranking",
-    "about":        "About us",
+    "achievements": "The Trophy Wall",
+    "shop":         "The Back Room",
+    "ranking":      "Leagues",
+    "about":        "History",
     "settings":     "Settings",
     "logout":       "Log out",
     "admin":        "Admin Panel",
-    "map":          "World map"
+    "map":          "World map",
+    "tabCatalog":   "Catalog",
+    "tabCommunity": "Community",
+    "tabChat":      "Chat"
   },
   "sidebar": {
     "changeAvatar": "Change avatar →",
@@ -224,6 +227,10 @@
     "suggestBeer":  "Can't find your beer? Suggest it →",
     "mapBtn":       "View origin map"
   },
+  "community": {
+    "comingSoonTitle": "Coming Soon",
+    "comingSoonBody":  "Here you'll get to see the most original glasses shared by the community, approved before joining everyone's Collection."
+  },
   "suggest": {
     "title":             "Suggest a beer",
     "subtitle":          "Is a beer missing from the catalog? Let us know and we'll review it.",
@@ -343,6 +350,7 @@
   },
   "notebook": {
     "title":              "My Notebook",
+    "tabCuaderno":        "Notebook",
     "loading":            "Loading your notebook...",
     "empty":              "You haven't saved any beers yet.",
     "confirmDelete":      "Are you sure you want to delete this beer?",

@@ -1,19 +1,22 @@
 {
   "nav": {
-    "catalog":      "Catálogo",
-    "notebook":     "Mi Cuaderno",
+    "catalog":      "La Barra",
+    "notebook":     "Mi Barril",
     "feed":         "Feed",
     "friends":      "Amigos",
-    "social":       "Feed y Amigos",
+    "social":       "La Taberna",
     "messages":     "Mensajes",
-    "achievements": "Logros",
-    "shop":         "Tienda",
-    "ranking":      "Ranking",
-    "about":        "Sobre nosotros",
+    "achievements": "El Palmarés",
+    "shop":         "La Trastienda",
+    "ranking":      "Ligas",
+    "about":        "Historia",
     "settings":     "Configuración",
     "logout":       "Cerrar sesión",
     "admin":        "Panel Admin",
-    "map":          "Mapa mundial"
+    "map":          "Mapa mundial",
+    "tabCatalog":   "Catálogo",
+    "tabCommunity": "Comunidad",
+    "tabChat":      "Chat"
   },
   "sidebar": {
     "changeAvatar": "Cambiar avatar →",
@@ -224,6 +227,10 @@
     "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →",
     "mapBtn":       "Ver mapa de origen"
   },
+  "community": {
+    "comingSoonTitle": "Próximamente",
+    "comingSoonBody":  "Acá vas a poder ver las copas más originales que suba la comunidad, aprobadas antes de sumarse a la Colección de todos."
+  },
   "suggest": {
     "title":         "Sugerir cerveza",
     "subtitle":      "¿Falta alguna cerveza en el catálogo? Cuéntanos y la revisaremos.",
@@ -343,6 +350,7 @@
   },
   "notebook": {
     "title":              "Mi Cuaderno",
+    "tabCuaderno":        "Cuaderno",
     "loading":            "Cargando tu cuaderno...",
     "empty":              "No has guardado ninguna cerveza aún.",
     "confirmDelete":      "¿Seguro que quieres borrar esta cerveza?",

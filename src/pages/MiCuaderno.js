@@ -891,7 +891,7 @@ const MiCuaderno = () => {
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215" }}>
         {[
-          { id: "cuaderno",  label: t("notebook.title"), Icon: BookIcon },
+          { id: "cuaderno",  label: t("notebook.tabCuaderno"), Icon: BookIcon },
           { id: "coleccion", label: t("coleccion.titleBeers"), Icon: DiamondIcon },
         ].map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}

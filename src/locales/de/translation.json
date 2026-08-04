@@ -16,7 +16,8 @@
     "map":          "Weltkarte",
     "tabCatalog":   "Katalog",
     "tabCommunity": "Community",
-    "tabChat":      "Chat"
+    "tabChat":      "Chat",
+    "tabNoticias":  "Neuigkeiten"
   },
   "sidebar": {
     "changeAvatar": "Avatar ändern →",
@@ -158,6 +159,20 @@
       "error":             "Meldung konnte nicht gesendet werden. Bitte versuch es erneut.",
       "pickEntryTitle":    "Wähle, welchen Eintrag von {{nombre}} du melden möchtest",
       "noEntries":         "Dieser Benutzer hat keine sichtbaren Einträge zum Melden."
+    }
+  },
+  "noticias": {
+    "loading":     "Neuigkeiten werden geladen...",
+    "title":       "Neuigkeiten",
+    "subtitle":    "Neuigkeiten aus der Bierwelt und von unseren sozialen Netzwerken",
+    "readMore":    "Weiterlesen",
+    "empty": {
+      "title": "Noch keine Neuigkeiten",
+      "body":  "Hier findest du bald Neuigkeiten aus der Bierwelt und von unseren sozialen Netzwerken."
+    },
+    "category": {
+      "general": "Allgemein",
+      "redes":   "Soziale Netzwerke"
     }
   },
   "friends": {

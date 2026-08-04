@@ -16,7 +16,8 @@
     "map":          "Mapa mundial",
     "tabCatalog":   "Catálogo",
     "tabCommunity": "Comunidad",
-    "tabChat":      "Chat"
+    "tabChat":      "Chat",
+    "tabNoticias":  "Noticias"
   },
   "sidebar": {
     "changeAvatar": "Cambiar avatar →",
@@ -158,6 +159,20 @@
       "error":             "No se pudo enviar el reporte. Inténtalo de nuevo.",
       "pickEntryTitle":    "Elige qué entrada de {{nombre}} quieres reportar",
       "noEntries":         "No hay entradas visibles de este usuario para reportar."
+    }
+  },
+  "noticias": {
+    "loading":     "Cargando noticias...",
+    "title":       "Noticias",
+    "subtitle":    "Novedades del mundo cervecero y de nuestras redes",
+    "readMore":    "Leer más",
+    "empty": {
+      "title": "Todavía no hay noticias",
+      "body":  "Pronto vas a encontrar acá novedades del mundo cervecero y de nuestras redes."
+    },
+    "category": {
+      "general": "General",
+      "redes":   "Redes Sociales"
     }
   },
   "friends": {

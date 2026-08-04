@@ -16,7 +16,8 @@
     "map":          "World map",
     "tabCatalog":   "Catalog",
     "tabCommunity": "Community",
-    "tabChat":      "Chat"
+    "tabChat":      "Chat",
+    "tabNoticias":  "News"
   },
   "sidebar": {
     "changeAvatar": "Change avatar →",
@@ -158,6 +159,20 @@
       "error":             "Couldn't send the report. Please try again.",
       "pickEntryTitle":    "Pick which of {{nombre}}'s entries you want to report",
       "noEntries":         "This user has no visible entries to report."
+    }
+  },
+  "noticias": {
+    "loading":     "Loading news...",
+    "title":       "News",
+    "subtitle":    "Updates from the beer world and our social media",
+    "readMore":    "Read more",
+    "empty": {
+      "title": "No news yet",
+      "body":  "You'll soon find updates from the beer world and our social media here."
+    },
+    "category": {
+      "general": "General",
+      "redes":   "Social Media"
     }
   },
   "friends": {

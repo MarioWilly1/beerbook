@@ -7,6 +7,7 @@ import { translateDescription } from "../utils/translate";
 import {
   QuestionIcon, LightBulbIcon, FlagIcon, BeakerIcon, PencilIcon, GoalIcon,
   ZapIcon, CopyIcon, CheckIcon, PlusIcon, ContainerIcon, TelescopeIcon, PulseIcon,
+  MegaphoneIcon,
 } from "@primer/octicons-react";
 
 function fmtDate(ts) {
@@ -1359,6 +1360,180 @@ const RetosPanel = () => {
   );
 };
 
+// ── Sub-panel: Noticias ──────────────────────────────────────────────────────
+const NEWS_CATEGORY_OPTIONS = [
+  { value: "general", label: "General",         emoji: "🍺" },
+  { value: "redes",   label: "Redes Sociales",  emoji: "📱" },
+];
+
+const EMPTY_NEWS_FORM = {
+  title: "", body: "", link_url: "", category: "general", published_at: todayISO(),
+};
+
+const NoticiasPanel = () => {
+  const [form, setForm]           = useState(EMPTY_NEWS_FORM);
+  const [editingId, setEditingId] = useState(null);
+  const [items, setItems]         = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [saving, setSaving]       = useState(false);
+  const [msg, setMsg]             = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("news")
+      .select("*")
+      .order("published_at", { ascending: false });
+    setItems(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const setField = (field, value) => setForm((f) => ({ ...f, [field]: value }));
+
+  const resetForm = () => { setForm(EMPTY_NEWS_FORM); setEditingId(null); };
+
+  const handleEdit = (n) => {
+    setForm({
+      title: n.title, body: n.body, link_url: n.link_url || "",
+      category: n.category, published_at: n.published_at,
+    });
+    setEditingId(n.id);
+    setMsg("");
+  };
+
+  const handleDelete = async (id) => {
+    const { error } = await supabase.from("news").delete().eq("id", id);
+    if (error) { setMsg(`✕ No se pudo borrar: ${error.message}`); return; }
+    if (editingId === id) resetForm();
+    load();
+  };
+
+  const handleSave = async () => {
+    setMsg("");
+    if (!form.title.trim()) { setMsg("✕ El título no puede estar vacío."); return; }
+    if (!form.body.trim())  { setMsg("✕ El texto no puede estar vacío."); return; }
+    if (!form.published_at) { setMsg("✕ Completá la fecha."); return; }
+    if (form.link_url.trim() && !/^https?:\/\//i.test(form.link_url.trim())) {
+      setMsg("✕ El enlace tiene que empezar con http:// o https://.");
+      return;
+    }
+
+    setSaving(true);
+    const payload = {
+      title: form.title.trim(),
+      body: form.body.trim(),
+      link_url: form.link_url.trim() || null,
+      category: form.category,
+      published_at: form.published_at,
+    };
+
+    const { error } = editingId
+      ? await supabase.from("news").update({ ...payload, updated_at: new Date().toISOString() }).eq("id", editingId)
+      : await supabase.from("news").insert(payload);
+
+    setSaving(false);
+    if (error) { setMsg(`✕ ${error.message}`); return; }
+    setMsg(editingId ? "✓ Noticia actualizada." : "✓ Noticia creada.");
+    resetForm();
+    load();
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={sectionCard}>
+        <h3 style={sectionTitle}>{editingId ? "Editar noticia" : "Nueva noticia"}</h3>
+
+        <Field label="Categoría">
+          <div style={{ display: "flex", gap: 10 }}>
+            {NEWS_CATEGORY_OPTIONS.map((c) => (
+              <button
+                key={c.value}
+                type="button"
+                onClick={() => setField("category", c.value)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 700,
+                  border: `1px solid ${form.category === c.value ? "#d4af37" : "#2e2215"}`,
+                  background: form.category === c.value ? "rgba(212,175,55,0.12)" : "#0d0a06",
+                  color: form.category === c.value ? "#d4af37" : "#9a7d62",
+                }}
+              >
+                {c.emoji} {c.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        <Field label="Título">
+          <input value={form.title} onChange={(e) => setField("title", e.target.value)}
+            maxLength={120} style={input} placeholder="Ej: Nueva cerveza de temporada disponible" />
+        </Field>
+
+        <Field label="Texto breve">
+          <textarea value={form.body} onChange={(e) => setField("body", e.target.value.slice(0, 400))}
+            rows={3} maxLength={400} style={textarea} placeholder="Contá la novedad en pocas líneas" />
+          <div style={{ fontSize: 11, color: form.body.length >= 370 ? "#8b2020" : "#5a4535", textAlign: "right", marginTop: 3 }}>
+            {form.body.length}/400
+          </div>
+        </Field>
+
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <Field label="Enlace (opcional)" style={{ flex: "1 1 220px" }}>
+            <input value={form.link_url} onChange={(e) => setField("link_url", e.target.value)}
+              style={input} placeholder="https://..." />
+          </Field>
+          <Field label="Fecha" style={{ flex: "1 1 160px" }}>
+            <input type="date" value={form.published_at}
+              onChange={(e) => setField("published_at", e.target.value)} style={input} />
+          </Field>
+        </div>
+
+        {msg && <p style={{ margin: "0 0 12px", fontSize: 13, color: msg.startsWith("✓") ? "#4caf50" : "#c0392b" }}>{msg}</p>}
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={handleSave} disabled={saving} style={{ ...approveBtn, display: "flex", alignItems: "center", gap: 6 }}>
+            {saving ? "Guardando…" : editingId ? (<><CheckIcon size={14} /> Guardar cambios</>) : (<><PlusIcon size={14} /> Publicar noticia</>)}
+          </button>
+          {editingId && (
+            <button onClick={resetForm} style={rejectBtn}>Cancelar edición</button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <h3 style={sectionTitle}>Noticias publicadas</h3>
+        {loading ? (
+          <p style={{ color: "#9a7d62", fontSize: 13 }}>Cargando…</p>
+        ) : items.length === 0 ? (
+          <p style={{ color: "#5a4535", fontSize: 13 }}>Todavía no publicaste ninguna noticia.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {items.map((n) => {
+              const cat = NEWS_CATEGORY_OPTIONS.find((c) => c.value === n.category) || NEWS_CATEGORY_OPTIONS[0];
+              return (
+                <div key={n.id} style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ fontWeight: 700, color: "#f0e4cc", fontSize: 14 }}>
+                      {cat.emoji} {n.title}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#9a7d62", marginTop: 2 }}>
+                      {cat.label} · {n.published_at}
+                    </div>
+                  </div>
+                  <button onClick={() => handleEdit(n)} style={{ ...copyBtn, padding: "6px 12px", fontSize: 12 }}>Editar</button>
+                  <button onClick={() => handleDelete(n.id)} style={{ ...rejectBtn, padding: "6px 12px", fontSize: 12 }}>Borrar</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ── Página principal AdminPanel ────────────────────────────────────────────────
 const AdminPanel = ({ profile }) => {
   const navigate = useNavigate();
@@ -1388,6 +1563,7 @@ const AdminPanel = ({ profile }) => {
           { key: "cargar",      label: "Cargar Cerveza",          Icon: BeakerIcon },
           { key: "editar",      label: "Editar Cerveza",          Icon: PencilIcon },
           { key: "retos",       label: "Reto Semanal",            Icon: GoalIcon },
+          { key: "noticias",    label: "Noticias",                Icon: MegaphoneIcon },
         ].map(({ key, label, Icon }) => (
           <button
             key={key}
@@ -1414,6 +1590,7 @@ const AdminPanel = ({ profile }) => {
       {tab === "cargar"      && <CargarCerveza />}
       {tab === "editar"      && <EditarCerveza />}
       {tab === "retos"       && <RetosPanel />}
+      {tab === "noticias"    && <NoticiasPanel />}
     </div>
   );
 };

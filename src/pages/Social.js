@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { RssIcon, PeopleIcon, CommentIcon } from "@primer/octicons-react";
+import { RssIcon, PeopleIcon, CommentIcon, MegaphoneIcon } from "@primer/octicons-react";
 import Feed from "./Feed";
 import Amigos from "./Amigos";
 import Chats from "./Chats";
+import Noticias from "./Noticias";
 import { useTotalUnread } from "../hooks/useTotalUnread";
 
-// Feed, Amigos y Chat fusionados en una sola pantalla con tabs internas —
-// reduce la cantidad de links del sidebar (pedido explícito para mejorar
-// el layout mobile, ahora extendido a "La Taberna" con las 3 pestañas).
+// Feed, Amigos, Chat y Noticias fusionados en una sola pantalla con tabs
+// internas — reduce la cantidad de links del sidebar (pedido explícito para
+// mejorar el layout mobile, ahora extendido a "La Taberna" con 4 pestañas).
 // El tab activo es estado local (no cambia la URL): así el link del
 // sidebar (siempre a /feed) se mantiene resaltado sin importar qué
 // pestaña interna esté abierta. /amigos y /chats se conservan como
@@ -49,9 +50,18 @@ const Social = ({ defaultTab }) => {
             <span style={unreadBadge}>{totalUnread > 99 ? "99+" : totalUnread}</span>
           )}
         </button>
+        <button
+          onClick={() => setTab("noticias")}
+          style={{ ...tabBtnStyle, ...(tab === "noticias" ? tabBtnActive : {}) }}
+        >
+          <MegaphoneIcon size={14} /> {t("nav.tabNoticias")}
+        </button>
       </div>
 
-      {tab === "feed" ? <Feed /> : tab === "amigos" ? <Amigos /> : <Chats />}
+      {tab === "feed" ? <Feed />
+        : tab === "amigos" ? <Amigos />
+        : tab === "chat" ? <Chats />
+        : <Noticias />}
     </div>
   );
 };

@@ -316,8 +316,12 @@
     "styleSection":      "STIL",
     "countrySection":    "LAND",
     "alcoholSection":    "ALKOHOLGEHALT",
+    "alcoholLabel":      "Alkohol",
     "trending":          "Trending",
-    "trendingHint":      "Biere mit der meisten Community-Aktivität in den letzten 7 Tagen"
+    "trendingHint":      "Biere mit der meisten Community-Aktivität in den letzten 7 Tagen",
+    "allCountries":      "Alle Länder",
+    "allStyles":         "Alle Bierstile",
+    "allFamilies":       "Alle Familien"
   },
   "beerform": {
     "verified":           "Verifiziert",

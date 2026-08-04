@@ -316,8 +316,12 @@
     "styleSection":      "STYLE",
     "countrySection":    "COUNTRY",
     "alcoholSection":    "ALCOHOL CONTENT",
+    "alcoholLabel":      "Alcohol",
     "trending":          "Trending",
-    "trendingHint":      "Beers with the most community activity in the last 7 days"
+    "trendingHint":      "Beers with the most community activity in the last 7 days",
+    "allCountries":      "All countries",
+    "allStyles":         "All styles",
+    "allFamilies":       "All families"
   },
   "beerform": {
     "verified":           "Verified",

@@ -140,6 +140,7 @@ const Dashboard = () => {
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState(null);
   const [countryFilter, setCountryFilter] = useState(null);
+  const [familiaFilter, setFamiliaFilter] = useState(null);
   const [alcoholFilter, setAlcoholFilter] = useState([0, 15]);
   const [trendingFilter, setTrendingFilter] = useState(false);
 
@@ -170,6 +171,11 @@ const Dashboard = () => {
     [beers]
   );
 
+  const familias = useMemo(
+    () => [...new Set(beers.map((b) => b.familia).filter(Boolean))].sort(),
+    [beers]
+  );
+
   if (loading) return <p style={{ color: "#9a7d62" }}>{t("dashboard.loading")}</p>;
   if (error) return <p style={{ color: "#8b2020" }}>Error: {error}</p>;
 
@@ -179,6 +185,7 @@ const Dashboard = () => {
     .filter((beer) => !search || normalizeStr(beer.nombre).includes(normalizeStr(search)))
     .filter((beer) => !styleFilter || normalizeStr(beer.estilo).includes(normalizeStr(styleFilter)))
     .filter((beer) => !countryFilter || beer.pais?.includes(countryFilter))
+    .filter((beer) => !familiaFilter || beer.familia === familiaFilter)
     .filter((beer) => {
       if (minAlc === 0 && maxAlc === 15) return true;
       const alc = Number(beer.alcohol) || 0;
@@ -238,12 +245,15 @@ const Dashboard = () => {
         setStyleFilter={setStyleFilter}
         countryFilter={countryFilter}
         setCountryFilter={setCountryFilter}
+        familiaFilter={familiaFilter}
+        setFamiliaFilter={setFamiliaFilter}
         alcoholFilter={alcoholFilter}
         setAlcoholFilter={setAlcoholFilter}
         trendingFilter={trendingFilter}
         setTrendingFilter={setTrendingFilter}
         styles={styles}
         countries={countries}
+        familias={familias}
       />
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>

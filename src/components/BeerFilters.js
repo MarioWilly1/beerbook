@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
-import { XIcon, SearchIcon, FlameIcon, FilterIcon } from "@primer/octicons-react";
+import { XIcon, SearchIcon, FlameIcon } from "@primer/octicons-react";
 
 const RANGE_CSS = `
   .bf-thumb {
@@ -40,26 +40,6 @@ const RANGE_CSS = `
   .bf-thumb::-webkit-slider-runnable-track { background: transparent; }
   .bf-thumb::-moz-range-track { background: transparent; }
 `;
-
-const Chip = ({ label, active, onClick }) => (
-  <button
-    onClick={onClick}
-    style={{
-      padding: "6px 14px",
-      borderRadius: 999,
-      border: `1.5px solid ${active ? "#d4af37" : "#2e2215"}`,
-      cursor: "pointer",
-      fontWeight: active ? 700 : 500,
-      fontSize: 13,
-      background: active ? "rgba(212,175,55,0.15)" : "#2a1e0f",
-      color: active ? "#d4af37" : "#9a7d62",
-      transition: "all 0.15s",
-      whiteSpace: "nowrap",
-    }}
-  >
-    {label}
-  </button>
-);
 
 const Badge = ({ label, onRemove }) => (
   <span
@@ -108,7 +88,7 @@ const RangeSlider = ({ low, high, onChange }) => {
   const rightPct = (v) => `${100 - ((v - MIN) / (MAX - MIN)) * 100}%`;
 
   return (
-    <div>
+    <div style={{ flex: 1, minWidth: 0 }}>
       <div style={{ position: "relative", height: 24 }}>
         <div
           style={{
@@ -164,9 +144,9 @@ const RangeSlider = ({ low, high, onChange }) => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          fontSize: 12,
+          fontSize: 11,
           color: "#9a7d62",
-          marginTop: 4,
+          marginTop: 2,
           fontWeight: 600,
         }}
       >
@@ -177,13 +157,35 @@ const RangeSlider = ({ low, high, onChange }) => {
   );
 };
 
-const sectionLabel = {
-  margin: "0 0 10px",
-  fontSize: 11,
-  fontWeight: 700,
-  color: "#5a4535",
-  letterSpacing: "0.8px",
+const selectStyle = {
+  flex: "1 1 140px",
+  minWidth: 0,
+  padding: "9px 10px",
+  border: "1.5px solid #2e2215",
+  borderRadius: 10,
+  fontSize: 13,
+  outline: "none",
+  background: "#2a1e0f",
+  color: "#f0e4cc",
+  cursor: "pointer",
 };
+
+// Desplegable compacto y siempre visible — reemplaza las nubes de chips
+// que vivían adentro del panel colapsable "Filtros". Solo se muestra si
+// hay opciones (dinámico según el catálogo actual, mismo criterio que
+// antes con estilos/países).
+const SelectFilter = ({ value, onChange, options, allLabel, getLabel }) => (
+  <select
+    value={value ?? "all"}
+    onChange={(e) => onChange(e.target.value === "all" ? null : e.target.value)}
+    style={selectStyle}
+  >
+    <option value="all">{allLabel}</option>
+    {options.map((opt) => (
+      <option key={opt} value={opt}>{getLabel ? getLabel(opt) : opt}</option>
+    ))}
+  </select>
+);
 
 const BeerFilters = ({
   search,
@@ -192,26 +194,27 @@ const BeerFilters = ({
   setStyleFilter,
   countryFilter,
   setCountryFilter,
+  familiaFilter,
+  setFamiliaFilter,
   alcoholFilter,
   setAlcoholFilter,
   trendingFilter,
   setTrendingFilter,
   styles,
   countries,
+  familias = [],
   showTrending = true,
 }) => {
   const { t, i18n } = useTranslation();
-  const [open, setOpen] = useState(false);
 
   const [low, high] = alcoholFilter;
   const alcActive = low > 0 || high < 15;
-  const activeCount = [styleFilter, countryFilter, alcActive || null, trendingFilter || null].filter(
-    Boolean
-  ).length;
+  const hasActive = styleFilter || countryFilter || familiaFilter || alcActive || trendingFilter;
 
   const clearAll = () => {
     setStyleFilter(null);
     setCountryFilter(null);
+    setFamiliaFilter(null);
     setAlcoholFilter([0, 15]);
     setTrendingFilter(false);
   };
@@ -223,20 +226,14 @@ const BeerFilters = ({
         border: "1px solid #2e2215",
         borderRadius: 14,
         marginBottom: 20,
+        padding: "12px 14px",
       }}
     >
       <style>{RANGE_CSS}</style>
 
-      {/* Search + filter toggle */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          padding: "12px 14px",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ flex: 1, position: "relative" }}>
+      {/* Buscador + Trending */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+        <div style={{ flex: "1 1 220px", position: "relative", minWidth: 0 }}>
           <span
             style={{
               position: "absolute",
@@ -298,160 +295,97 @@ const BeerFilters = ({
               fontWeight: 700,
               fontSize: 13,
               whiteSpace: "nowrap",
+              flex: "0 0 auto",
             }}
           >
             <FlameIcon size={14} /> {t("filters.trending")}
           </button>
         )}
-
-        <button
-          onClick={() => setOpen((v) => !v)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "10px 14px",
-            borderRadius: 10,
-            cursor: "pointer",
-            border: `1.5px solid ${open || activeCount > 0 ? "#d4af37" : "#2e2215"}`,
-            background: open ? "#d4af37" : activeCount > 0 ? "rgba(212,175,55,0.12)" : "#2a1e0f",
-            color: open ? "#0d0a06" : "#9a7d62",
-            fontWeight: 600,
-            fontSize: 13,
-            whiteSpace: "nowrap",
-          }}
-        >
-          <FilterIcon size={14} /> {t("filters.filtersBtn")}
-          {activeCount > 0 && (
-            <span
-              style={{
-                background: open ? "rgba(0,0,0,0.18)" : "#d4af37",
-                color: "#0d0a06",
-                borderRadius: "50%",
-                width: 18,
-                height: 18,
-                fontSize: 11,
-                fontWeight: 800,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {activeCount}
-            </span>
-          )}
-        </button>
       </div>
 
-      {/* Active filter badges */}
-      {(styleFilter || countryFilter || alcActive || trendingFilter) && (
-        <div
-          style={{
-            display: "flex",
-            gap: 6,
-            flexWrap: "wrap",
-            padding: "0 14px 12px",
-          }}
-        >
-          {trendingFilter && (
-            <Badge label={<><FlameIcon size={12} /> {t("filters.trending")}</>} onRemove={() => setTrendingFilter(false)} />
-          )}
-          {styleFilter && (
-            <Badge label={styleFilter} onRemove={() => setStyleFilter(null)} />
-          )}
-          {countryFilter && (
-            <Badge
-              label={getCountryName(countryFilter, i18n.language)}
-              onRemove={() => setCountryFilter(null)}
+      {/* País / Estilo / Familia — siempre visibles, combinables entre sí */}
+      {(countries.length > 0 || styles.length > 0 || familias.length > 0) && (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+          {countries.length > 0 && (
+            <SelectFilter
+              value={countryFilter}
+              onChange={setCountryFilter}
+              options={countries}
+              allLabel={t("filters.allCountries")}
+              getLabel={(c) => getCountryName(c, i18n.language)}
             />
           )}
-          {alcActive && (
-            <Badge
-              label={`${low}–${high}% alc.`}
-              onRemove={() => setAlcoholFilter([0, 15])}
+          {styles.length > 0 && (
+            <SelectFilter
+              value={styleFilter}
+              onChange={setStyleFilter}
+              options={styles}
+              allLabel={t("filters.allStyles")}
+            />
+          )}
+          {familias.length > 0 && (
+            <SelectFilter
+              value={familiaFilter}
+              onChange={setFamiliaFilter}
+              options={familias}
+              allLabel={t("filters.allFamilies")}
             />
           )}
         </div>
       )}
 
-      {/* Collapsible filter panel */}
-      {open && (
+      {/* Alcohol — slider fino, siempre visible (no se reduce bien a un select) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#5a4535", flexShrink: 0 }}>
+          {t("filters.alcoholLabel")}
+        </span>
+        <RangeSlider low={low} high={high} onChange={(l, h) => setAlcoholFilter([l, h])} />
+      </div>
+
+      {/* Chips de filtros activos + limpiar todo */}
+      {hasActive && (
         <div
           style={{
+            display: "flex",
+            gap: 6,
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginTop: 12,
+            paddingTop: 12,
             borderTop: "1px solid #2e2215",
-            padding: "16px 14px",
           }}
         >
-          {styles.length > 0 && (
-            <div style={{ marginBottom: 18 }}>
-              <p style={sectionLabel}>{t("filters.styleSection")}</p>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {styles.map((s) => (
-                  <Chip
-                    key={s}
-                    label={s}
-                    active={styleFilter === s}
-                    onClick={() =>
-                      setStyleFilter(styleFilter === s ? null : s)
-                    }
-                  />
-                ))}
-              </div>
-            </div>
+          {trendingFilter && (
+            <Badge label={<><FlameIcon size={12} /> {t("filters.trending")}</>} onRemove={() => setTrendingFilter(false)} />
           )}
-
-          {countries.length > 0 && (
-            <div style={{ marginBottom: 18 }}>
-              <p style={sectionLabel}>{t("filters.countrySection")}</p>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {countries.map((c) => (
-                  <Chip
-                    key={c}
-                    label={getCountryName(c, i18n.language)}
-                    active={countryFilter === c}
-                    onClick={() =>
-                      setCountryFilter(countryFilter === c ? null : c)
-                    }
-                  />
-                ))}
-              </div>
-            </div>
+          {countryFilter && (
+            <Badge label={getCountryName(countryFilter, i18n.language)} onRemove={() => setCountryFilter(null)} />
           )}
-
-          <div style={{ marginBottom: 8 }}>
-            <p style={sectionLabel}>{t("filters.alcoholSection")}</p>
-            <RangeSlider
-              low={low}
-              high={high}
-              onChange={(l, h) => setAlcoholFilter([l, h])}
-            />
-          </div>
-
-          {(styleFilter || countryFilter || alcActive || trendingFilter) && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                marginTop: 16,
-              }}
-            >
-              <button
-                onClick={clearAll}
-                style={{
-                  background: "none",
-                  border: "1px solid #2e2215",
-                  borderRadius: 8,
-                  padding: "6px 14px",
-                  fontSize: 13,
-                  color: "#5a4535",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-              >
-                {t("filters.clearBtn")}
-              </button>
-            </div>
+          {styleFilter && (
+            <Badge label={styleFilter} onRemove={() => setStyleFilter(null)} />
           )}
+          {familiaFilter && (
+            <Badge label={familiaFilter} onRemove={() => setFamiliaFilter(null)} />
+          )}
+          {alcActive && (
+            <Badge label={`${low}–${high}% alc.`} onRemove={() => setAlcoholFilter([0, 15])} />
+          )}
+          <button
+            onClick={clearAll}
+            style={{
+              background: "none",
+              border: "1px solid #2e2215",
+              borderRadius: 8,
+              padding: "5px 12px",
+              fontSize: 12,
+              color: "#5a4535",
+              cursor: "pointer",
+              fontWeight: 600,
+              marginLeft: "auto",
+            }}
+          >
+            {t("filters.clearBtn")}
+          </button>
         </div>
       )}
     </div>

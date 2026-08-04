@@ -676,6 +676,7 @@ const MiCuaderno = () => {
   const [search, setSearch]               = useState("");
   const [styleFilter, setStyleFilter]     = useState(null);
   const [countryFilter, setCountryFilter] = useState(null);
+  const [familiaFilter, setFamiliaFilter] = useState(null);
   const [alcoholFilter, setAlcoholFilter] = useState([0, 15]);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [hiddenCounts, setHiddenCounts]   = useState({}); // { beer_id: cantidad de amigos a los que se les oculta }
@@ -873,6 +874,11 @@ const MiCuaderno = () => {
     [editableBeers]
   );
 
+  const familias = useMemo(
+    () => [...new Set(editableBeers.map((b) => b.familia).filter(Boolean))].sort(),
+    [editableBeers]
+  );
+
   if (loading) return <p style={{ color: "#9a7d62" }}>{t("notebook.loading")}</p>;
 
   const [minAlc, maxAlc] = alcoholFilter;
@@ -880,6 +886,7 @@ const MiCuaderno = () => {
     .filter((b) => !search || normalizeStr(b.nombre).includes(normalizeStr(search)))
     .filter((b) => !styleFilter || normalizeStr(b.estilo).includes(normalizeStr(styleFilter)))
     .filter((b) => !countryFilter || b.pais?.includes(countryFilter))
+    .filter((b) => !familiaFilter || b.familia === familiaFilter)
     .filter((b) => {
       if (minAlc === 0 && maxAlc === 15) return true;
       const alc = Number(b.alcohol) || 0;
@@ -925,6 +932,8 @@ const MiCuaderno = () => {
             setStyleFilter={setStyleFilter}
             countryFilter={countryFilter}
             setCountryFilter={setCountryFilter}
+            familiaFilter={familiaFilter}
+            setFamiliaFilter={setFamiliaFilter}
             alcoholFilter={alcoholFilter}
             setAlcoholFilter={setAlcoholFilter}
             trendingFilter={false}
@@ -932,6 +941,7 @@ const MiCuaderno = () => {
             showTrending={false}
             styles={styles}
             countries={countries}
+            familias={familias}
           />
 
           {search && (

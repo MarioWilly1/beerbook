@@ -225,7 +225,7 @@
     "saving":             "Guardando..."
   },
   "dashboard": {
-    "title":        "Catálogo de Cervezas",
+    "title":        "Explora todas las cervezas disponibles",
     "loading":      "Cargando cervezas...",
     "collectionProgressShort": "{{count}}/{{total}} cervezas probadas",
     "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →",

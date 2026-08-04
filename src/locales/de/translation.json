@@ -225,7 +225,7 @@
     "saving":             "Wird gespeichert..."
   },
   "dashboard": {
-    "title":        "Bierkatalog",
+    "title":        "Entdecke alle verfügbaren Biere",
     "loading":      "Biere werden geladen...",
     "collectionProgressShort": "{{count}}/{{total}} Biere probiert",
     "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →",

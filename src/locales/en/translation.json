@@ -225,7 +225,7 @@
     "saving":             "Saving..."
   },
   "dashboard": {
-    "title":        "Beer Catalog",
+    "title":        "Explore every beer available",
     "loading":      "Loading beers...",
     "collectionProgressShort": "{{count}}/{{total}} beers tried",
     "suggestBeer":  "Can't find your beer? Suggest it →",

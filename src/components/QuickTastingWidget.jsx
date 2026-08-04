@@ -26,7 +26,7 @@ const QuickTastingWidget = ({ count, onTap, pending }) => {
 
   return (
     <div style={wrapStyle} onClick={(e) => e.stopPropagation()}>
-      <span style={{ fontSize: 12, color: "#9a7d62", whiteSpace: "nowrap" }}>
+      <span style={{ fontSize: 12, color: "#9a7d62" }}>
         🍺 {t("notebook.timesTriedLabel")}:{" "}
         <strong style={{ ...countStyle, transform: bump ? "scale(1.35)" : "scale(1)" }}>{count}</strong>
       </span>
@@ -47,7 +47,7 @@ const QuickTastingWidget = ({ count, onTap, pending }) => {
 
 const wrapStyle = {
   position: "relative", display: "inline-flex", alignItems: "center", gap: 8,
-  padding: "4px 8px", borderRadius: 8,
+  padding: "4px 8px", borderRadius: 8, minWidth: 0, maxWidth: "100%",
   background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)",
 };
 const countStyle = { display: "inline-block", color: "#d4af37", transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1)" };

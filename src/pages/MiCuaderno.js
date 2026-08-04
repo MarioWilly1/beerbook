@@ -983,7 +983,7 @@ const XpBadge = ({ xp }) => (
   <span style={{ fontSize: "10px", color: "#d4af37", fontWeight: 700, marginLeft: "4px" }}>+{xp} XP</span>
 );
 
-const nbCardStyle       = { border: "1px solid #2e2215", borderRadius: "10px", padding: "6px", background: "#1c1409", display: "flex", flexDirection: "column" };
+const nbCardStyle       = { border: "1px solid #2e2215", borderRadius: "10px", padding: "6px", background: "#1c1409", display: "flex", flexDirection: "column", minWidth: 0 };
 const nbInfoBtnStyle    = { background: "none", border: "none", color: "#8b6b2e", fontSize: 13, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
 const nbFieldStyle      = { marginBottom: "8px" };
 const nbLabelStyle      = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: "3px" };

@@ -21,6 +21,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
 import LugarPage from "./pages/LugarPage";
+import Legal from "./pages/Legal";
 import ChatPage from "./pages/ChatPage";
 import AdminPanel from "./pages/AdminPanel";
 import TiendaPage from "./pages/TiendaPage";
@@ -92,11 +93,12 @@ function App() {
     return () => { handle?.remove(); };
   }, []);
 
-  // Ruta pública /lugar/:id — accessible sin autenticación
-  if (location.pathname.startsWith("/lugar/")) {
+  // Rutas públicas — accesibles sin autenticación
+  if (location.pathname.startsWith("/lugar/") || location.pathname === "/legal") {
     return (
       <Routes>
         <Route path="/lugar/:id" element={<LugarPage />} />
+        <Route path="/legal" element={<Legal />} />
       </Routes>
     );
   }

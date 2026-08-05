@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { useBadges } from "../hooks/useBadges";
@@ -457,6 +458,13 @@ const Configuracion = ({ onProfileChange }) => {
 
       {/* Tab: Ayuda y Soporte */}
       {tab === "ayuda" && session && <SupportTab session={session} t={t} />}
+
+      {/* Ítem fijo, siempre visible sin importar la pestaña activa */}
+      <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #2e2215", textAlign: "center" }}>
+        <Link to="/legal" style={{ fontSize: 12, color: "#5a4535", textDecoration: "underline" }}>
+          {t("settings.legalLink")}
+        </Link>
+      </div>
 
       {/* Avatar selector modal */}
       {showAvatarSelector && session && (

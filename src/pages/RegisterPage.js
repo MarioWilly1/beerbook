@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import DateInput from "../components/DateInput";
 import { EyeIcon, EyeClosedIcon } from "@primer/octicons-react";
@@ -225,6 +226,13 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
           <button type="button" onClick={onSwitchToLogin} style={inlineLinkStyle}>
             Inicia sesión
           </button>
+        </p>
+
+        <p style={{ textAlign: "center", marginTop: "10px", fontSize: "12px", color: "#999" }}>
+          Al registrarte, aceptás nuestra{" "}
+          <Link to="/legal" style={inlineLinkStyle}>
+            Política de Privacidad y Términos de Servicio
+          </Link>
         </p>
       </div>
     </div>

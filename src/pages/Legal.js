@@ -26,7 +26,7 @@ const Legal = () => (
       <Link to="/" style={backLinkStyle}>← Volver</Link>
 
       <h1 style={titleStyle}>RiBeer's — Política de Privacidad y Términos de Servicio</h1>
-      <p style={metaStyle}><strong>Última actualización:</strong> [FECHA] — Versión 0.1 (borrador de trabajo)</p>
+      <p style={metaStyle}><strong>Última actualización:</strong> 5 de agosto de 2026 — Versión 0.1 (borrador de trabajo)</p>
 
       <div style={warningBoxStyle}>
         ⚠️ <strong>AVISO IMPORTANTE:</strong> este documento es un borrador generado como punto de partida y NO

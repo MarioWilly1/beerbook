@@ -39,7 +39,7 @@ const Legal = () => (
 
       <Section>1. Responsable del tratamiento</Section>
       <P>
-        Mario Fernando Rivero Ramírez (persona física) · DNI 80264821L · Calle el Tejo 5, 06011 Badajoz, España ·
+        Mario Fernando Rivero Ramírez (persona física) · DNI 80264821L · 06011 Badajoz, España ·
         ribeers.app@gmail.com
       </P>
       <P>
@@ -269,7 +269,7 @@ const Legal = () => (
       </P>
 
       <Section>14. Contacto</Section>
-      <P>ribeers.app@gmail.com · Calle el Tejo 5, 06011 Badajoz, España</P>
+      <P>ribeers.app@gmail.com · 06011 Badajoz, España</P>
     </div>
   </div>
 );

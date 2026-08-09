@@ -11,6 +11,7 @@ import ReactionBar from "../components/ReactionBar";
 import StoryBar from "../components/StoryBar";
 import ReportEntryModal from "../components/ReportEntryModal";
 import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
+import NativePullToRefresh from "../components/NativePullToRefresh";
 
 const ACTION_EMOJI = {
   register: "🍺",
@@ -137,13 +138,14 @@ const FeedEntry = ({ entry, reactionData, currentUserId, onToggle, onReport }) =
 
 const Feed = () => {
   const { t } = useTranslation();
-  const { feed, loading } = useFeed();
+  const { feed, loading, refetch } = useFeed();
   const { reactionsMap, toggleReaction, currentUserId } = useFeedReactions(feed);
   const [reportTarget, setReportTarget] = useState(null);
 
   if (loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("feed.loading")}</p>;
 
   return (
+    <NativePullToRefresh onRefresh={() => refetch({ silent: true })}>
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
       {/* Barra de historias efímeras */}
       <StoryBar />
@@ -187,6 +189,7 @@ const Feed = () => {
         />
       )}
     </div>
+    </NativePullToRefresh>
   );
 };
 

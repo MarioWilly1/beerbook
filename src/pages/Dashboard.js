@@ -11,6 +11,7 @@ import OriginMapPanel from "../components/OriginMapPanel";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useTrendingBeers } from "../hooks/useTrendingBeers";
 import ChallengesBellButton from "../components/ChallengesBellButton";
+import NativePullToRefresh from "../components/NativePullToRefresh";
 import { XIcon, GlobeIcon, ChevronUpIcon, ChevronDownIcon } from "@primer/octicons-react";
 import { STYLE_KEYWORDS, normalizeStr } from "../utils/styleCategories";
 
@@ -129,7 +130,7 @@ const SuggestBeerModal = ({ onClose, t }) => {
 const Dashboard = ({ tabsSlot }) => {
   const isNative = Capacitor.isNativePlatform();
   const { t } = useTranslation();
-  const { beers, loading, error } = useBeers();
+  const { beers, loading, error, refetch: refetchBeers } = useBeers();
   const { userBeers, refetch } = useUserBeers();
   const { stats, refetch: refetchStats } = useUserStats();
   const { trendingIds, rankOf } = useTrendingBeers();
@@ -200,6 +201,7 @@ const Dashboard = ({ tabsSlot }) => {
     });
 
   return (
+    <NativePullToRefresh onRefresh={() => refetchBeers({ silent: true })}>
     <div>
       {/* En la app nativa el header de NativeShell ya muestra la marca
           "RiBeer's" en todas las pantallas — repetir el título acá es
@@ -296,6 +298,7 @@ const Dashboard = ({ tabsSlot }) => {
         ))}
       </div>
     </div>
+    </NativePullToRefresh>
   );
 };
 

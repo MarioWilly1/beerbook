@@ -22,6 +22,8 @@ import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
 import LugarPage from "./pages/LugarPage";
 import Legal from "./pages/Legal";
+import NativeShell from "./components/NativeShell";
+import PerfilHub from "./pages/PerfilHub";
 import ChatPage from "./pages/ChatPage";
 import AdminPanel from "./pages/AdminPanel";
 import TiendaPage from "./pages/TiendaPage";
@@ -204,24 +206,53 @@ function App() {
         },
       }}
     />
-    <Layout session={session} profile={profile} onAvatarChange={(url) => setProfile((p) => ({ ...p, avatar_url: url }))}>
-      <Routes>
-        <Route path="/" element={<LaBarra />} />
-        <Route path="/cuaderno" element={<MiCuaderno />} />
-        <Route path="/logros" element={<Logros />} />
-        <Route path="/ranking" element={<Ranking />} />
-        <Route path="/feed" element={<Social defaultTab="feed" />} />
-        <Route path="/amigos" element={<Social defaultTab="amigos" />} />
-        <Route path="/chats" element={<Social defaultTab="chat" />} />
-        <Route path="/tienda" element={<TiendaPage />} />
-        <Route path="/sobre-nosotros" element={<SobreNosotros />} />
-        <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
-        <Route path="/perfil/:userId" element={<ProfilePage />} />
-        <Route path="/chats/:id" element={<ChatPage />} />
-        <Route path="/admin" element={<AdminPanel profile={profile} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Layout>
+    {Capacitor.isNativePlatform() ? (
+      // App nativa (Android): envoltorio de navegación distinto (barra
+      // inferior, ver NativeShell.js/PerfilHub.js) — el árbol web de abajo
+      // queda intacto, sin tocar ni una línea, tal como pidió Mario. Mismas
+      // páginas/hooks de siempre, solo cambia el "envoltorio". Suma dos
+      // rutas propias de esta variante: /noticias (antes solo alcanzable
+      // como tab interno de La Taberna) y /perfil-app (menú de Perfil).
+      <NativeShell>
+        <Routes>
+          <Route path="/" element={<LaBarra />} />
+          <Route path="/cuaderno" element={<MiCuaderno />} />
+          <Route path="/logros" element={<Logros />} />
+          <Route path="/ranking" element={<Ranking />} />
+          <Route path="/feed" element={<Social defaultTab="feed" />} />
+          <Route path="/amigos" element={<Social defaultTab="amigos" />} />
+          <Route path="/chats" element={<Social defaultTab="chat" />} />
+          <Route path="/noticias" element={<Social defaultTab="noticias" />} />
+          <Route path="/tienda" element={<TiendaPage />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+          <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
+          <Route path="/perfil/:userId" element={<ProfilePage />} />
+          <Route path="/perfil-app" element={<PerfilHub session={session} profile={profile} />} />
+          <Route path="/chats/:id" element={<ChatPage />} />
+          <Route path="/admin" element={<AdminPanel profile={profile} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </NativeShell>
+    ) : (
+      <Layout session={session} profile={profile} onAvatarChange={(url) => setProfile((p) => ({ ...p, avatar_url: url }))}>
+        <Routes>
+          <Route path="/" element={<LaBarra />} />
+          <Route path="/cuaderno" element={<MiCuaderno />} />
+          <Route path="/logros" element={<Logros />} />
+          <Route path="/ranking" element={<Ranking />} />
+          <Route path="/feed" element={<Social defaultTab="feed" />} />
+          <Route path="/amigos" element={<Social defaultTab="amigos" />} />
+          <Route path="/chats" element={<Social defaultTab="chat" />} />
+          <Route path="/tienda" element={<TiendaPage />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+          <Route path="/configuracion" element={<Configuracion onProfileChange={(changes) => setProfile((p) => ({ ...p, ...changes }))} />} />
+          <Route path="/perfil/:userId" element={<ProfilePage />} />
+          <Route path="/chats/:id" element={<ChatPage />} />
+          <Route path="/admin" element={<AdminPanel profile={profile} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Layout>
+    )}
     </>
   );
 }

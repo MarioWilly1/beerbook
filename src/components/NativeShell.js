@@ -1,0 +1,102 @@
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  PlusCircleIcon, BookIcon, RssIcon, PersonIcon,
+} from "@primer/octicons-react";
+import { useTotalUnread } from "../hooks/useTotalUnread";
+
+// Envoltorio de navegación exclusivo de la app nativa (Capacitor) — hermano
+// de Layout.js, NUNCA usado en web. Barra inferior de 4 secciones fijas;
+// todo lo secundario (Tienda, Noticias, Historia, Configuración, Logros,
+// Ligas, Retos) vive dentro del menú de "Perfil" (ver PerfilHub.js), no acá.
+// Reutiliza las mismas rutas/páginas que ya existen — cero lógica de negocio
+// duplicada, solo cambia el "envoltorio" de navegación.
+const TABS = [
+  { to: "/",         label: "Registrar", Icon: PlusCircleIcon, end: true },
+  { to: "/cuaderno", label: "Colección", Icon: BookIcon },
+  { to: "/feed",      label: "Social",   Icon: RssIcon, badge: "social" },
+  { to: "/perfil-app", label: "Perfil",  Icon: PersonIcon },
+];
+
+const NativeShell = ({ children }) => {
+  const totalUnread = useTotalUnread();
+
+  return (
+    <div style={wrapStyle}>
+      <main style={mainStyle}>
+        {children}
+      </main>
+
+      <nav style={tabBarStyle}>
+        {TABS.map(({ to, label, Icon, end, badge }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            style={({ isActive }) => ({
+              ...tabBtnStyle,
+              color: isActive ? "#d4af37" : "#9a7d62",
+            })}
+          >
+            <span style={{ position: "relative", display: "flex" }}>
+              <Icon size={22} />
+              {badge === "social" && totalUnread > 0 && (
+                <span style={badgeStyle}>{totalUnread > 99 ? "99+" : totalUnread}</span>
+              )}
+            </span>
+            <span style={tabLabelStyle}>{label}</span>
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  );
+};
+
+const wrapStyle = {
+  display: "flex",
+  flexDirection: "column",
+  height: "100vh",
+  overflow: "hidden",
+  background: "#0d0a06",
+};
+const mainStyle = {
+  flex: 1,
+  overflowY: "auto",
+  padding: "16px 16px 20px",
+};
+const tabBarStyle = {
+  display: "flex",
+  justifyContent: "space-around",
+  alignItems: "stretch",
+  flexShrink: 0,
+  background: "#1c1409",
+  borderTop: "1px solid #2e2215",
+  // env(safe-area-inset-bottom) respeta la barra de gestos de Android en
+  // pantalla completa (StatusBar.setOverlaysWebView, ver App.js) — sin esto
+  // la barra queda pegada debajo de la zona de gestos del sistema.
+  paddingBottom: "env(safe-area-inset-bottom, 0px)",
+};
+const tabBtnStyle = {
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 4,
+  padding: "8px 4px 6px",
+  textDecoration: "none",
+  fontSize: 10.5,
+  fontWeight: 700,
+};
+const tabLabelStyle = {
+  whiteSpace: "nowrap",
+};
+const badgeStyle = {
+  position: "absolute", top: -4, right: -8,
+  background: "#c0392b", color: "#fff", borderRadius: 999,
+  minWidth: 15, height: 15, padding: "0 3px",
+  fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center",
+  lineHeight: 1, border: "2px solid #1c1409",
+};
+
+export default NativeShell;

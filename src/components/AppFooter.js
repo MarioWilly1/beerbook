@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/chapa_y_espuma/",
   tiktok:    "https://www.tiktok.com/@chapa_y_espuma",
-  youtube:   "https://youtube.com/@chapa_y_espuma",
+  youtube:   "https://www.youtube.com/@chapayespuma",
   discord:   "https://discord.gg/E6SGr3NX",
 };
 
@@ -81,7 +81,7 @@ const AppFooter = () => (
     <div style={iconsRowStyle}>
       <SocialIcon href={SOCIAL_LINKS.instagram} label="Instagram @chapa_y_espuma"><InstagramIcon /></SocialIcon>
       <SocialIcon href={SOCIAL_LINKS.tiktok} label="TikTok @chapa_y_espuma"><TikTokIcon /></SocialIcon>
-      <SocialIcon href={SOCIAL_LINKS.youtube} label="YouTube @chapa_y_espuma"><YouTubeIcon /></SocialIcon>
+      <SocialIcon href={SOCIAL_LINKS.youtube} label="YouTube @chapayespuma"><YouTubeIcon /></SocialIcon>
       <SocialIcon href={SOCIAL_LINKS.discord} label="Discord — Chapa y Espuma"><DiscordIcon /></SocialIcon>
     </div>
   </footer>

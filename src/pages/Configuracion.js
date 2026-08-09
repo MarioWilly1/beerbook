@@ -50,10 +50,17 @@ const Toggle = ({ value, onChange, label, description }) => (
   </div>
 );
 
+const VALID_TABS = TABS.map((tb) => tb.key);
+
 const Configuracion = ({ onProfileChange }) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
-  const [tab, setTab] = useState("perfil");
+  // Soporta deep-link directo a una pestaña (ej. /configuracion?tab=ayuda
+  // desde el footer de Atención al Cliente).
+  const [tab, setTab] = useState(() => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    return VALID_TABS.includes(requested) ? requested : "perfil";
+  });
   const [session, setSession] = useState(null);
   const [localProfile, setLocalProfile] = useState(null);
 

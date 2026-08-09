@@ -14,6 +14,7 @@ import { useTotalUnread } from "../hooks/useTotalUnread";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useUserStats } from "../hooks/useUserStats";
 import ConfirmModal from "./ConfirmModal";
+import AppFooter from "./AppFooter";
 import {
   ThreeBarsIcon, RssIcon, GearIcon, ToolsIcon,
   SignOutIcon, PencilIcon, TagIcon,
@@ -271,6 +272,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
         }}
       >
         {children}
+        <AppFooter />
       </main>
 
       {/* Avatar selector modal */}

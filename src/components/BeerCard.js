@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import ReactDOM from "react-dom";
+import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
 import { supabase } from "../services/supabase";
@@ -439,7 +440,7 @@ const XpBadge = ({ xp }) => (
 );
 
 const infoBtnStyle     = { background: "none", border: "none", color: "#8b6b2e", fontSize: 13, cursor: "pointer", padding: "0 2px", lineHeight: 1, flexShrink: 0, transition: "color 0.15s" };
-const cardStyle        = { border: "1px solid #2e2215", borderRadius: "10px", padding: "6px", background: "#1c1409", display: "flex", flexDirection: "column" };
+const cardStyle        = { border: "1px solid #2e2215", borderRadius: "10px", padding: "6px", background: "#1c1409", display: "flex", flexDirection: "column", boxShadow: NATIVE_CARD_SHADOW };
 const metaStyle        = { margin: "0 0 4px", fontSize: "11px", color: "#9a7d62" };
 const fieldStyle       = { marginBottom: "8px" };
 const labelStyle       = { display: "block", fontSize: "11px", fontWeight: "600", color: "#9a7d62", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.4px" };

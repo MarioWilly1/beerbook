@@ -6,6 +6,7 @@ import PrestigeBadge from "../components/PrestigeBadge";
 import ChallengesModal from "../components/ChallengesModal";
 import ConfirmModal from "../components/ConfirmModal";
 import { useUserStats } from "../hooks/useUserStats";
+import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 import {
   TrophyIcon, ShieldIcon, TagIcon, MegaphoneIcon, InfoIcon,
   GearIcon, GiftIcon, SignOutIcon, ChevronRightIcon, PersonIcon,
@@ -105,6 +106,7 @@ const headerStyle = {
   borderRadius: 14,
   cursor: "pointer",
   color: "#9a7d62",
+  boxShadow: NATIVE_CARD_SHADOW,
 };
 const nameStyle = {
   margin: 0,
@@ -128,6 +130,7 @@ const menuStyle = {
   border: "1px solid #2e2215",
   borderRadius: 14,
   overflow: "hidden",
+  boxShadow: NATIVE_CARD_SHADOW,
 };
 const rowStyle = {
   display: "flex",

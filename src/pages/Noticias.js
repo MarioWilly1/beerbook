@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LinkExternalIcon } from "@primer/octicons-react";
 import { supabase } from "../services/supabase";
+import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 
 const CATEGORY_EMOJI = { general: "🍺", redes: "📱" };
 
@@ -87,6 +88,7 @@ const cardStyle  = {
   borderRadius: 12,
   padding: 16,
   marginBottom: 16,
+  boxShadow: NATIVE_CARD_SHADOW,
 };
 const emptyStyle = {
   textAlign: "center",

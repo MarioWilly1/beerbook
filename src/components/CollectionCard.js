@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 
 // ── Keyframe CSS injected once ────────────────────────────────────────────────
 const STYLES = `
@@ -54,13 +55,16 @@ export const injectStyles = () => {
 export const RARITY = {
   comun: {
     color: "#7a6a55", glyph: "⚪",
-    card: { border: "1px solid #3a2e20", background: "#1c1409" },
+    // rara/épica/legendaria/mítica ya tienen su propio glow animado (ver
+    // abajo) que aporta profundidad de sobra — la sombra plana de la Fase A
+    // solo suma acá y en poco_comun, que no tenían ningún efecto.
+    card: { border: "1px solid #3a2e20", background: "#1c1409", boxShadow: NATIVE_CARD_SHADOW },
     badge: { background: "rgba(122,106,85,0.2)", color: "#7a6a55", border: "1px solid rgba(122,106,85,0.35)" },
     animation: null,
   },
   poco_comun: {
     color: "#4a9e6a", glyph: "🟢",
-    card: { border: "1.5px solid #2d6645", background: "#111d16" },
+    card: { border: "1.5px solid #2d6645", background: "#111d16", boxShadow: NATIVE_CARD_SHADOW },
     badge: { background: "rgba(74,158,106,0.15)", color: "#4a9e6a", border: "1px solid rgba(74,158,106,0.4)" },
     animation: null,
   },

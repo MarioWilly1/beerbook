@@ -10,6 +10,7 @@ import Lightbox from "../components/Lightbox";
 import ReactionBar from "../components/ReactionBar";
 import StoryBar from "../components/StoryBar";
 import ReportEntryModal from "../components/ReportEntryModal";
+import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 
 const ACTION_EMOJI = {
   register: "🍺",
@@ -195,6 +196,7 @@ const cardStyle  = {
   borderRadius: 12,
   padding: 16,
   marginBottom: 16,
+  boxShadow: NATIVE_CARD_SHADOW,
 };
 const emptyStyle = {
   textAlign: "center",

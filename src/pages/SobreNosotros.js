@@ -1,6 +1,11 @@
+import { useState } from "react";
+import Lightbox from "../components/Lightbox";
+
 // Carta de bienvenida de los fundadores. Texto y foto reales — no editar el
 // contenido sin que Sergio/Mario lo pidan explícitamente.
 const SobreNosotros = () => {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   return (
     <div style={pageStyle}>
       <p style={eyebrowStyle}>Una carta de los fundadores</p>
@@ -11,11 +16,20 @@ const SobreNosotros = () => {
           <img
             src="/founders.jpg"
             alt="Sergio y Mario, fundadores de RiBeer's"
-            style={photoImg}
+            onClick={() => setLightboxOpen(true)}
+            style={{ ...photoImg, cursor: "zoom-in" }}
           />
         </div>
       </div>
       <p style={captionStyle}>Sergio y Mario — fundadores de RiBeer's</p>
+
+      {lightboxOpen && (
+        <Lightbox
+          src="/founders.jpg"
+          alt="Sergio y Mario, fundadores de RiBeer's"
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
 
       <div style={dividerStyle} />
 

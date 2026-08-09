@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+// La marca pública en redes es @chapa_y_espuma, distinta del nombre interno
+// de la app (RiBeer's) — a propósito, para no revelar el concepto antes del
+// lanzamiento. No renombrar estos links a @RiBeers sin que Mario lo pida.
 const SOCIAL_LINKS = {
-  instagram: "https://instagram.com/RiBeers",
-  tiktok:    "https://tiktok.com/@RiBeers",
+  instagram: "https://www.instagram.com/chapa_y_espuma/",
+  tiktok:    "https://www.tiktok.com/@chapa_y_espuma",
   youtube:   "https://youtube.com/@RiBeers",
   discord:   "https://discord.gg/E6SGr3NX",
 };
@@ -76,8 +79,8 @@ const AppFooter = () => (
     </div>
 
     <div style={iconsRowStyle}>
-      <SocialIcon href={SOCIAL_LINKS.instagram} label="Instagram @RiBeers"><InstagramIcon /></SocialIcon>
-      <SocialIcon href={SOCIAL_LINKS.tiktok} label="TikTok @RiBeers"><TikTokIcon /></SocialIcon>
+      <SocialIcon href={SOCIAL_LINKS.instagram} label="Instagram @chapa_y_espuma"><InstagramIcon /></SocialIcon>
+      <SocialIcon href={SOCIAL_LINKS.tiktok} label="TikTok @chapa_y_espuma"><TikTokIcon /></SocialIcon>
       <SocialIcon href={SOCIAL_LINKS.youtube} label="YouTube @RiBeers"><YouTubeIcon /></SocialIcon>
       <SocialIcon href={SOCIAL_LINKS.discord} label="Discord — RiBeer's"><DiscordIcon /></SocialIcon>
     </div>

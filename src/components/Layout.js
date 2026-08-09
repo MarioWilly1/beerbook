@@ -70,7 +70,10 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
           >
             <ThreeBarsIcon size={22} />
           </button>
-          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#d4af37", fontWeight: 700 }}>
+          <span
+            onClick={() => { navigate("/"); closeDrawer(); }}
+            style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#d4af37", fontWeight: 700, cursor: "pointer" }}
+          >
             🍺 RiBeer's
           </span>
           {totalUnread > 0 ? (
@@ -127,14 +130,19 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
         <div>
           {/* Title only on desktop — header has branding on mobile */}
           {!isMobile && (
-            <h1 style={{
-              fontSize: "22px",
-              marginBottom: "16px",
-              textAlign: "center",
-              letterSpacing: "1px",
-              fontFamily: "'Playfair Display', serif",
-              color: "#d4af37",
-            }}>
+            <h1
+              onClick={() => { navigate("/"); closeDrawer(); }}
+              title={t("nav.catalog")}
+              style={{
+                fontSize: "22px",
+                marginBottom: "16px",
+                textAlign: "center",
+                letterSpacing: "1px",
+                fontFamily: "'Playfair Display', serif",
+                color: "#d4af37",
+                cursor: "pointer",
+              }}
+            >
               🍺 RiBeer's
             </h1>
           )}

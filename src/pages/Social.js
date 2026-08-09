@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { Capacitor } from "@capacitor/core";
 import { useTranslation } from "react-i18next";
 import { RssIcon, PeopleIcon, CommentIcon, MegaphoneIcon } from "@primer/octicons-react";
 import Feed from "./Feed";
@@ -7,6 +8,9 @@ import Amigos from "./Amigos";
 import Chats from "./Chats";
 import Noticias from "./Noticias";
 import { useTotalUnread } from "../hooks/useTotalUnread";
+import NativeTabSlide from "../components/NativeTabSlide";
+
+const TAB_ORDER = ["feed", "amigos", "chat", "noticias"];
 
 // Feed, Amigos, Chat y Noticias fusionados en una sola pantalla con tabs
 // internas — reduce la cantidad de links del sidebar (pedido explícito para
@@ -58,10 +62,19 @@ const Social = ({ defaultTab }) => {
         </button>
       </div>
 
-      {tab === "feed" ? <Feed />
-        : tab === "amigos" ? <Amigos />
-        : tab === "chat" ? <Chats />
-        : <Noticias />}
+      {Capacitor.isNativePlatform() ? (
+        <NativeTabSlide tabKey={tab} tabOrder={TAB_ORDER}>
+          {tab === "feed" ? <Feed />
+            : tab === "amigos" ? <Amigos />
+            : tab === "chat" ? <Chats />
+            : <Noticias />}
+        </NativeTabSlide>
+      ) : (
+        tab === "feed" ? <Feed />
+          : tab === "amigos" ? <Amigos />
+          : tab === "chat" ? <Chats />
+          : <Noticias />
+      )}
     </div>
   );
 };

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
 import Dashboard from "./Dashboard";
+import NativeTabSlide from "../components/NativeTabSlide";
+
+const TAB_ORDER = ["catalogo", "comunidad"];
 
 // Wrapper con tabs internas — el Catálogo (Dashboard.js) sigue intacto,
 // se le suma "Comunidad" como pestaña hermana. Mismo patrón que
@@ -36,9 +39,11 @@ const LaBarra = () => {
   if (isNative) {
     return (
       <div>
-        {tab === "catalogo"
-          ? <Dashboard tabsSlot={tabBar} />
-          : <>{tabBar}<ComunidadPlaceholder /></>}
+        <NativeTabSlide tabKey={tab} tabOrder={TAB_ORDER}>
+          {tab === "catalogo"
+            ? <Dashboard tabsSlot={tabBar} />
+            : <>{tabBar}<ComunidadPlaceholder /></>}
+        </NativeTabSlide>
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { Capacitor } from "@capacitor/core";
 import { useBeers } from "../hooks/useBeers";
 import { useUserBeers } from "../hooks/useUserBeers";
 import BeerCard from "../components/BeerCard";
@@ -125,7 +126,8 @@ const SuggestBeerModal = ({ onClose, t }) => {
   );
 };
 
-const Dashboard = () => {
+const Dashboard = ({ tabsSlot }) => {
+  const isNative = Capacitor.isNativePlatform();
   const { t } = useTranslation();
   const { beers, loading, error } = useBeers();
   const { userBeers, refetch } = useUserBeers();
@@ -199,7 +201,10 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>
+      {/* En la app nativa el header de NativeShell ya muestra la marca
+          "RiBeer's" en todas las pantallas — repetir el título acá es
+          redundante y ocupa espacio, así que se omite solo ahí. */}
+      {!isNative && <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>}
 
       {/* Map toggle + suggest row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
@@ -255,6 +260,10 @@ const Dashboard = () => {
         countries={countries}
         familias={familias}
       />
+
+      {/* Solo se recibe en la app nativa (LaBarra.js) — en web tabsSlot es
+          undefined y este bloque no renderiza nada, cero cambio visual. */}
+      {tabsSlot}
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
         <p style={{ color: "#5a4535", fontSize: 13, margin: 0 }}>

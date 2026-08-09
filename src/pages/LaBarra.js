@@ -1,31 +1,51 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Capacitor } from "@capacitor/core";
 import Dashboard from "./Dashboard";
 
 // Wrapper con tabs internas — el Catálogo (Dashboard.js) sigue intacto,
 // se le suma "Comunidad" como pestaña hermana. Mismo patrón que
 // Social.js: no toca el componente envuelto, solo decide cuál mostrar.
+//
+// En la app nativa las pestañas se muestran DEBAJO del buscador/filtros de
+// Dashboard, no arriba — por eso ahí se le pasan como `tabsSlot` en vez de
+// renderizarse acá arriba. En web el comportamiento queda exactamente
+// igual que siempre (tabs arriba, Dashboard sin el prop).
 const LaBarra = () => {
   const { t } = useTranslation();
   const [tab, setTab] = useState("catalogo");
+  const isNative = Capacitor.isNativePlatform();
+
+  const tabBar = (
+    <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+      <button
+        onClick={() => setTab("catalogo")}
+        style={{ ...tabBtnStyle, ...(tab === "catalogo" ? tabBtnActive : {}) }}
+      >
+        {t("nav.tabCatalog")}
+      </button>
+      <button
+        onClick={() => setTab("comunidad")}
+        style={{ ...tabBtnStyle, ...(tab === "comunidad" ? tabBtnActive : {}) }}
+      >
+        {t("nav.tabCommunity")}
+      </button>
+    </div>
+  );
+
+  if (isNative) {
+    return (
+      <div>
+        {tab === "catalogo"
+          ? <Dashboard tabsSlot={tabBar} />
+          : <>{tabBar}<ComunidadPlaceholder /></>}
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        <button
-          onClick={() => setTab("catalogo")}
-          style={{ ...tabBtnStyle, ...(tab === "catalogo" ? tabBtnActive : {}) }}
-        >
-          {t("nav.tabCatalog")}
-        </button>
-        <button
-          onClick={() => setTab("comunidad")}
-          style={{ ...tabBtnStyle, ...(tab === "comunidad" ? tabBtnActive : {}) }}
-        >
-          {t("nav.tabCommunity")}
-        </button>
-      </div>
-
+      {tabBar}
       {tab === "catalogo" ? <Dashboard /> : <ComunidadPlaceholder />}
     </div>
   );

@@ -23,6 +23,10 @@ const NativeShell = ({ children }) => {
 
   return (
     <div style={wrapStyle}>
+      <header style={headerStyle}>
+        <span style={brandStyle}>🍺 RiBeer's</span>
+      </header>
+
       <main style={mainStyle}>
         {children}
       </main>
@@ -58,6 +62,28 @@ const wrapStyle = {
   height: "100vh",
   overflow: "hidden",
   background: "#0d0a06",
+};
+const headerStyle = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  height: 44,
+  backgroundImage: "linear-gradient(rgba(13,10,6,0.97), rgba(13,10,6,0.97)), url('/wood.jpg')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  borderBottom: "1px solid #2e2215",
+  // Con StatusBar.setOverlaysWebView (App.js) la barra de estado del sistema
+  // se superpone al WebView — sin este padding el reloj/batería tapan el
+  // logo. Mismo criterio que paddingBottom en tabBarStyle, para la zona
+  // segura de arriba.
+  paddingTop: "env(safe-area-inset-top, 0px)",
+};
+const brandStyle = {
+  fontFamily: "'Playfair Display', serif",
+  fontSize: 17,
+  fontWeight: 700,
+  color: "#d4af37",
 };
 const mainStyle = {
   flex: 1,

@@ -8,10 +8,16 @@ import { Capacitor } from "@capacitor/core";
 // web no hace nada, el cambio sigue siendo instantáneo como siempre.
 //
 // No mantiene ambas pestañas montadas a la vez para animar una salida real
-// (eso es trabajo de la Fase E, a nivel de rutas) — solo anima la ENTRADA
-// del contenido que ya reemplazó al anterior, desde el lado que corresponda
-// según si la pestaña nueva está a la derecha o izquierda de la anterior en
-// `tabOrder`. Mucho más simple y ya da la sensación de "tarjeta deslizando".
+// — solo anima la ENTRADA del contenido que ya reemplazó al anterior, desde
+// el lado que corresponda según si la pestaña nueva está a la derecha o
+// izquierda de la anterior en `tabOrder`. Mucho más simple y ya da la
+// sensación de "tarjeta deslizando".
+//
+// También se reutiliza en la Fase E para las transiciones a nivel de ruta
+// entre las 4 secciones principales (NativeShell.js, tabKey=pathname) — ahí
+// `tabKey` puede no estar en `tabOrder` (pantallas secundarias fuera del
+// menú de Perfil, ej. /logros, /configuracion); en ese caso no animamos,
+// para no calcular una dirección sin sentido.
 //
 // `tabOrder` tiene que ser una referencia estable (constante de módulo, no
 // un array literal inline) para no disparar el efecto en cada render.
@@ -21,11 +27,13 @@ const NativeTabSlide = ({ tabKey, tabOrder, children }) => {
 
   useEffect(() => {
     const index = tabOrder.indexOf(tabKey);
-    const direction = index > prevIndexRef.current ? 1 : -1;
+    const prevIndex = prevIndexRef.current;
     prevIndexRef.current = index;
 
+    if (index === -1 || prevIndex === -1) return;
     if (!Capacitor.isNativePlatform() || !ref.current) return;
 
+    const direction = index > prevIndex ? 1 : -1;
     gsap.fromTo(
       ref.current,
       { x: direction * 24, opacity: 0 },

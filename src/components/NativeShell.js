@@ -4,6 +4,7 @@ import {
   PlusCircleIcon, BookIcon, RssIcon, PersonIcon, PlusIcon,
 } from "@primer/octicons-react";
 import { useTotalUnread } from "../hooks/useTotalUnread";
+import NativeTabSlide from "./NativeTabSlide";
 
 const FAB_CSS = `
   .native-fab { transition: transform 0.15s ease; }
@@ -22,6 +23,7 @@ const TABS = [
   { to: "/feed",      label: "Social",   Icon: RssIcon, badge: "social" },
   { to: "/perfil-app", label: "Perfil",  Icon: PersonIcon },
 ];
+const TAB_PATHS = TABS.map((tb) => tb.to);
 
 const NativeShell = ({ children }) => {
   const totalUnread = useTotalUnread();
@@ -37,7 +39,15 @@ const NativeShell = ({ children }) => {
       </header>
 
       <main style={mainStyle}>
-        {children}
+        {/* Fase E — reutiliza el mismo deslizamiento liviano de la Fase B
+            (NativeTabSlide), ahora con tabKey=pathname para animar entre las
+            4 secciones principales. Si el pathname (actual o el anterior) no
+            está en TAB_PATHS — pantallas secundarias abiertas desde el menú
+            de Perfil, ej. /logros, /configuracion — no anima, ver el guard
+            agregado en NativeTabSlide.jsx. */}
+        <NativeTabSlide tabKey={location.pathname} tabOrder={TAB_PATHS}>
+          {children}
+        </NativeTabSlide>
       </main>
 
       {/* FAB v1 — atajo directo a Registrar (hoy el catálogo, ver LaBarra.js).

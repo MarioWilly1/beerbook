@@ -362,6 +362,14 @@
     "saveBtn":            "Speichern · +{{xp}} XP",
     "inNotebook":         "In deinem Notizbuch"
   },
+  "quickTasting": {
+    "title":              "Neue Verkostung",
+    "photoPlaceholder":   "Tippen, um ein Foto zu machen/wählen",
+    "commentPlaceholder": "Wie war es diesmal?",
+    "saving":             "Speichern...",
+    "saveBtn":            "Verkostung speichern · +3 XP",
+    "error":              "Verkostung konnte nicht gespeichert werden. Bitte versuch es erneut."
+  },
   "hideEntry": {
     "btn":               "Verbergen für...",
     "hiddenCount_one":   "verborgen für {{count}}",

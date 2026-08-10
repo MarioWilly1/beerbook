@@ -28,6 +28,7 @@ import { insertTasting, updateLatestTasting } from "../utils/tastings";
 import HideEntryModal from "../components/HideEntryModal";
 import TastingGalleryModal from "../components/TastingGalleryModal";
 import QuickTastingWidget from "../components/QuickTastingWidget";
+import QuickTastingModal from "../components/QuickTastingModal";
 import GlassesTab from "./GlassesTab";
 import { RAREZA_EMOJI } from "../utils/rareza";
 import {
@@ -682,6 +683,7 @@ const MiCuaderno = () => {
   const [hiddenCounts, setHiddenCounts]   = useState({}); // { beer_id: cantidad de amigos a los que se les oculta }
   const [tastingCounts, setTastingCounts] = useState({}); // { beer_id: cantidad real de catas registradas }
   const [tastingPending, setTastingPending] = useState({}); // { beer_id: true mientras hay un guardado en curso }
+  const [quickTastingTarget, setQuickTastingTarget] = useState(null); // cerveza para la que está abierto QuickTastingModal
 
   const loadHiddenCounts = useCallback(async (uid) => {
     const { data } = await supabase.from("entry_hidden_from").select("beer_id").eq("owner_id", uid);
@@ -800,28 +802,35 @@ const MiCuaderno = () => {
     if (newBadges.length)       { toastBadges(newBadges); }
   };
 
-  // Registrar que volviste a probar esta cerveza con un solo toque: crea una
-  // fila NUEVA en blanco en el historial (beer_tastings) — sin foto/nota,
-  // eso queda opcional para completar después desde la galería — y gana +3
-  // XP fijo (siempre repetida acá, porque para llegar a Mi Cuaderno la
-  // cerveza ya tuvo su primera cata). El contador se sube optimista al
-  // toque; si el guardado falla se revierte.
-  const handleQuickTasting = async (beer) => {
+  // Registrar que volviste a probar esta cerveza: en vez de insertar una
+  // fila en blanco, abre QuickTastingModal a pedir foto + comentario (la
+  // Puntuación no se pide acá, es un campo a nivel de la cerveza — ver
+  // migración 20260810000000, que blindó el trigger de sync para que la
+  // cata rápida no la pise). El insert real y el resto del pipeline
+  // (XP +3, streak, logros, retos) corren en handleQuickTastingSaved, una
+  // vez que el modal subió la foto y confirmó.
+  const handleQuickTasting = (beer) => {
+    setQuickTastingTarget(beer);
+  };
+
+  const handleQuickTastingSaved = async ({ user_photo_url, photo_hash, comment }) => {
+    const beer = quickTastingTarget;
+    if (!beer) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
-    if (tastingPending[beer.id]) return;
 
     setTastingPending((prev) => ({ ...prev, [beer.id]: true }));
-    setTastingCounts((prev) => ({ ...prev, [beer.id]: (prev[beer.id] || 0) + 1 }));
 
-    const { error } = await insertTasting(supabase, session.user.id, beer.id, {});
+    const { error } = await insertTasting(supabase, session.user.id, beer.id, {
+      user_photo_url, photo_hash, comment,
+    });
 
     setTastingPending((prev) => ({ ...prev, [beer.id]: false }));
 
-    if (error) {
-      setTastingCounts((prev) => ({ ...prev, [beer.id]: Math.max(0, (prev[beer.id] || 1) - 1) }));
-      return;
-    }
+    if (error) throw error;
+
+    setQuickTastingTarget(null);
+    setTastingCounts((prev) => ({ ...prev, [beer.id]: (prev[beer.id] || 0) + 1 }));
 
     const { data: xpRows } = await supabase
       .from("user_beers").select('"XP"').eq("user_id", session.user.id);
@@ -830,7 +839,7 @@ const MiCuaderno = () => {
     const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
     const newLevel   = getLevelInfo(newTotal).level;
 
-    await logActivity(session.user.id, beer.id, { rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
+    await logActivity(session.user.id, beer.id, { rating: beer.Rating, comment, photo: user_photo_url });
 
     const [newStreak, achStats] = await Promise.all([
       updateStreak(),
@@ -989,6 +998,13 @@ const MiCuaderno = () => {
 
       <Lightbox src={showImage} onClose={() => setShowImage(null)} />
       {infoModal && <BeerInfoModal beer={infoModal} onClose={() => setInfoModal(null)} />}
+      {quickTastingTarget && (
+        <QuickTastingModal
+          beer={quickTastingTarget}
+          onClose={() => setQuickTastingTarget(null)}
+          onSaved={handleQuickTastingSaved}
+        />
+      )}
     </div>
   );
 };

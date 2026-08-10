@@ -362,6 +362,14 @@
     "saveBtn":            "Save · +{{xp}} XP",
     "inNotebook":         "In your notebook"
   },
+  "quickTasting": {
+    "title":              "New tasting",
+    "photoPlaceholder":   "Tap to take/choose a photo",
+    "commentPlaceholder": "How was it this time?",
+    "saving":             "Saving...",
+    "saveBtn":            "Save tasting · +3 XP",
+    "error":              "Couldn't save the tasting. Please try again."
+  },
   "hideEntry": {
     "btn":               "Hide from...",
     "hiddenCount_one":   "hidden from {{count}}",

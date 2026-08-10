@@ -362,6 +362,14 @@
     "saveBtn":            "Guardar · +{{xp}} XP",
     "inNotebook":         "En tu cuaderno"
   },
+  "quickTasting": {
+    "title":              "Nueva cata",
+    "photoPlaceholder":   "Tocá para sacar/elegir foto",
+    "commentPlaceholder": "¿Cómo estuvo esta vez?",
+    "saving":             "Guardando...",
+    "saveBtn":            "Guardar cata · +3 XP",
+    "error":              "No se pudo guardar la cata. Inténtalo de nuevo."
+  },
   "hideEntry": {
     "btn":               "Ocultar de...",
     "hiddenCount_one":   "oculta de {{count}}",

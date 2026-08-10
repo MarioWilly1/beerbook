@@ -1,9 +1,14 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
-  PlusCircleIcon, BookIcon, RssIcon, PersonIcon,
+  PlusCircleIcon, BookIcon, RssIcon, PersonIcon, PlusIcon,
 } from "@primer/octicons-react";
 import { useTotalUnread } from "../hooks/useTotalUnread";
+
+const FAB_CSS = `
+  .native-fab { transition: transform 0.15s ease; }
+  .native-fab:active { transform: scale(0.92); }
+`;
 
 // Envoltorio de navegación exclusivo de la app nativa (Capacitor) — hermano
 // de Layout.js, NUNCA usado en web. Barra inferior de 4 secciones fijas;
@@ -20,9 +25,13 @@ const TABS = [
 
 const NativeShell = ({ children }) => {
   const totalUnread = useTotalUnread();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div style={wrapStyle}>
+      <style>{FAB_CSS}</style>
+
       <header style={headerStyle}>
         <span style={brandStyle}>🍺 RiBeer's</span>
       </header>
@@ -30,6 +39,23 @@ const NativeShell = ({ children }) => {
       <main style={mainStyle}>
         {children}
       </main>
+
+      {/* FAB v1 — atajo directo a Registrar (hoy el catálogo, ver LaBarra.js).
+          La versión que abre la cámara directo queda para la Fase F, cuando
+          exista una pantalla propia de "captura primero, elegí la cerveza
+          después" (ver el análisis de factibilidad que hicimos antes de
+          empezar). Se oculta en la propia pantalla de Registrar — no tiene
+          sentido ofrecer un atajo hacia donde ya estás. */}
+      {location.pathname !== "/" && (
+        <button
+          className="native-fab"
+          onClick={() => navigate("/")}
+          aria-label="Registrar cerveza"
+          style={fabStyle}
+        >
+          <PlusIcon size={26} />
+        </button>
+      )}
 
       <nav style={tabBarStyle}>
         {TABS.map(({ to, label, Icon, end, badge }) => (
@@ -57,11 +83,31 @@ const NativeShell = ({ children }) => {
 };
 
 const wrapStyle = {
+  position: "relative",
   display: "flex",
   flexDirection: "column",
   height: "100vh",
   overflow: "hidden",
   background: "#0d0a06",
+};
+const fabStyle = {
+  position: "absolute",
+  // Justo arriba de la barra inferior (altura aprox. de tabBarStyle) + la
+  // zona segura de gestos, con un margen propio.
+  bottom: "calc(64px + env(safe-area-inset-bottom, 0px) + 14px)",
+  right: 16,
+  width: 52,
+  height: 52,
+  borderRadius: "50%",
+  border: "none",
+  background: "#d4af37",
+  color: "#0d0a06",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 6px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(212,175,55,0.35)",
+  cursor: "pointer",
+  zIndex: 10,
 };
 const headerStyle = {
   flexShrink: 0,

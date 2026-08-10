@@ -54,12 +54,18 @@ const Social = ({ defaultTab }) => {
             <span style={unreadBadge}>{totalUnread > 99 ? "99+" : totalUnread}</span>
           )}
         </button>
-        <button
-          onClick={() => setTab("noticias")}
-          style={{ ...tabBtnStyle, ...(tab === "noticias" ? tabBtnActive : {}) }}
-        >
-          <MegaphoneIcon size={14} /> {t("nav.tabNoticias")}
-        </button>
+        {/* En la app nativa, Noticias ya vive en el menú de Perfil
+            (PerfilHub.js) — repetirla acá es un duplicado. Sigue completa
+            en web: ahí no hay menú de Perfil, esta pestaña es la ÚNICA
+            forma de llegar a Noticias, sacarla sería una regresión real. */}
+        {!Capacitor.isNativePlatform() && (
+          <button
+            onClick={() => setTab("noticias")}
+            style={{ ...tabBtnStyle, ...(tab === "noticias" ? tabBtnActive : {}) }}
+          >
+            <MegaphoneIcon size={14} /> {t("nav.tabNoticias")}
+          </button>
+        )}
       </div>
 
       {Capacitor.isNativePlatform() ? (

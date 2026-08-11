@@ -251,6 +251,19 @@
     "comingSoonTitle": "Coming Soon",
     "comingSoonBody":  "Here you'll get to see the most original glasses shared by the community, approved before joining everyone's Collection."
   },
+  "dualVerify": {
+    "startBtn":         "🛡️ Reinforced Verification (optional)",
+    "badgeActive":      "Reinforced Verification active",
+    "title":            "Reinforced Verification",
+    "step1Title":       "Photo of the beer",
+    "step1Subtitle":    "Take a photo right now — you can't pick one from your gallery.",
+    "step2Title":       "Now a selfie",
+    "step2Subtitle":    "Take a selfie right away, BeReal-style, to confirm it's you.",
+    "captureBeerBtn":   "📷 Take photo",
+    "captureSelfieBtn": "🤳 Take selfie",
+    "uploading":        "Uploading…",
+    "error":            "We couldn't process the photo. Try again."
+  },
   "barcode": {
     "scanBtn":          "Scan barcode",
     "scannerTitle":     "Scan the code",
@@ -336,6 +349,7 @@
     "unverify":             "Unverify",
     "dismiss":              "Dismiss",
     "reportSourceDuplicate":  "Duplicate photo",
+    "reportSourceDuplicateSelfie": "Duplicate selfie",
     "reportSourceVelocity":   "Suspicious speed",
     "reportSourceCommunity":  "Community report"
   },
@@ -356,6 +370,7 @@
   },
   "beerform": {
     "verified":           "Verified",
+    "reinforcedVerified": "Reinforced Verification",
     "timesLabel":         "Times tried",
     "ratingLabel":        "Rating",
     "noRating":           "— No rating —",

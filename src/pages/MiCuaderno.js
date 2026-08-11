@@ -30,10 +30,11 @@ import TastingGalleryModal from "../components/TastingGalleryModal";
 import QuickTastingWidget from "../components/QuickTastingWidget";
 import QuickTastingModal from "../components/QuickTastingModal";
 import GlassesTab from "./GlassesTab";
+import DualPhotoVerification from "../components/DualPhotoVerification";
 import { RAREZA_EMOJI } from "../utils/rareza";
 import {
   BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
-  CheckIcon, SearchIcon, XIcon,
+  CheckIcon, SearchIcon, XIcon, ShieldCheckIcon,
 } from "@primer/octicons-react";
 
 // Mismo helper que Dashboard.js/OriginMapPanel.js — no está extraído a un
@@ -373,6 +374,7 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
   const [uploadErr, setUploadErr] = useState("");
   const [showHideModal, setShowHideModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [showDualVerify, setShowDualVerify] = useState(false);
   const fileInputRef = useRef(null);
 
   const handlePhotoSelect = async (e) => {
@@ -395,8 +397,17 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
     }
   };
 
+  const handleDualVerifyComplete = ({ photoUrl, photoHash, selfiePhotoUrl, selfiePhotoHash }) => {
+    onChange(beer.id, "user_photo_url", photoUrl);
+    onChange(beer.id, "photo_hash", photoHash);
+    onChange(beer.id, "selfie_photo_url", selfiePhotoUrl);
+    onChange(beer.id, "selfie_photo_hash", selfiePhotoHash);
+    setShowDualVerify(false);
+  };
+
   const displayPhoto = beer.user_photo_url?.trim() || beer.foto_url;
   const hasUserPhoto = !!beer.user_photo_url?.trim();
+  const hasSelfie = !!beer.selfie_photo_url?.trim();
   const isComplete =
     beer.Rating !== "" && Number(beer.Rating) > 0 &&
     beer.comment.trim().length > 0 &&
@@ -424,11 +435,11 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
           {hasUserPhoto && (
             <span style={{
               position: "absolute", bottom: 6, right: 6,
-              background: "rgba(0,0,0,0.7)", color: "#d4af37",
+              background: "rgba(0,0,0,0.7)", color: hasSelfie ? "#a366e8" : "#d4af37",
               fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
-              pointerEvents: "none",
+              pointerEvents: "none", display: "flex", alignItems: "center", gap: 3,
             }}>
-              📸 {t("beerform.verified")}
+              {hasSelfie ? <><ShieldCheckIcon size={11} /> {t("beerform.reinforcedVerified")}</> : <>📸 {t("beerform.verified")}</>}
             </span>
           )}
         </div>
@@ -573,7 +584,12 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
                     {uploading ? "⏳ Subiendo…" : (<><DeviceCameraIcon size={14} /> Cambiar foto</>)}
                   </button>
                   <button
-                    onClick={() => { onChange(beer.id, "user_photo_url", ""); onChange(beer.id, "photo_hash", null); }}
+                    onClick={() => {
+                      onChange(beer.id, "user_photo_url", ""); onChange(beer.id, "photo_hash", null);
+                      // Sin foto de la cerveza no tiene sentido conservar la
+                      // Verificación Reforzada — se limpian juntas.
+                      onChange(beer.id, "selfie_photo_url", ""); onChange(beer.id, "selfie_photo_hash", null);
+                    }}
                     style={{ ...nbClearPhotoBtn, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
                   >
                     <TrashIcon size={14} /> Quitar foto
@@ -590,6 +606,31 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
               </button>
             )}
           </div>
+
+          <div style={nbFieldStyle}>
+            {hasSelfie ? (
+              <div style={nbReinforcedBadgeStyle}>
+                <ShieldCheckIcon size={14} /> {t("dualVerify.badgeActive")}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowDualVerify(true)}
+                style={nbReinforcedBtnStyle}
+              >
+                <ShieldCheckIcon size={14} /> {t("dualVerify.startBtn")}
+              </button>
+            )}
+          </div>
+
+          {showDualVerify && (
+            <DualPhotoVerification
+              beerNombre={beer.nombre}
+              beerId={beer.id}
+              onComplete={handleDualVerifyComplete}
+              onCancel={() => setShowDualVerify(false)}
+            />
+          )}
 
           <LocationPicker value={beer.location} onChange={(loc) => onChange(beer.id, "location", loc)} />
 
@@ -718,6 +759,7 @@ const MiCuaderno = () => {
         XP:             beer.XP || 0,
         commercialized: beer.commercialized ?? true,
         user_photo_url: beer.user_photo_url || "",
+        selfie_photo_url: beer.selfie_photo_url || "",
         location: beer.location_lat
           ? { lat: beer.location_lat, lng: beer.location_lng, name: beer.location_name, isPublic: beer.location_public ?? true, price: beer.price_paid ?? null }
           : null,
@@ -754,18 +796,20 @@ const MiCuaderno = () => {
     // foto). Si no cambió, se omite del payload y Postgres deja intacto
     // el valor ya guardado.
     const payload = {
-      times:           beer.times,
-      comment:         beer.comment,
-      commercialized:  beer.commercialized,
-      user_photo_url:  beer.user_photo_url || null,
-      Rating:          beer.Rating !== "" ? Number(beer.Rating) : null,
-      location_lat:    beer.location?.lat    ?? null,
-      location_lng:    beer.location?.lng    ?? null,
-      location_name:   beer.location?.name   ?? null,
-      location_public: beer.location?.isPublic ?? true,
-      price_paid:      beer.location?.price  ?? null,
+      times:            beer.times,
+      comment:          beer.comment,
+      commercialized:   beer.commercialized,
+      user_photo_url:   beer.user_photo_url || null,
+      selfie_photo_url: beer.selfie_photo_url || null,
+      Rating:           beer.Rating !== "" ? Number(beer.Rating) : null,
+      location_lat:     beer.location?.lat    ?? null,
+      location_lng:     beer.location?.lng    ?? null,
+      location_name:    beer.location?.name   ?? null,
+      location_public:  beer.location?.isPublic ?? true,
+      price_paid:       beer.location?.price  ?? null,
     };
     if (beer.photo_hash !== undefined) payload.photo_hash = beer.photo_hash;
+    if (beer.selfie_photo_hash !== undefined) payload.selfie_photo_hash = beer.selfie_photo_hash;
 
     const { error } = await supabase.from("user_beers").update(payload)
       .eq("user_id", session.user.id).eq("beer_id", beer.id);
@@ -774,9 +818,11 @@ const MiCuaderno = () => {
 
     await updateLatestTasting(supabase, session.user.id, beer.id, {
       rating: payload.Rating, comment: payload.comment || null, user_photo_url: payload.user_photo_url,
+      selfie_photo_url: payload.selfie_photo_url,
       location_lat: payload.location_lat, location_lng: payload.location_lng, location_name: payload.location_name,
       location_public: payload.location_public, price_paid: payload.price_paid,
       ...(beer.photo_hash !== undefined ? { photo_hash: beer.photo_hash } : {}),
+      ...(beer.selfie_photo_hash !== undefined ? { selfie_photo_hash: beer.selfie_photo_hash } : {}),
     });
 
     await logActivity(session.user.id, beer.id, { rating: beer.Rating, comment: beer.comment, photo: beer.user_photo_url });
@@ -1023,6 +1069,8 @@ const nbSaveBtn         = { flex: 1, padding: "8px 10px", background: "#d4af37",
 const nbDeleteBtn       = { padding: "8px 10px", background: "#2a0a0a", color: "#c07a3f", border: "1px solid #8b2020", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "12px" };
 const nbPhotoBtn        = { padding: "8px 12px", background: "#1c1409", border: "1.5px dashed #3a2e20", borderRadius: 8, fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600, textAlign: "center" };
 const nbClearPhotoBtn   = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
+const nbReinforcedBtnStyle   = { width: "100%", padding: "9px 12px", background: "rgba(163,102,232,0.08)", border: "1.5px dashed rgba(163,102,232,0.4)", borderRadius: 8, fontSize: 12, color: "#a366e8", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 };
+const nbReinforcedBadgeStyle = { padding: "9px 12px", background: "rgba(163,102,232,0.1)", border: "1px solid rgba(163,102,232,0.3)", borderRadius: 8, fontSize: 12, color: "#a366e8", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 };
 const nbHideFromBtn     = { display: "flex", alignItems: "center", gap: 6, width: "100%", padding: "7px 10px", marginTop: 8, background: "#1c1409", border: "1px solid #2e2215", borderRadius: 8, color: "#9a7d62", cursor: "pointer", fontSize: 12, fontWeight: 600, textAlign: "left" };
 const nbHideFromBadge   = { marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "#d4af37", background: "rgba(212,175,55,0.12)", padding: "2px 7px", borderRadius: 20 };
 

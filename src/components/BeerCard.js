@@ -20,7 +20,8 @@ import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { hashToString } from "../utils/perceptualHash";
 import { insertTasting, updateLatestTasting } from "../utils/tastings";
 import { RAREZA_EMOJI } from "../utils/rareza";
-import { GlobeIcon, CheckIcon, XIcon } from "@primer/octicons-react";
+import DualPhotoVerification from "./DualPhotoVerification";
+import { GlobeIcon, CheckIcon, XIcon, ShieldCheckIcon } from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -46,6 +47,9 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState("");
   const fileInputRef = useRef(null);
+  const [selfiePhotoUrl,  setSelfiePhotoUrl]  = useState(myBeerData?.selfie_photo_url || "");
+  const [selfiePhotoHash, setSelfiePhotoHash] = useState(undefined); // undefined = sin cambios esta sesión
+  const [showDualVerify, setShowDualVerify]   = useState(false);
   const [location,  setLocation]  = useState(
     myBeerData?.location_lat
       ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true, price: myBeerData.price_paid ?? null }
@@ -88,6 +92,18 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const handleRemovePhoto = () => {
     setPhotoUrl("");
     setPhotoHash(null);
+    // Sin foto de la cerveza no tiene sentido conservar la Verificación
+    // Reforzada — se limpian juntas.
+    setSelfiePhotoUrl("");
+    setSelfiePhotoHash(null);
+  };
+
+  const handleDualVerifyComplete = ({ photoUrl: newPhotoUrl, photoHash: newPhotoHash, selfiePhotoUrl: newSelfieUrl, selfiePhotoHash: newSelfieHash }) => {
+    setPhotoUrl(newPhotoUrl);
+    setPhotoHash(newPhotoHash);
+    setSelfiePhotoUrl(newSelfieUrl);
+    setSelfiePhotoHash(newSelfieHash);
+    setShowDualVerify(false);
   };
 
   const isColeccionable = beer.es_edicion_especial || RAREZA_COLECCIONABLE.has(beer.rareza);
@@ -124,6 +140,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       rating:           rating !== "" ? Number(rating) : null,
       comment:          comment || null,
       user_photo_url:   photoUrl || null,
+      selfie_photo_url: selfiePhotoUrl || null,
       location_lat:     location?.lat    ?? null,
       location_lng:     location?.lng    ?? null,
       location_name:    location?.name   ?? null,
@@ -131,6 +148,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       price_paid:       location?.price  ?? null,
     };
     if (photoHash !== undefined) tastingFields.photo_hash = photoHash;
+    if (selfiePhotoHash !== undefined) tastingFields.selfie_photo_hash = selfiePhotoHash;
 
     if (!isInMyBeers) {
       // Primera vez que se agrega esta cerveza al cuaderno: crear la fila
@@ -140,10 +158,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
         user_id: session.user.id, beer_id: beer.id, times,
         comment: comment || "", Rating: tastingFields.rating,
         user_photo_url: tastingFields.user_photo_url,
+        selfie_photo_url: tastingFields.selfie_photo_url,
         location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
         location_name: tastingFields.location_name, location_public: tastingFields.location_public,
         price_paid: tastingFields.price_paid,
         ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
+        ...(selfiePhotoHash !== undefined ? { selfie_photo_hash: selfiePhotoHash } : {}),
       });
       if (error) { setSaving(false); return; }
       const { error: tastingError } = await insertTasting(supabase, session.user.id, beer.id, tastingFields);
@@ -154,10 +174,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       const { error } = await supabase.from("user_beers").update({
         times, comment: comment || "", Rating: tastingFields.rating,
         user_photo_url: tastingFields.user_photo_url,
+        selfie_photo_url: tastingFields.selfie_photo_url,
         location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
         location_name: tastingFields.location_name, location_public: tastingFields.location_public,
         price_paid: tastingFields.price_paid,
         ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
+        ...(selfiePhotoHash !== undefined ? { selfie_photo_hash: selfiePhotoHash } : {}),
       }).eq("user_id", session.user.id).eq("beer_id", beer.id);
       if (error) { setSaving(false); return; }
       await updateLatestTasting(supabase, session.user.id, beer.id, tastingFields);
@@ -231,11 +253,11 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
           {photoUrl?.trim() && (
             <span style={{
               position: "absolute", bottom: 6, right: 6,
-              background: "rgba(0,0,0,0.7)", color: "#d4af37",
+              background: "rgba(0,0,0,0.7)", color: selfiePhotoUrl?.trim() ? "#a366e8" : "#d4af37",
               fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
-              pointerEvents: "none",
+              pointerEvents: "none", display: "flex", alignItems: "center", gap: 3,
             }}>
-              📸 {t("beerform.verified")}
+              {selfiePhotoUrl?.trim() ? <><ShieldCheckIcon size={11} /> {t("beerform.reinforcedVerified")}</> : <>📸 {t("beerform.verified")}</>}
             </span>
           )}
           <Lightbox src={lightboxSrc} alt={beer.nombre} onClose={() => setLightboxSrc(null)} />
@@ -419,6 +441,31 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
             )}
           </div>
 
+          <div style={fieldStyle}>
+            {selfiePhotoUrl ? (
+              <div style={reinforcedBadgeStyle}>
+                <ShieldCheckIcon size={14} /> {t("dualVerify.badgeActive")}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowDualVerify(true)}
+                style={reinforcedBtnStyle}
+              >
+                <ShieldCheckIcon size={14} /> {t("dualVerify.startBtn")}
+              </button>
+            )}
+          </div>
+
+          {showDualVerify && (
+            <DualPhotoVerification
+              beerNombre={beer.nombre}
+              beerId={beer.id}
+              onComplete={handleDualVerifyComplete}
+              onCancel={() => setShowDualVerify(false)}
+            />
+          )}
+
           <LocationPicker value={location} onChange={setLocation} />
 
           {isComplete && (
@@ -460,6 +507,8 @@ const bonusBannerStyle = { background: "rgba(212,175,55,0.10)", border: "1px sol
 const saveBtn          = { width: "100%", padding: "10px", borderRadius: "8px", border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: "700", fontSize: "13px", cursor: "pointer", marginTop: "4px" };
 const photoBtnStyle      = { padding: "8px 12px", background: "#1c1409", border: "1.5px dashed #3a2e20", borderRadius: 8, fontSize: 13, color: "#9a7d62", cursor: "pointer", fontWeight: 600, textAlign: "center" };
 const clearPhotoBtnStyle = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
+const reinforcedBtnStyle = { width: "100%", padding: "9px 12px", background: "rgba(163,102,232,0.08)", border: "1.5px dashed rgba(163,102,232,0.4)", borderRadius: 8, fontSize: 12, color: "#a366e8", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 };
+const reinforcedBadgeStyle = { padding: "9px 12px", background: "rgba(163,102,232,0.1)", border: "1px solid rgba(163,102,232,0.3)", borderRadius: 8, fontSize: 12, color: "#a366e8", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 };
 
 // Detalle como overlay flotante (portal a document.body) en vez de acordeón
 // inline — así el grid de tarjetas colapsadas queda siempre parejo, sin que

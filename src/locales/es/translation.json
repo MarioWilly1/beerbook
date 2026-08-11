@@ -251,6 +251,19 @@
     "comingSoonTitle": "Próximamente",
     "comingSoonBody":  "Aquí podrás ver las copas más originales que suba la comunidad, aprobadas antes de sumarse a la Colección de todos."
   },
+  "dualVerify": {
+    "startBtn":         "🛡️ Verificación Reforzada (opcional)",
+    "badgeActive":      "Verificación Reforzada activa",
+    "title":            "Verificación Reforzada",
+    "step1Title":       "Foto de la cerveza",
+    "step1Subtitle":    "Sacale una foto ahora mismo — no se puede elegir una de la galería.",
+    "step2Title":       "Ahora una selfie",
+    "step2Subtitle":    "Sacate una selfie enseguida, como en BeReal, para confirmar que sos vos.",
+    "captureBeerBtn":   "📷 Sacar foto",
+    "captureSelfieBtn": "🤳 Sacar selfie",
+    "uploading":        "Subiendo…",
+    "error":            "No pudimos procesar la foto. Probá de nuevo."
+  },
   "barcode": {
     "scanBtn":          "Escanear código de barras",
     "scannerTitle":     "Escaneá el código",
@@ -336,6 +349,7 @@
     "unverify":             "Desverificar",
     "dismiss":              "Ignorar",
     "reportSourceDuplicate":  "Foto duplicada",
+    "reportSourceDuplicateSelfie": "Selfie duplicada",
     "reportSourceVelocity":   "Velocidad sospechosa",
     "reportSourceCommunity":  "Reporte comunitario"
   },
@@ -356,6 +370,7 @@
   },
   "beerform": {
     "verified":           "Verificada",
+    "reinforcedVerified": "Verificación Reforzada",
     "timesLabel":         "Veces probada",
     "ratingLabel":        "Puntuación",
     "noRating":           "— Sin puntuación —",

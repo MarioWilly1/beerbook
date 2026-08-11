@@ -23,6 +23,7 @@ export const useMyBeers = () => {
           "Rating",
           "XP",
           user_photo_url,
+          selfie_photo_url,
           commercialized,
           location_lat,
           location_lng,

@@ -656,9 +656,10 @@ const GlassSuggestionsPanel = ({ t }) => {
 
 // ── Sub-panel: Reportes (anti-trampa) ──────────────────────────────────────────
 const SOURCE_META = {
-  duplicate_photo:  { icon: "🪞", color: "#c07a3f", labelKey: "admin.reportSourceDuplicate" },
-  velocity:         { icon: "⚡", color: "#4a90d9", labelKey: "admin.reportSourceVelocity" },
-  community_report: { icon: "🚩", color: "#8b2020", labelKey: "admin.reportSourceCommunity" },
+  duplicate_photo:   { icon: "🪞", color: "#c07a3f", labelKey: "admin.reportSourceDuplicate" },
+  duplicate_selfie:  { icon: "🤳", color: "#a366e8", labelKey: "admin.reportSourceDuplicateSelfie" },
+  velocity:          { icon: "⚡", color: "#4a90d9", labelKey: "admin.reportSourceVelocity" },
+  community_report:  { icon: "🚩", color: "#8b2020", labelKey: "admin.reportSourceCommunity" },
 };
 
 const ReportsPanel = ({ t }) => {

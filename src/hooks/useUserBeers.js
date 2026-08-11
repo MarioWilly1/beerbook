@@ -14,7 +14,7 @@ export const useUserBeers = () => {
 
     const { data, error } = await supabase
       .from("user_beers")
-      .select('beer_id, times, comment, "Rating", user_photo_url, "XP"')
+      .select('beer_id, times, comment, "Rating", user_photo_url, selfie_photo_url, "XP"')
       .eq("user_id", session.user.id);
 
     if (!error && data) {

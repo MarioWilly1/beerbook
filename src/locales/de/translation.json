@@ -251,6 +251,19 @@
     "comingSoonTitle": "Demnächst",
     "comingSoonBody":  "Hier siehst du bald die originellsten Gläser der Community, freigegeben, bevor sie in die gemeinsame Sammlung aufgenommen werden."
   },
+  "dualVerify": {
+    "startBtn":         "🛡️ Verstärkte Verifizierung (optional)",
+    "badgeActive":      "Verstärkte Verifizierung aktiv",
+    "title":            "Verstärkte Verifizierung",
+    "step1Title":       "Foto vom Bier",
+    "step1Subtitle":    "Mach jetzt ein Foto — du kannst keins aus der Galerie auswählen.",
+    "step2Title":       "Jetzt ein Selfie",
+    "step2Subtitle":    "Mach sofort ein Selfie, wie bei BeReal, um zu bestätigen, dass du es bist.",
+    "captureBeerBtn":   "📷 Foto aufnehmen",
+    "captureSelfieBtn": "🤳 Selfie aufnehmen",
+    "uploading":        "Wird hochgeladen…",
+    "error":            "Das Foto konnte nicht verarbeitet werden. Versuch es erneut."
+  },
   "barcode": {
     "scanBtn":          "Barcode scannen",
     "scannerTitle":     "Code scannen",
@@ -336,6 +349,7 @@
     "unverify":             "Verifizierung entfernen",
     "dismiss":              "Verwerfen",
     "reportSourceDuplicate":  "Doppeltes Foto",
+    "reportSourceDuplicateSelfie": "Doppeltes Selfie",
     "reportSourceVelocity":   "Verdächtige Geschwindigkeit",
     "reportSourceCommunity":  "Community-Meldung"
   },
@@ -356,6 +370,7 @@
   },
   "beerform": {
     "verified":           "Verifiziert",
+    "reinforcedVerified": "Verstärkte Verifizierung",
     "timesLabel":         "Probiert",
     "ratingLabel":        "Bewertung",
     "noRating":           "— Keine Bewertung —",

@@ -261,6 +261,8 @@
     "searchPlaceholder":  "Search beer by name…",
     "notFoundBtn":        "Can't find it? Suggest it",
     "alreadyOwnedHint":   "You already have this beer in your Notebook — this will be added as a new tasting.",
+    "commentLabel":       "Note or story (optional)",
+    "commentPlaceholder": "Anything to add? You can also do it later...",
     "saveError":          "We couldn't save it. Try again.",
     "saving":             "Saving…",
     "confirmBtn":         "✓ Register",

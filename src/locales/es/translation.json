@@ -261,6 +261,8 @@
     "searchPlaceholder":  "Buscar cerveza por nombre…",
     "notFoundBtn":        "¿No la encontrás? Sugerirla",
     "alreadyOwnedHint":   "Ya tenés esta cerveza en tu Cuaderno — esto se va a sumar como una nueva cata.",
+    "commentLabel":       "Anécdota o comentario (opcional)",
+    "commentPlaceholder": "¿Algo para agregar? Podés hacerlo después también...",
     "saveError":          "No pudimos guardarla. Probá de nuevo.",
     "saving":             "Guardando…",
     "confirmBtn":         "✓ Registrar",

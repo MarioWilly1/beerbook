@@ -261,6 +261,8 @@
     "searchPlaceholder":  "Bier nach Namen suchen…",
     "notFoundBtn":        "Nicht gefunden? Vorschlagen",
     "alreadyOwnedHint":   "Dieses Bier ist schon in deinem Notizbuch — das wird als neue Verkostung hinzugefügt.",
+    "commentLabel":       "Notiz oder Anekdote (optional)",
+    "commentPlaceholder": "Etwas hinzuzufügen? Das geht auch später...",
     "saveError":          "Konnte nicht gespeichert werden. Versuch es erneut.",
     "saving":             "Wird gespeichert…",
     "confirmBtn":         "✓ Registrieren",

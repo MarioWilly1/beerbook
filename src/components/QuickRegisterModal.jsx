@@ -36,6 +36,7 @@ const QuickRegisterModal = ({ onClose }) => {
   const [photoHash, setPhotoHash] = useState(undefined);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [selectedBeer, setSelectedBeer] = useState(null);
+  const [comment, setComment] = useState("");
   const [showSuggest, setShowSuggest] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
@@ -123,24 +124,27 @@ const QuickRegisterModal = ({ onClose }) => {
       hashStr = hashToString(photoHash);
     }
 
+    const trimmedComment = comment.trim();
+
     if (alreadyOwned) {
       // Ya está en el cuaderno — esto es una re-cata liviana (mismo patrón
-      // que MiCuaderno.js usa para QuickTastingModal), no toca la fila
-      // resumen ni el rating/comentario que ya tenía guardados.
+      // que MiCuaderno.js usa para QuickTastingModal), no toca el rating ni
+      // la foto que ya tenía guardados salvo lo que esta cata trae (foto y/o
+      // comentario nuevos, que quedan como los más recientes en la ficha).
       const { error: tastingError } = await insertTasting(supabase, session.user.id, selectedBeer.id, {
-        comment: null,
+        comment: trimmedComment || null,
         user_photo_url: photoUrl || null,
         ...(hashStr !== undefined ? { photo_hash: hashStr } : {}),
       });
       if (tastingError) { setError(t("quickRegister.saveError")); setPhase("confirm"); return; }
-      await logActivity(session.user.id, selectedBeer.id, { photo: photoUrl });
+      await logActivity(session.user.id, selectedBeer.id, { comment: trimmedComment, photo: photoUrl });
       soundClink();
       toastSave(3, false);
       onClose();
       return;
     }
 
-    const result = await registerFirstTasting(supabase, selectedBeer, { photoUrl, photoHash: hashStr });
+    const result = await registerFirstTasting(supabase, selectedBeer, { photoUrl, photoHash: hashStr, comment: trimmedComment });
     if (result.error) { setError(t("quickRegister.saveError")); setPhase("confirm"); return; }
     onClose();
   };
@@ -231,13 +235,38 @@ const QuickRegisterModal = ({ onClose }) => {
                 {t("quickRegister.alreadyOwnedHint")}
               </p>
             )}
+
+            {phase !== "saving" && (
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#9a7d62", textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 5 }}>
+                  {t("quickRegister.commentLabel")}
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value.slice(0, 400))}
+                  placeholder={t("quickRegister.commentPlaceholder")}
+                  rows={2}
+                  maxLength={400}
+                  style={{
+                    width: "100%", padding: "9px 12px", borderRadius: 8,
+                    background: "#0d0a06", border: "1px solid #2e2215", color: "#f0e4cc",
+                    fontSize: 13, outline: "none", boxSizing: "border-box", resize: "none",
+                    fontFamily: "Inter, sans-serif",
+                  }}
+                  spellCheck="true"
+                  autoCorrect="on"
+                  autoCapitalize="sentences"
+                />
+              </div>
+            )}
+
             {error && <p style={{ margin: "0 0 14px", fontSize: 12, color: "#c07a3f" }}>{error}</p>}
 
             <button onClick={handleConfirm} disabled={phase === "saving"} style={{ ...primaryBtnStyle, opacity: phase === "saving" ? 0.6 : 1 }}>
               {phase === "saving" ? t("quickRegister.saving") : t("quickRegister.confirmBtn")}
             </button>
             {phase !== "saving" && (
-              <button onClick={() => { setSelectedBeer(null); setPhase("search"); }} style={secondaryLinkStyle}>
+              <button onClick={() => { setSelectedBeer(null); setComment(""); setPhase("search"); }} style={secondaryLinkStyle}>
                 {t("quickRegister.backBtn")}
               </button>
             )}

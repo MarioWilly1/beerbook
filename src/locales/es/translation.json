@@ -251,6 +251,21 @@
     "comingSoonTitle": "Próximamente",
     "comingSoonBody":  "Aquí podrás ver las copas más originales que suba la comunidad, aprobadas antes de sumarse a la Colección de todos."
   },
+  "quickRegister": {
+    "title":              "Registro rápido",
+    "introSubtitle":      "Sacale una foto a la cerveza y te ayudamos a identificarla.",
+    "takePhotoBtn":       "📷 Tomar foto",
+    "searchInsteadBtn":   "Buscar por nombre",
+    "openingCamera":      "Abriendo la cámara…",
+    "photoAttachedHint":  "Foto lista — buscá el nombre para confirmar cuál es.",
+    "searchPlaceholder":  "Buscar cerveza por nombre…",
+    "notFoundBtn":        "¿No la encontrás? Sugerirla",
+    "alreadyOwnedHint":   "Ya tenés esta cerveza en tu Cuaderno — esto se va a sumar como una nueva cata.",
+    "saveError":          "No pudimos guardarla. Probá de nuevo.",
+    "saving":             "Guardando…",
+    "confirmBtn":         "✓ Registrar",
+    "backBtn":            "← Volver a buscar"
+  },
   "dualVerify": {
     "startBtn":         "🛡️ Verificación Reforzada (opcional)",
     "badgeActive":      "Verificación Reforzada activa",

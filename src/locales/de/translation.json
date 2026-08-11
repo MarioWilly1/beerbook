@@ -251,6 +251,21 @@
     "comingSoonTitle": "Demnächst",
     "comingSoonBody":  "Hier siehst du bald die originellsten Gläser der Community, freigegeben, bevor sie in die gemeinsame Sammlung aufgenommen werden."
   },
+  "quickRegister": {
+    "title":              "Schnellregistrierung",
+    "introSubtitle":      "Mach ein Foto vom Bier und wir helfen, es zu identifizieren.",
+    "takePhotoBtn":       "📷 Foto aufnehmen",
+    "searchInsteadBtn":   "Nach Namen suchen",
+    "openingCamera":      "Kamera wird geöffnet…",
+    "photoAttachedHint":  "Foto bereit — suche den Namen, um zu bestätigen, welches es ist.",
+    "searchPlaceholder":  "Bier nach Namen suchen…",
+    "notFoundBtn":        "Nicht gefunden? Vorschlagen",
+    "alreadyOwnedHint":   "Dieses Bier ist schon in deinem Notizbuch — das wird als neue Verkostung hinzugefügt.",
+    "saveError":          "Konnte nicht gespeichert werden. Versuch es erneut.",
+    "saving":             "Wird gespeichert…",
+    "confirmBtn":         "✓ Registrieren",
+    "backBtn":            "← Zurück zur Suche"
+  },
   "dualVerify": {
     "startBtn":         "🛡️ Verstärkte Verifizierung (optional)",
     "badgeActive":      "Verstärkte Verifizierung aktiv",

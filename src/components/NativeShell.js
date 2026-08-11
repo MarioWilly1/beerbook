@@ -1,10 +1,11 @@
-import React from "react";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   PlusCircleIcon, BookIcon, RssIcon, PersonIcon, PlusIcon,
 } from "@primer/octicons-react";
 import { useTotalUnread } from "../hooks/useTotalUnread";
 import NativeTabSlide from "./NativeTabSlide";
+import QuickRegisterModal from "./QuickRegisterModal";
 
 const FAB_CSS = `
   .native-fab { transition: transform 0.15s ease; }
@@ -27,8 +28,8 @@ const TAB_PATHS = TABS.map((tb) => tb.to);
 
 const NativeShell = ({ children }) => {
   const totalUnread = useTotalUnread();
-  const navigate = useNavigate();
   const location = useLocation();
+  const [showQuickRegister, setShowQuickRegister] = useState(false);
 
   return (
     <div style={wrapStyle}>
@@ -50,21 +51,24 @@ const NativeShell = ({ children }) => {
         </NativeTabSlide>
       </main>
 
-      {/* FAB v1 — atajo directo a Registrar (hoy el catálogo, ver LaBarra.js).
-          La versión que abre la cámara directo queda para la Fase F, cuando
-          exista una pantalla propia de "captura primero, elegí la cerveza
-          después" (ver el análisis de factibilidad que hicimos antes de
-          empezar). Se oculta en la propia pantalla de Registrar — no tiene
-          sentido ofrecer un atajo hacia donde ya estás. */}
+      {/* FAB v2 — reemplaza el atajo simple a Registrar (v1) por el flujo de
+          Registro Rápido: abre la cámara directo, identifica la cerveza por
+          código de barras o buscador, y guarda la primera cata en el
+          mismo toque (ver QuickRegisterModal.jsx). Se oculta en la propia
+          pantalla de Registrar — no tiene sentido ofrecer un atajo hacia
+          donde ya estás. */}
       {location.pathname !== "/" && (
         <button
           className="native-fab"
-          onClick={() => navigate("/")}
-          aria-label="Registrar cerveza"
+          onClick={() => setShowQuickRegister(true)}
+          aria-label="Registro rápido"
           style={fabStyle}
         >
           <PlusIcon size={26} />
         </button>
+      )}
+      {showQuickRegister && (
+        <QuickRegisterModal onClose={() => setShowQuickRegister(false)} />
       )}
 
       <nav style={tabBarStyle}>

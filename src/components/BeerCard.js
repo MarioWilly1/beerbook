@@ -4,28 +4,22 @@ import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
 import { supabase } from "../services/supabase";
-import { computeEntryXP, getLevelInfo, XP_VALUES } from "../utils/xp";
-import { updateStreak } from "../utils/streak";
-import { fetchAchievementStats, checkAndAwardAchievements, checkSeriesAchievements } from "../utils/achievements";
-import { logActivity } from "../utils/activity";
-import { checkAndAwardBadges } from "../utils/badges";
-import { fetchWeeklyChallengeProgress, checkAndAwardWeeklyChallenge } from "../utils/weeklyChallenge";
+import { computeEntryXP, XP_VALUES } from "../utils/xp";
+import { toastSave } from "../utils/toast";
+import { soundClink } from "../utils/sounds";
+import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
+import { hashToString } from "../utils/perceptualHash";
+import { updateLatestTasting } from "../utils/tastings";
+import { registerFirstTasting } from "../utils/registerBeer";
 import Lightbox from "./Lightbox";
 import BeerInfoModal from "./BeerInfoModal";
 import LocationPicker from "./LocationPicker";
-import { toastSave, toastAchievements, toastBadges, toastLevelUp } from "../utils/toast";
-import { celebrateLevel, celebrateAchievement } from "../utils/celebrate";
-import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
-import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
-import { hashToString } from "../utils/perceptualHash";
-import { insertTasting, updateLatestTasting } from "../utils/tastings";
-import { RAREZA_EMOJI } from "../utils/rareza";
+import { RAREZA_EMOJI, RAREZA_COLECCIONABLE } from "../utils/rareza";
 import DualPhotoVerification from "./DualPhotoVerification";
 import { GlobeIcon, CheckIcon, XIcon, ShieldCheckIcon } from "@primer/octicons-react";
 
 const RATING_OPTIONS = ["", 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
-const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
 const RAREZA_BADGE = {
   comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.2)"   },
   poco_comun: { color: "#4a9e6a", bg: "rgba(74,158,106,0.12)",  border: "rgba(74,158,106,0.3)"   },
@@ -119,17 +113,25 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     if (!session) return;
 
     setSaving(true);
-    // El XP real lo computa el server (trigger de beer_tastings) — esto es
-    // solo la estimación para el toast/animación de nivel, que coincide
-    // exactamente con la fórmula server-side para una primera cata.
-    const xp = computeEntryXP({ rating, comment, photo: photoUrl }) + collectionBonus;
 
-    const { data: xpRows } = await supabase
-      .from("user_beers").select('"XP"').eq("user_id", session.user.id);
-    const prevTotal  = xpRows?.reduce((s, b) => s + (b.XP || 0), 0) ?? 0;
-    const newTotal   = prevTotal + (isInMyBeers ? 0 : xp);
-    const didLevelUp = getLevelInfo(newTotal).level > getLevelInfo(prevTotal).level;
-    const newLevel = getLevelInfo(newTotal).level;
+    if (!isInMyBeers) {
+      // Primera vez que se agrega esta cerveza al cuaderno — toda la lógica
+      // (fila resumen, primera cata, XP/racha/logros/insignias, toasts y
+      // celebraciones) vive en registerFirstTasting, compartida con
+      // QuickRegisterModal.jsx para no duplicarla.
+      const result = await registerFirstTasting(supabase, beer, {
+        photoUrl, photoHash, selfiePhotoUrl, selfiePhotoHash,
+        comment, rating, location, times,
+      });
+      setSaving(false);
+      if (result.error) return;
+      onSaved && onSaved();
+      return;
+    }
+
+    // Ya está en el cuaderno: esto es una EDICIÓN de la reseña actual, no
+    // una cata nueva — no otorga XP adicional (por eso no hay chequeo de
+    // nivel acá, una edición nunca puede subir de nivel).
 
     // photo_hash es un bigint de 64 bits — nunca se lee de vuelta desde la
     // base (perdería precisión al pasar por JSON/Number en JS). Solo se
@@ -150,77 +152,24 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     if (photoHash !== undefined) tastingFields.photo_hash = photoHash;
     if (selfiePhotoHash !== undefined) tastingFields.selfie_photo_hash = selfiePhotoHash;
 
-    if (!isInMyBeers) {
-      // Primera vez que se agrega esta cerveza al cuaderno: crear la fila
-      // resumen (arranca en XP=0) y registrar la primera cata, que es la
-      // que efectivamente le suma el XP real vía trigger.
-      const { error } = await supabase.from("user_beers").upsert({
-        user_id: session.user.id, beer_id: beer.id, times,
-        comment: comment || "", Rating: tastingFields.rating,
-        user_photo_url: tastingFields.user_photo_url,
-        selfie_photo_url: tastingFields.selfie_photo_url,
-        location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
-        location_name: tastingFields.location_name, location_public: tastingFields.location_public,
-        price_paid: tastingFields.price_paid,
-        ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
-        ...(selfiePhotoHash !== undefined ? { selfie_photo_hash: selfiePhotoHash } : {}),
-      });
-      if (error) { setSaving(false); return; }
-      const { error: tastingError } = await insertTasting(supabase, session.user.id, beer.id, tastingFields);
-      if (tastingError) { setSaving(false); return; }
-    } else {
-      // Ya está en el cuaderno: esto es una EDICIÓN de la reseña actual,
-      // no una cata nueva — no otorga XP adicional.
-      const { error } = await supabase.from("user_beers").update({
-        times, comment: comment || "", Rating: tastingFields.rating,
-        user_photo_url: tastingFields.user_photo_url,
-        selfie_photo_url: tastingFields.selfie_photo_url,
-        location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
-        location_name: tastingFields.location_name, location_public: tastingFields.location_public,
-        price_paid: tastingFields.price_paid,
-        ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
-        ...(selfiePhotoHash !== undefined ? { selfie_photo_hash: selfiePhotoHash } : {}),
-      }).eq("user_id", session.user.id).eq("beer_id", beer.id);
-      if (error) { setSaving(false); return; }
-      await updateLatestTasting(supabase, session.user.id, beer.id, tastingFields);
-    }
-
-    await logActivity(session.user.id, beer.id, { rating, comment, photo: photoUrl });
-
-    const [newStreak, achStats] = await Promise.all([
-      updateStreak(),
-      fetchAchievementStats(session.user.id),
-    ]);
-    // fire-and-forget, el banner del Dashboard refleja el resultado — puede
-    // haber hasta 2 retos activos (diario + semanal) para chequear
-    fetchWeeklyChallengeProgress().then((list) => list.forEach(checkAndAwardWeeklyChallenge));
-    const [ordinaryAchievements, newBadges, seriesAchievements] = await Promise.all([
-      achStats ? checkAndAwardAchievements(session.user.id, achStats, newStreak) : Promise.resolve([]),
-      achStats ? checkAndAwardBadges(session.user.id, achStats)                  : Promise.resolve([]),
-      checkSeriesAchievements(session.user.id),
-    ]);
-    const newAchievements = [...ordinaryAchievements, ...seriesAchievements];
+    const { error } = await supabase.from("user_beers").update({
+      times, comment: comment || "", Rating: tastingFields.rating,
+      user_photo_url: tastingFields.user_photo_url,
+      selfie_photo_url: tastingFields.selfie_photo_url,
+      location_lat: tastingFields.location_lat, location_lng: tastingFields.location_lng,
+      location_name: tastingFields.location_name, location_public: tastingFields.location_public,
+      price_paid: tastingFields.price_paid,
+      ...(photoHash !== undefined ? { photo_hash: photoHash } : {}),
+      ...(selfiePhotoHash !== undefined ? { selfie_photo_hash: selfiePhotoHash } : {}),
+    }).eq("user_id", session.user.id).eq("beer_id", beer.id);
+    if (error) { setSaving(false); return; }
+    await updateLatestTasting(supabase, session.user.id, beer.id, tastingFields);
 
     setSaving(false);
     onSaved && onSaved();
 
     soundClink();
-    toastSave(isInMyBeers ? 0 : xp, isComplete);
-    if (collectionBonus > 0) toastAchievements([{ emoji: "💎", nombre: "¡Cerveza coleccionable!", descripcion: "Primera vez que la registrás", xpBonus: collectionBonus }]);
-
-    if (didLevelUp) {
-      celebrateLevel();
-      soundLevelUp();
-      toastLevelUp(newLevel);
-    }
-    if (newAchievements.length > 0) {
-      celebrateAchievement();
-      soundAchievement();
-      toastAchievements(newAchievements);
-    }
-    if (newBadges.length > 0) {
-      toastBadges(newBadges);
-    }
+    toastSave(0, isComplete);
   };
 
   const rb = beer.rareza ? (RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun) : null;

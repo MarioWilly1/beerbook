@@ -5,6 +5,8 @@ export const RAREZA_EMOJI = {
   epica: "🟣", legendaria: "🟡", mitica: "🌈",
 };
 
+export const RAREZA_COLECCIONABLE = new Set(["rara", "epica", "legendaria", "mitica"]);
+
 export const RAREZA_BADGE = {
   comun:      { color: "#7a6a55", bg: "rgba(122,106,85,0.1)",   border: "rgba(122,106,85,0.2)"   },
   poco_comun: { color: "#4a9e6a", bg: "rgba(74,158,106,0.12)",  border: "rgba(74,158,106,0.3)"   },

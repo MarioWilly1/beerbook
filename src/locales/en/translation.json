@@ -251,6 +251,21 @@
     "comingSoonTitle": "Coming Soon",
     "comingSoonBody":  "Here you'll get to see the most original glasses shared by the community, approved before joining everyone's Collection."
   },
+  "quickRegister": {
+    "title":              "Quick register",
+    "introSubtitle":      "Snap a photo of the beer and we'll help identify it.",
+    "takePhotoBtn":       "📷 Take photo",
+    "searchInsteadBtn":   "Search by name",
+    "openingCamera":      "Opening the camera…",
+    "photoAttachedHint":  "Photo ready — search the name to confirm which one it is.",
+    "searchPlaceholder":  "Search beer by name…",
+    "notFoundBtn":        "Can't find it? Suggest it",
+    "alreadyOwnedHint":   "You already have this beer in your Notebook — this will be added as a new tasting.",
+    "saveError":          "We couldn't save it. Try again.",
+    "saving":             "Saving…",
+    "confirmBtn":         "✓ Register",
+    "backBtn":            "← Back to search"
+  },
   "dualVerify": {
     "startBtn":         "🛡️ Reinforced Verification (optional)",
     "badgeActive":      "Reinforced Verification active",

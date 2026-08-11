@@ -15,17 +15,41 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { useUserStats } from "../hooks/useUserStats";
 import ConfirmModal from "./ConfirmModal";
 import AppFooter from "./AppFooter";
+import QuickRegisterModal from "./QuickRegisterModal";
 import {
   ThreeBarsIcon, RssIcon, GearIcon, ToolsIcon,
   SignOutIcon, PencilIcon, TagIcon,
-  ListUnorderedIcon, BookIcon, TrophyIcon, ShieldIcon, InfoIcon,
+  ListUnorderedIcon, BookIcon, TrophyIcon, ShieldIcon, InfoIcon, PlusIcon,
 } from "@primer/octicons-react";
+
+const FAB_CSS = `
+  .web-fab { transition: transform 0.15s ease; }
+  .web-fab:active { transform: scale(0.92); }
+`;
+const fabStyle = {
+  position: "fixed",
+  bottom: 24,
+  right: 24,
+  width: 56,
+  height: 56,
+  borderRadius: "50%",
+  border: "none",
+  background: "#d4af37",
+  color: "#0d0a06",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 6px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(212,175,55,0.35)",
+  cursor: "pointer",
+  zIndex: 1150,
+};
 
 const Layout = ({ children, session, profile, onAvatarChange }) => {
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [prestigeCloseup, setPrestigeCloseup] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showQuickRegister, setShowQuickRegister] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -53,6 +77,25 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", position: "relative" }}>
+      <style>{FAB_CSS}</style>
+
+      {/* Botón flotante de Registro Rápido — equivalente web del FAB nativo
+          (NativeShell.js), no existía ningún acceso flotante en web hasta
+          ahora. Mismo criterio de visibilidad: oculto en "/" (el catálogo),
+          no tiene sentido un atajo hacia donde ya estás. */}
+      {location.pathname !== "/" && (
+        <button
+          className="web-fab"
+          onClick={() => setShowQuickRegister(true)}
+          aria-label="Registro rápido"
+          style={fabStyle}
+        >
+          <PlusIcon size={26} />
+        </button>
+      )}
+      {showQuickRegister && (
+        <QuickRegisterModal onClose={() => setShowQuickRegister(false)} />
+      )}
 
       {/* ── Mobile: fixed top header ─────────────────────────────────────────── */}
       {isMobile && (

@@ -12,8 +12,10 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { useTrendingBeers } from "../hooks/useTrendingBeers";
 import ChallengesBellButton from "../components/ChallengesBellButton";
 import NativePullToRefresh from "../components/NativePullToRefresh";
-import { XIcon, GlobeIcon, ChevronUpIcon, ChevronDownIcon } from "@primer/octicons-react";
+import BarcodeScanner from "../components/BarcodeScanner";
+import { XIcon, GlobeIcon, ChevronUpIcon, ChevronDownIcon, DeviceCameraIcon } from "@primer/octicons-react";
 import { STYLE_KEYWORDS, normalizeStr } from "../utils/styleCategories";
+import { toastInfo } from "../utils/toast";
 
 // ── Modal: Sugerir cerveza ─────────────────────────────────────────────────────
 const SuggestBeerModal = ({ onClose, t }) => {
@@ -127,6 +129,38 @@ const SuggestBeerModal = ({ onClose, t }) => {
   );
 };
 
+// ── Modal: código de barras no encontrado ───────────────────────────────────
+const BarcodeNotFoundModal = ({ onClose, onSuggest, t }) => {
+  const overlayStyle = {
+    position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    zIndex: 1000, padding: 16,
+  };
+  const modalStyle = {
+    background: "#1c1409", border: "1px solid #2e2215", borderRadius: 16,
+    padding: 28, width: "100%", maxWidth: 380, textAlign: "center",
+  };
+  return (
+    <div style={overlayStyle} onClick={onClose}>
+      <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
+        <p style={{ fontSize: 34, margin: "0 0 10px" }}>🔍</p>
+        <p style={{ color: "#f0e4cc", fontWeight: 700, fontSize: 16, margin: "0 0 8px" }}>
+          {t("barcode.notFoundTitle")}
+        </p>
+        <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 22px", lineHeight: 1.5 }}>
+          {t("barcode.notFoundBody")}
+        </p>
+        <button onClick={onSuggest} style={{ width: "100%", padding: "11px 0", borderRadius: 8, border: "none", background: "#d4af37", color: "#0d0a06", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 10 }}>
+          {t("barcode.suggestBtn")}
+        </button>
+        <button onClick={onClose} style={{ width: "100%", padding: "10px 0", borderRadius: 8, border: "1px solid #2e2215", background: "none", color: "#9a7d62", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
+          {t("barcode.closeBtn")}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = ({ tabsSlot }) => {
   const isNative = Capacitor.isNativePlatform();
   const { t } = useTranslation();
@@ -140,6 +174,9 @@ const Dashboard = ({ tabsSlot }) => {
   const [showSuggest, setShowSuggest] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [focusBeer, setFocusBeer] = useState(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanNotFound, setScanNotFound] = useState(false);
+  const [scanMatchId, setScanMatchId] = useState(null);
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState(null);
   const [countryFilter, setCountryFilter] = useState(null);
@@ -154,6 +191,18 @@ const Dashboard = ({ tabsSlot }) => {
       setRefresh(false);
     }
   }, [refresh, refetch, refetchStats]);
+
+  const handleBarcodeDetected = useCallback((code) => {
+    setShowScanner(false);
+    const match = beers.find((b) => b.codigo_barras === code);
+    if (!match) { setScanNotFound(true); return; }
+    // Reset de filtros: si el match está oculto por un filtro activo (ej.
+    // una búsqueda de texto previa), igual queremos mostrar su ficha.
+    setSearch(""); setStyleFilter(null); setCountryFilter(null);
+    setFamiliaFilter(null); setAlcoholFilter([0, 15]); setTrendingFilter(false);
+    setScanMatchId(match.id);
+    toastInfo(`✓ ${match.nombre}`);
+  }, [beers]);
 
   const countries = useMemo(() => {
     if (!beers.length) return [];
@@ -225,6 +274,17 @@ const Dashboard = ({ tabsSlot }) => {
           <GlobeIcon size={14} /> {t("dashboard.mapBtn")} {showMap ? <ChevronUpIcon size={14} /> : <ChevronDownIcon size={14} />}
         </button>
         <button
+          onClick={() => setShowScanner(true)}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "7px 14px", borderRadius: 8,
+            border: "1px solid #2e2215", background: "#1c1409",
+            color: "#9a7d62", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}
+        >
+          <DeviceCameraIcon size={14} /> {t("barcode.scanBtn")}
+        </button>
+        <button
           onClick={() => setShowSuggest(true)}
           style={{
             background: "none", border: "none", color: "#8b6b2e",
@@ -244,6 +304,16 @@ const Dashboard = ({ tabsSlot }) => {
         />
       )}
       {showSuggest && <SuggestBeerModal onClose={() => setShowSuggest(false)} t={t} />}
+      {showScanner && (
+        <BarcodeScanner onDetected={handleBarcodeDetected} onClose={() => setShowScanner(false)} />
+      )}
+      {scanNotFound && (
+        <BarcodeNotFoundModal
+          t={t}
+          onClose={() => setScanNotFound(false)}
+          onSuggest={() => { setScanNotFound(false); setShowSuggest(true); }}
+        />
+      )}
 
       <BeerFilters
         search={search}
@@ -294,6 +364,8 @@ const Dashboard = ({ tabsSlot }) => {
             inCuaderno={false}
             onVerMapa={beer.origen_lat != null ? () => { setFocusBeer(beer); setShowMap(true); } : null}
             isTrending={trendingIds.has(beer.id)}
+            autoOpen={beer.id === scanMatchId}
+            onAutoOpened={() => setScanMatchId(null)}
           />
         ))}
       </div>

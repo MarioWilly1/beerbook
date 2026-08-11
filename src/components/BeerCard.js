@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { NATIVE_CARD_SHADOW } from "../utils/nativeElevation";
 import { useTranslation } from "react-i18next";
@@ -34,9 +34,10 @@ const RAREZA_BADGE = {
   mitica:     { color: "#e040fb", bg: "rgba(224,64,251,0.1)",   border: "rgba(224,64,251,0.25)"  },
 };
 
-const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrending }) => {
+const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrending, autoOpen, onAutoOpened }) => {
   const { t, i18n } = useTranslation();
   const [expanded,  setExpanded]  = useState(false);
+  const cardRef = useRef(null);
   const [times,     setTimes]     = useState(myBeerData?.times || 0);
   const [comment,   setComment]   = useState(myBeerData?.comment || "");
   const [rating,    setRating]    = useState(myBeerData?.Rating ?? "");
@@ -53,6 +54,16 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const [saving,     setSaving]    = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState(null);
   const [infoOpen,   setInfoOpen]  = useState(false);
+
+  // Match de escaneo de código de barras (Fase F1): abre la ficha directo y
+  // hace scroll hasta la tarjeta, sin que el usuario tenga que buscarla.
+  useEffect(() => {
+    if (!autoOpen) return;
+    setExpanded(true);
+    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    onAutoOpened && onAutoOpened();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpen]);
 
   const handlePhotoSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -193,7 +204,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const rb = beer.rareza ? (RAREZA_BADGE[beer.rareza] || RAREZA_BADGE.comun) : null;
 
   return (
-    <div style={cardStyle}>
+    <div ref={cardRef} style={cardStyle}>
       {/* ── Sección siempre visible — click para expandir ── */}
       <div onClick={() => setExpanded((v) => !v)} style={{ cursor: "pointer" }}>
         {/* Foto */}

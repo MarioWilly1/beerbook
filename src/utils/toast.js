@@ -51,6 +51,14 @@ export const toastBadges = (list) => {
   });
 };
 
+export const toastInfo = (message) => {
+  toast(message, {
+    style: base,
+    icon: "🍺",
+    duration: 3000,
+  });
+};
+
 export const toastError = (message) => {
   toast.error(message, {
     style: { ...base, border: "1px solid rgba(192,57,43,0.5)" },

@@ -32,7 +32,7 @@ const CargarCerveza = () => {
   const [form, setForm] = useState({
     nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "",
     rareza: "comun", es_edicion_especial: false, motivo_edicion: "",
-    familia: "",
+    familia: "", codigo_barras: "",
   });
   const [fotoFile, setFotoFile]       = useState(null);
   const [fotoPreview, setFotoPreview] = useState(null);
@@ -122,13 +122,19 @@ const CargarCerveza = () => {
       es_edicion_especial: form.es_edicion_especial,
       motivo_edicion:     form.motivo_edicion.trim() || null,
       familia:            form.familia.trim() || null,
+      codigo_barras:      form.codigo_barras.trim() || null,
     };
 
     const { error: dbErr } = await supabase.from("beers_new").insert(row);
-    if (dbErr) { setError(`Error guardando: ${dbErr.message}`); setSaving(false); return; }
+    if (dbErr) {
+      const msg = dbErr.code === "23505" && dbErr.message.includes("codigo_barras")
+        ? "Ese código de barras ya está asignado a otra cerveza."
+        : `Error guardando: ${dbErr.message}`;
+      setError(msg); setSaving(false); return;
+    }
 
     setSuccess(`✓ "${form.nombre}" guardada correctamente.`);
-    setForm({ nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "", rareza: "comun", es_edicion_especial: false, motivo_edicion: "", familia: "" });
+    setForm({ nombre: "", estilo: "", pais: "", alcohol: "", info_detallada: "", rareza: "comun", es_edicion_especial: false, motivo_edicion: "", familia: "", codigo_barras: "" });
     setFotoFile(null); setFotoPreview(null);
     setCoordsRaw(""); setCoordsParsed(null);
     setSaving(false);
@@ -190,6 +196,14 @@ const CargarCerveza = () => {
             placeholder="Ej: 1906, Belgian Quad, Trappist…" style={input} />
           <p style={{ margin: "4px 0 0", fontSize: 11, color: "#5a4535" }}>
             Agrupa cervezas en una serie para habilitar logros de &quot;serie completa&quot;.
+          </p>
+        </Field>
+
+        <Field label="Código de barras (opcional)">
+          <input value={form.codigo_barras} onChange={set("codigo_barras")}
+            placeholder="Ej: 7501234567890" style={input} />
+          <p style={{ margin: "4px 0 0", fontSize: 11, color: "#5a4535" }}>
+            EAN-13/UPC-A del envase — habilita identificarla escaneando desde el catálogo.
           </p>
         </Field>
 
@@ -787,7 +801,7 @@ const EditarCerveza = () => {
     if (q.trim().length < 2) { setResults([]); return; }
     const { data } = await supabase
       .from("beers_new")
-      .select("id, nombre, estilo, pais, alcohol, rareza, es_edicion_especial, motivo_edicion, familia, info_detallada, info_detallada_en, info_detallada_de, foto_url, origen_lat, origen_lng")
+      .select("id, nombre, estilo, pais, alcohol, rareza, es_edicion_especial, motivo_edicion, familia, info_detallada, info_detallada_en, info_detallada_de, foto_url, origen_lat, origen_lng, codigo_barras")
       .ilike("nombre", `%${q.trim()}%`)
       .order("nombre")
       .limit(20);
@@ -806,6 +820,7 @@ const EditarCerveza = () => {
       motivo_edicion:      beer.motivo_edicion      || "",
       familia:             beer.familia             || "",
       info_detallada:      beer.info_detallada      || "",
+      codigo_barras:       beer.codigo_barras       || "",
     });
     if (beer.origen_lat != null && beer.origen_lng != null) {
       const raw = `${beer.origen_lat}, ${beer.origen_lng}`;
@@ -900,10 +915,16 @@ const EditarCerveza = () => {
       foto_url,
       origen_lat:          coordsParsed?.lat ?? null,
       origen_lng:          coordsParsed?.lng ?? null,
+      codigo_barras:       form.codigo_barras.trim()  || null,
     }).eq("id", selected.id);
 
     setSaving(false);
-    if (error) { setMsg(`❌ Error: ${error.message}`); return; }
+    if (error) {
+      const msg = error.code === "23505" && error.message.includes("codigo_barras")
+        ? "❌ Ese código de barras ya está asignado a otra cerveza."
+        : `❌ Error: ${error.message}`;
+      setMsg(msg); return;
+    }
     setMsg(`✓ "${form.nombre.trim()}" actualizada correctamente.`);
     setSelected((s) => ({ ...s, ...form, foto_url, info_detallada_en, info_detallada_de, origen_lat: coordsParsed?.lat ?? null, origen_lng: coordsParsed?.lng ?? null }));
     setFotoFile(null); setFotoPreview(null);
@@ -1004,6 +1025,11 @@ const EditarCerveza = () => {
             <Field label="Familia / Serie (opcional)">
               <input value={form.familia} onChange={set("familia")}
                 placeholder="Ej: 1906, Belgian Quad, Trappist…" style={input} />
+            </Field>
+
+            <Field label="Código de barras (opcional)">
+              <input value={form.codigo_barras} onChange={set("codigo_barras")}
+                placeholder="Ej: 7501234567890" style={input} />
             </Field>
 
             <Field label="Foto">

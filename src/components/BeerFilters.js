@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getCountryName } from "../utils/countryDisplay";
 import { XIcon, SearchIcon, FlameIcon, FilterIcon } from "@primer/octicons-react";
@@ -205,7 +206,9 @@ const BeerFilters = ({
 }) => {
   const { t, i18n } = useTranslation();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const panelRef = useRef(null);
+  const [dropdownPos, setDropdownPos] = useState(null);
+  const btnRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const [low, high] = alcoholFilter;
   const alcActive = low > 0 || high < 15;
@@ -221,11 +224,41 @@ const BeerFilters = ({
     setTrendingFilter(false);
   };
 
-  // Cierra el panel al tocar afuera (botón o desplegable).
+  // El desplegable se porta a document.body y se posiciona con coordenadas
+  // calculadas (position:fixed) en vez de position:absolute anclado acá —
+  // <main> en NativeShell.js solo declara overflowY:auto, pero por la spec
+  // de CSS eso vuelve overflow-x "auto" también de forma implícita (si un
+  // eje no-visible se declara y el otro queda en "visible", el otro pasa a
+  // auto) — cualquier position:absolute que se saliera de esos límites
+  // quedaba recortado, que es justo lo reportado. Mismo tratamiento que ya
+  // se le dio a los overlays de pantalla completa (BarcodeScanner, etc.),
+  // adaptado a un desplegable que necesita anclarse a un botón en vez de
+  // cubrir toda la pantalla.
+  const openFilters = () => {
+    const rect = btnRef.current?.getBoundingClientRect();
+    if (rect) {
+      const width = 260;
+      const margin = 16;
+      // Alineado al borde derecho del botón (mismo look que antes), pero
+      // clampeado para que nunca se salga de la pantalla — en un botón
+      // cerca del borde izquierdo, alinear a la derecha sin límite empujaba
+      // el desplegable fuera de la vista por el otro lado.
+      const left = Math.max(margin, Math.min(rect.right - width, window.innerWidth - width - margin));
+      setDropdownPos({ top: rect.bottom + 6, left });
+    }
+    setFiltersOpen(true);
+  };
+
+  // Cierra el panel al tocar afuera (botón o desplegable) — ahora hay que
+  // chequear los dos refs porque, al estar portado, el desplegable ya no es
+  // descendiente del botón en el DOM.
   useEffect(() => {
     if (!filtersOpen) return;
     const onClickOutside = (e) => {
-      if (panelRef.current && !panelRef.current.contains(e.target)) {
+      if (
+        btnRef.current && !btnRef.current.contains(e.target) &&
+        dropdownRef.current && !dropdownRef.current.contains(e.target)
+      ) {
         setFiltersOpen(false);
       }
     };
@@ -319,9 +352,10 @@ const BeerFilters = ({
         {/* País / Estilo / Familia / Alcohol — agrupados en un único
             desplegable compacto para no saturar la barra de filtros. */}
         {hasFilterOptions && (
-          <div style={{ position: "relative", flex: "0 0 auto" }} ref={panelRef}>
+          <div style={{ position: "relative", flex: "0 0 auto" }}>
             <button
-              onClick={() => setFiltersOpen((o) => !o)}
+              ref={btnRef}
+              onClick={() => (filtersOpen ? setFiltersOpen(false) : openFilters())}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -340,15 +374,18 @@ const BeerFilters = ({
               <FilterIcon size={14} /> {t("filters.filtersBtn")}
             </button>
 
-            {filtersOpen && (
+            {filtersOpen && dropdownPos && ReactDOM.createPortal(
               <div
+                ref={dropdownRef}
                 style={{
-                  position: "absolute",
-                  top: "calc(100% + 6px)",
-                  right: 0,
-                  zIndex: 20,
+                  position: "fixed",
+                  top: dropdownPos.top,
+                  left: dropdownPos.left,
+                  zIndex: 100000,
                   width: 260,
-                  maxWidth: "calc(100vw - 40px)",
+                  maxWidth: "calc(100vw - 32px)",
+                  maxHeight: `calc(100vh - ${dropdownPos.top}px - 16px)`,
+                  overflowY: "auto",
                   background: "#1c1409",
                   border: "1px solid #2e2215",
                   borderRadius: 12,
@@ -407,7 +444,8 @@ const BeerFilters = ({
                 >
                   {t("filters.applyBtn")}
                 </button>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         )}

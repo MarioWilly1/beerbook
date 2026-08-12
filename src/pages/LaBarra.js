@@ -39,7 +39,7 @@ const LaBarra = () => {
   if (isNative) {
     return (
       <div>
-        <NativeTabSlide tabKey={tab} tabOrder={TAB_ORDER}>
+        <NativeTabSlide tabKey={tab} tabOrder={TAB_ORDER} onSwipe={setTab}>
           {tab === "catalogo"
             ? <Dashboard tabsSlot={tabBar} />
             : <>{tabBar}<ComunidadPlaceholder /></>}

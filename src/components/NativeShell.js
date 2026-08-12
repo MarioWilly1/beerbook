@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   PlusCircleIcon, BookIcon, RssIcon, PersonIcon, PlusIcon,
 } from "@primer/octicons-react";
@@ -29,6 +29,7 @@ const TAB_PATHS = TABS.map((tb) => tb.to);
 const NativeShell = ({ children }) => {
   const totalUnread = useTotalUnread();
   const location = useLocation();
+  const navigate = useNavigate();
   const [showQuickRegister, setShowQuickRegister] = useState(false);
 
   return (
@@ -46,7 +47,7 @@ const NativeShell = ({ children }) => {
             está en TAB_PATHS — pantallas secundarias abiertas desde el menú
             de Perfil, ej. /logros, /configuracion — no anima, ver el guard
             agregado en NativeTabSlide.jsx. */}
-        <NativeTabSlide tabKey={location.pathname} tabOrder={TAB_PATHS}>
+        <NativeTabSlide tabKey={location.pathname} tabOrder={TAB_PATHS} onSwipe={navigate}>
           {children}
         </NativeTabSlide>
       </main>

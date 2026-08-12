@@ -286,6 +286,7 @@
     "scannerTitle":     "Escaneá el código",
     "instructions":     "Apuntá la cámara al código de barras de la botella o lata",
     "permissionError":  "No pudimos acceder a la cámara. Revisá los permisos de la app y volvé a intentar, o buscá la cerveza por nombre.",
+    "scanError":        "Hubo un problema escaneando. Volvé a intentar, o buscá la cerveza por nombre.",
     "closeBtn":         "Cerrar",
     "notFoundTitle":    "No encontramos esa cerveza",
     "notFoundBody":     "Este código de barras todavía no está en el catálogo. Podés sugerirla o buscarla por nombre.",

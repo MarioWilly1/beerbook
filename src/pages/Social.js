@@ -10,7 +10,11 @@ import Noticias from "./Noticias";
 import { useTotalUnread } from "../hooks/useTotalUnread";
 import NativeTabSlide from "../components/NativeTabSlide";
 
-const TAB_ORDER = ["feed", "amigos", "chat", "noticias"];
+// En nativo, Noticias no tiene botón propio (ver comentario más abajo) —
+// se excluye del orden usado para el swipe, si no un deslizamiento desde
+// "Chat" llevaría a una pestaña sin forma visible de volver salvo deslizar
+// de nuevo.
+const NATIVE_TAB_ORDER = ["feed", "amigos", "chat"];
 
 // Feed, Amigos, Chat y Noticias fusionados en una sola pantalla con tabs
 // internas — reduce la cantidad de links del sidebar (pedido explícito para
@@ -69,7 +73,7 @@ const Social = ({ defaultTab }) => {
       </div>
 
       {Capacitor.isNativePlatform() ? (
-        <NativeTabSlide tabKey={tab} tabOrder={TAB_ORDER}>
+        <NativeTabSlide tabKey={tab} tabOrder={NATIVE_TAB_ORDER} onSwipe={setTab}>
           {tab === "feed" ? <Feed />
             : tab === "amigos" ? <Amigos />
             : tab === "chat" ? <Chats />

@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import { BarcodeFormat } from "@zxing/library";
+import { BarcodeFormat, NotFoundException, ChecksumException, FormatException } from "@zxing/library";
 import { useTranslation } from "react-i18next";
 import { XIcon } from "@primer/octicons-react";
+
+// Errores "normales" de cada frame sin código legible a la vista — el loop
+// interno de zxing los reintenta solo, no ameritan mostrar nada.
+const isRetryableScanError = (err) =>
+  err instanceof NotFoundException || err instanceof ChecksumException || err instanceof FormatException;
 
 // Escaneo de código de barras (EAN-13/UPC-A) vía getUserMedia + @zxing/browser —
 // funciona igual en navegador y dentro del WebView de Capacitor (androidScheme
@@ -29,10 +34,33 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
       .decodeFromConstraints(
         { video: { facingMode: "environment" } },
         videoRef.current,
-        (result) => {
+        // El loop interno de zxing (BrowserCodeReader.scan) llama a este
+        // callback con (result, error, controls) en CADA frame — no se
+        // detiene solo porque hubo un resultado exitoso, y si ocurre un
+        // error que no sea "todavía no encontré nada" (NotFound/Checksum/
+        // FormatException, lo normal en casi todos los frames), el loop lo
+        // trata como fatal: detiene el stream de cámara internamente y
+        // nunca vuelve a llamar al callback. Antes solo mirábamos `result`
+        // e ignorábamos `error` por completo, así que ese caso ("la cámara
+        // se cierra sola pero no pasa nada") quedaba completamente mudo acá.
+        (result, err, controls) => {
           if (result && !detectedRef.current) {
             detectedRef.current = true;
-            onDetectedRef.current(result.getText());
+            // Frenar la cámara ACÁ, antes de avisarle al padre — así lo que
+            // haga onDetected (que puede disparar varios setState en
+            // cascada) nunca corre dentro del try/catch del loop de zxing:
+            // si tirara una excepción inesperada, zxing la reinterpretaría
+            // como un fallo de escaneo fatal en vez de un problema nuestro.
+            controls.stop();
+            try {
+              onDetectedRef.current(result.getText());
+            } catch {
+              if (!cancelled) setError(t("barcode.scanError"));
+            }
+            return;
+          }
+          if (err && !isRetryableScanError(err) && !detectedRef.current && !cancelled) {
+            setError(t("barcode.scanError"));
           }
         }
       )

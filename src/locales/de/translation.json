@@ -286,6 +286,7 @@
     "scannerTitle":     "Code scannen",
     "instructions":     "Richte die Kamera auf den Barcode der Flasche oder Dose",
     "permissionError":  "Wir konnten nicht auf die Kamera zugreifen. Überprüfe die App-Berechtigungen und versuche es erneut, oder suche das Bier nach Namen.",
+    "scanError":        "Beim Scannen ist ein Problem aufgetreten. Versuch es erneut, oder suche das Bier nach Namen.",
     "closeBtn":         "Schließen",
     "notFoundTitle":    "Dieses Bier haben wir nicht gefunden",
     "notFoundBody":     "Dieser Barcode ist noch nicht im Katalog. Du kannst ihn vorschlagen oder das Bier nach Namen suchen.",

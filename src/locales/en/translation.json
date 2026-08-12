@@ -286,6 +286,7 @@
     "scannerTitle":     "Scan the code",
     "instructions":     "Point the camera at the barcode on the bottle or can",
     "permissionError":  "We couldn't access the camera. Check the app's permissions and try again, or search for the beer by name.",
+    "scanError":        "Something went wrong while scanning. Try again, or search for the beer by name.",
     "closeBtn":         "Close",
     "notFoundTitle":    "We couldn't find that beer",
     "notFoundBody":     "This barcode isn't in the catalog yet. You can suggest it or search for it by name.",

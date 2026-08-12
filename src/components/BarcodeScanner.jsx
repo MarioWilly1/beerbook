@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { BarcodeFormat } from "@zxing/library";
 import { useTranslation } from "react-i18next";
@@ -49,7 +50,13 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
     };
   }, [t]);
 
-  return (
+  // Portal a document.body: este overlay se abre desde adentro del
+  // contenido de una pestaña nativa (NativeTabSlide.jsx), que puede quedar
+  // con un transform de GSAP activo — cualquier ancestro con transform
+  // rompe position:fixed (deja de fijarse a la pantalla y pasa a
+  // depender del tamaño de ese ancestro). El portal evita el problema de
+  // raíz sin importar qué transform tenga el árbol de arriba.
+  return ReactDOM.createPortal(
     <div style={overlayStyle}>
       <div style={topBarStyle}>
         <span style={{ color: "#f0e4cc", fontSize: 14, fontWeight: 700 }}>
@@ -76,7 +83,8 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
           <p style={instructionsStyle}>{t("barcode.instructions")}</p>
         </>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 

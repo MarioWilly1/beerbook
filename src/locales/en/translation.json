@@ -276,8 +276,8 @@
     "step1Subtitle":    "Take a photo right now — you can't pick one from your gallery.",
     "step2Title":       "Now a selfie",
     "step2Subtitle":    "Take a selfie right away, BeReal-style, to confirm it's you.",
-    "captureBeerBtn":   "📷 Take photo",
-    "captureSelfieBtn": "🤳 Take selfie",
+    "captureBtn":       "Take photo",
+    "cameraError":      "We couldn't access the camera. Check the app's permissions and try again.",
     "uploading":        "Uploading…",
     "error":            "We couldn't process the photo. Try again."
   },

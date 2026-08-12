@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Capacitor } from "@capacitor/core";
 
@@ -25,7 +25,15 @@ const NativeTabSlide = ({ tabKey, tabOrder, children }) => {
   const ref = useRef(null);
   const prevIndexRef = useRef(tabOrder.indexOf(tabKey));
 
-  useEffect(() => {
+  // useLayoutEffect (no useEffect): tiene que correr ANTES de que el
+  // navegador pinte, si no el contenido nuevo ya se ve un frame entero en su
+  // posición final y recién ahí GSAP lo "teletransporta" hacia atrás para
+  // animarlo de vuelta — en desktop esa ventana es invisible, pero en un
+  // dispositivo real (sobre todo con una pantalla pesada como el Dashboard)
+  // alcanza a verse como un flash sin transición real, que es exactamente lo
+  // que se reportó. Con useLayoutEffect el primer frame pintado YA arranca
+  // desplazado/transparente.
+  useLayoutEffect(() => {
     const index = tabOrder.indexOf(tabKey);
     const prevIndex = prevIndexRef.current;
     prevIndexRef.current = index;
@@ -36,8 +44,8 @@ const NativeTabSlide = ({ tabKey, tabOrder, children }) => {
     const direction = index > prevIndex ? 1 : -1;
     gsap.fromTo(
       ref.current,
-      { x: direction * 24, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.28, ease: "power2.out" }
+      { x: direction * 40, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.32, ease: "back.out(1.5)", clearProps: "transform" }
     );
   }, [tabKey, tabOrder]);
 

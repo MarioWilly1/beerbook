@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import ReactDOM from "react-dom";
 import { supabase } from "../services/supabase";
 import { XIcon } from "@primer/octicons-react";
 
@@ -51,7 +52,10 @@ const SuggestBeerModal = ({ onClose, t, prefillNombre = "" }) => {
     textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 5,
   };
 
-  return (
+  // Portal a document.body — mismo motivo que BarcodeScanner.jsx: se abre
+  // desde adentro del contenido de una pestaña nativa, donde un transform
+  // de GSAP puede romper position:fixed.
+  return ReactDOM.createPortal(
     <div style={overlayStyle} onClick={onClose}>
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
@@ -112,7 +116,8 @@ const SuggestBeerModal = ({ onClose, t, prefillNombre = "" }) => {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

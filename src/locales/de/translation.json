@@ -276,8 +276,8 @@
     "step1Subtitle":    "Mach jetzt ein Foto — du kannst keins aus der Galerie auswählen.",
     "step2Title":       "Jetzt ein Selfie",
     "step2Subtitle":    "Mach sofort ein Selfie, wie bei BeReal, um zu bestätigen, dass du es bist.",
-    "captureBeerBtn":   "📷 Foto aufnehmen",
-    "captureSelfieBtn": "🤳 Selfie aufnehmen",
+    "captureBtn":       "Foto aufnehmen",
+    "cameraError":      "Wir konnten nicht auf die Kamera zugreifen. Überprüfe die App-Berechtigungen und versuch es erneut.",
     "uploading":        "Wird hochgeladen…",
     "error":            "Das Foto konnte nicht verarbeitet werden. Versuch es erneut."
   },

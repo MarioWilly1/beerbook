@@ -13,7 +13,15 @@ import { Capacitor } from "@capacitor/core";
 // que lo contiene.
 const PULL_THRESHOLD = 70;
 const MAX_PULL = 100;
-const RESISTANCE = 0.5;
+
+// Rubber-band real (misma fórmula que UIScrollView de iOS) en vez de un
+// multiplicador lineal plano: se vuelve progresivamente más resistente
+// cuanto más se tira, en vez de ceder siempre la misma proporción — así se
+// siente elástico/orgánico en vez de "mecánico". Se acerca asintóticamente
+// a MAX_PULL sin necesitar un Math.min aparte.
+function rubberBand(delta) {
+  return MAX_PULL * (1 - 1 / (delta / MAX_PULL + 1));
+}
 
 function findScrollParent(el) {
   let node = el?.parentElement;
@@ -46,7 +54,7 @@ const NativePullToRefresh = ({ onRefresh, children }) => {
   }, [refreshing]);
 
   const settle = useCallback((toZero) => {
-    gsap.to(contentRef.current, { y: 0, duration: 0.3, ease: "power2.out" });
+    gsap.to(contentRef.current, { y: 0, duration: 0.4, ease: "elastic.out(1, 0.65)" });
     gsap.to(indicatorRef.current, { opacity: toZero ? 0 : 1, duration: 0.2 });
     if (toZero) gsap.to(fillRef.current, { scaleY: 0, duration: 0.25, delay: 0.05 });
   }, []);
@@ -65,7 +73,7 @@ const NativePullToRefresh = ({ onRefresh, children }) => {
     if (delta <= 0 || scrollParentRef.current.scrollTop > 0) { pullingRef.current = false; return; }
 
     e.preventDefault();
-    const pull = Math.min(delta * RESISTANCE, MAX_PULL);
+    const pull = rubberBand(delta);
     pullDistRef.current = pull;
     const progress = Math.min(pull / PULL_THRESHOLD, 1);
 

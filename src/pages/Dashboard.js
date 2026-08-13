@@ -16,6 +16,7 @@ import SuggestBeerModal from "../components/SuggestBeerModal";
 import { GlobeIcon, ChevronUpIcon, ChevronDownIcon, DeviceCameraIcon } from "@primer/octicons-react";
 import { STYLE_KEYWORDS, normalizeStr } from "../utils/styleCategories";
 import { toastInfo } from "../utils/toast";
+import { logDebug } from "../utils/debugLog";
 
 // ── Modal: código de barras no encontrado ───────────────────────────────────
 const BarcodeNotFoundModal = ({ onClose, onSuggest, t }) => {
@@ -81,34 +82,32 @@ const Dashboard = ({ tabsSlot }) => {
   }, [refresh, refetch, refetchStats]);
 
   const handleBarcodeDetected = useCallback((code) => {
-    // eslint-disable-next-line no-alert
-    alert("[DEBUG] Buscando en catálogo... (código=" + code + ", " + beers.length + " cervezas cargadas)");
+    logDebug("Buscando en catálogo... (código=" + code + ", " + beers.length + " cervezas cargadas)");
     setShowScanner(false);
     const match = beers.find((b) => b.codigo_barras === code);
     if (!match) {
-      // eslint-disable-next-line no-alert
-      alert("[DEBUG] Resultado: NO encontrado — mostrando modal de no encontrado");
+      logDebug("Resultado: NO encontrado — mostrando modal de no encontrado");
       setScanNotFound(true);
       return;
     }
-    // eslint-disable-next-line no-alert
-    alert("[DEBUG] Resultado: encontrado — " + match.nombre + " (id=" + match.id + ")");
+    logDebug("Resultado: encontrado — " + match.nombre + " (id=" + match.id + ")");
     // Reset de filtros: si el match está oculto por un filtro activo (ej.
     // una búsqueda de texto previa), igual queremos mostrar su ficha.
     setSearch(""); setStyleFilter(null); setCountryFilter(null);
     setFamiliaFilter(null); setAlcoholFilter([0, 15]); setTrendingFilter(false);
-    // eslint-disable-next-line no-alert
-    alert("[DEBUG] Navegando a ficha de " + match.nombre);
-    setScanMatchId(match.id);
-    // eslint-disable-next-line no-alert
-    alert("[DEBUG] scanMatchId seteado, llamando a toastInfo...");
+    logDebug("Filtros reseteados, por llamar a setScanMatchId(" + match.id + ")...");
+    try {
+      setScanMatchId(match.id);
+      logDebug("setScanMatchId ejecutado sin errores");
+    } catch (setMatchErr) {
+      logDebug("setScanMatchId tiró un error: " + setMatchErr.message);
+    }
+    logDebug("Navegando a ficha de " + match.nombre + ", llamando a toastInfo...");
     try {
       toastInfo(`✓ ${match.nombre}`);
-      // eslint-disable-next-line no-alert
-      alert("[DEBUG] toastInfo completado sin errores");
+      logDebug("toastInfo completado sin errores");
     } catch (toastErr) {
-      // eslint-disable-next-line no-alert
-      alert("[DEBUG] toastInfo tiró un error: " + toastErr.message);
+      logDebug("toastInfo tiró un error: " + toastErr.message);
     }
   }, [beers]);
 

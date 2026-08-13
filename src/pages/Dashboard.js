@@ -81,22 +81,24 @@ const Dashboard = ({ tabsSlot }) => {
   }, [refresh, refetch, refetchStats]);
 
   const handleBarcodeDetected = useCallback((code) => {
-    // eslint-disable-next-line no-console
-    console.log("[Dashboard] handleBarcodeDetected llamado con code:", code, "— catálogo cargado:", beers.length, "cervezas");
+    // eslint-disable-next-line no-alert
+    alert("[DEBUG] Buscando en catálogo... (código=" + code + ", " + beers.length + " cervezas cargadas)");
     setShowScanner(false);
     const match = beers.find((b) => b.codigo_barras === code);
     if (!match) {
-      // eslint-disable-next-line no-console
-      console.log("[Dashboard] sin match para ese código — mostrando modal de no encontrado");
+      // eslint-disable-next-line no-alert
+      alert("[DEBUG] Resultado: NO encontrado — mostrando modal de no encontrado");
       setScanNotFound(true);
       return;
     }
-    // eslint-disable-next-line no-console
-    console.log("[Dashboard] match encontrado:", match.nombre, "id:", match.id);
+    // eslint-disable-next-line no-alert
+    alert("[DEBUG] Resultado: encontrado — " + match.nombre + " (id=" + match.id + ")");
     // Reset de filtros: si el match está oculto por un filtro activo (ej.
     // una búsqueda de texto previa), igual queremos mostrar su ficha.
     setSearch(""); setStyleFilter(null); setCountryFilter(null);
     setFamiliaFilter(null); setAlcoholFilter([0, 15]); setTrendingFilter(false);
+    // eslint-disable-next-line no-alert
+    alert("[DEBUG] Navegando a ficha de " + match.nombre);
     setScanMatchId(match.id);
     toastInfo(`✓ ${match.nombre}`);
   }, [beers]);

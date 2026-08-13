@@ -21,8 +21,8 @@ const safeStop = (controls) => {
   try {
     controls?.stop();
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error("[BarcodeScanner] stop() tiró un error:", err);
+    // eslint-disable-next-line no-alert
+    alert("[DEBUG] controls.stop() tiró un error: " + err.message);
   }
 };
 
@@ -63,30 +63,30 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
           if (result && !detectedRef.current) {
             detectedRef.current = true;
             const code = result.getText();
-            // eslint-disable-next-line no-console
-            console.log("[BarcodeScanner] código detectado:", code);
+            // eslint-disable-next-line no-alert
+            alert("[DEBUG] Código detectado: " + code);
             // Frenar la cámara ACÁ, antes de avisarle al padre — así lo que
             // haga onDetected (que puede disparar varios setState en
             // cascada) nunca corre dentro del try/catch del loop de zxing:
             // si tirara una excepción inesperada, zxing la reinterpretaría
             // como un fallo de escaneo fatal en vez de un problema nuestro.
             safeStop(controls);
-            // eslint-disable-next-line no-console
-            console.log("[BarcodeScanner] cámara frenada (o el intento falló, ver log de arriba si corresponde)");
+            // eslint-disable-next-line no-alert
+            alert("[DEBUG] Cámara frenada, llamando a onDetected...");
             try {
               onDetectedRef.current(code);
-              // eslint-disable-next-line no-console
-              console.log("[BarcodeScanner] onDetected ejecutado sin errores");
+              // eslint-disable-next-line no-alert
+              alert("[DEBUG] onDetected ejecutado sin errores");
             } catch (onDetectedErr) {
-              // eslint-disable-next-line no-console
-              console.error("[BarcodeScanner] onDetected tiró un error:", onDetectedErr);
+              // eslint-disable-next-line no-alert
+              alert("[DEBUG] onDetected tiró un error: " + onDetectedErr.message);
               if (!cancelled) setError(t("barcode.scanError"));
             }
             return;
           }
           if (err && !isRetryableScanError(err) && !detectedRef.current && !cancelled) {
-            // eslint-disable-next-line no-console
-            console.error("[BarcodeScanner] error fatal del loop de escaneo:", err);
+            // eslint-disable-next-line no-alert
+            alert("[DEBUG] Error fatal del loop de escaneo: " + err.message);
             setError(t("barcode.scanError"));
           }
         }

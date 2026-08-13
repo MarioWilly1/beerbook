@@ -81,9 +81,18 @@ const Dashboard = ({ tabsSlot }) => {
   }, [refresh, refetch, refetchStats]);
 
   const handleBarcodeDetected = useCallback((code) => {
+    // eslint-disable-next-line no-console
+    console.log("[Dashboard] handleBarcodeDetected llamado con code:", code, "— catálogo cargado:", beers.length, "cervezas");
     setShowScanner(false);
     const match = beers.find((b) => b.codigo_barras === code);
-    if (!match) { setScanNotFound(true); return; }
+    if (!match) {
+      // eslint-disable-next-line no-console
+      console.log("[Dashboard] sin match para ese código — mostrando modal de no encontrado");
+      setScanNotFound(true);
+      return;
+    }
+    // eslint-disable-next-line no-console
+    console.log("[Dashboard] match encontrado:", match.nombre, "id:", match.id);
     // Reset de filtros: si el match está oculto por un filtro activo (ej.
     // una búsqueda de texto previa), igual queremos mostrar su ficha.
     setSearch(""); setStyleFilter(null); setCountryFilter(null);

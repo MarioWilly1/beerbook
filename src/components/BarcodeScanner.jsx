@@ -10,6 +10,22 @@ import { XIcon } from "@primer/octicons-react";
 const isRetryableScanError = (err) =>
   err instanceof NotFoundException || err instanceof ChecksumException || err instanceof FormatException;
 
+// controls.stop() puede tirar en algunos WebView (ej. frenar el track de
+// cámara en medio de un frame) — si eso pasa SIN capturar dentro de la
+// limpieza del useEffect (que corre al desmontar, ej. cuando onDetected ya
+// cerró el escáner), React lo trata como un error no atrapado y puede
+// interrumpir el resto del commit — exactamente el "pantalla gris, después
+// no pasa nada" reportado. Se centraliza acá para que TODOS los puntos que
+// llaman a stop() (detección, cleanup, cancelación tardía) queden a salvo.
+const safeStop = (controls) => {
+  try {
+    controls?.stop();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("[BarcodeScanner] stop() tiró un error:", err);
+  }
+};
+
 // Escaneo de código de barras (EAN-13/UPC-A) vía getUserMedia + @zxing/browser —
 // funciona igual en navegador y dentro del WebView de Capacitor (androidScheme
 // "https" ya lo hace un contexto seguro), sin necesitar un plugin nativo.
@@ -46,26 +62,37 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
         (result, err, controls) => {
           if (result && !detectedRef.current) {
             detectedRef.current = true;
+            const code = result.getText();
+            // eslint-disable-next-line no-console
+            console.log("[BarcodeScanner] código detectado:", code);
             // Frenar la cámara ACÁ, antes de avisarle al padre — así lo que
             // haga onDetected (que puede disparar varios setState en
             // cascada) nunca corre dentro del try/catch del loop de zxing:
             // si tirara una excepción inesperada, zxing la reinterpretaría
             // como un fallo de escaneo fatal en vez de un problema nuestro.
-            controls.stop();
+            safeStop(controls);
+            // eslint-disable-next-line no-console
+            console.log("[BarcodeScanner] cámara frenada (o el intento falló, ver log de arriba si corresponde)");
             try {
-              onDetectedRef.current(result.getText());
-            } catch {
+              onDetectedRef.current(code);
+              // eslint-disable-next-line no-console
+              console.log("[BarcodeScanner] onDetected ejecutado sin errores");
+            } catch (onDetectedErr) {
+              // eslint-disable-next-line no-console
+              console.error("[BarcodeScanner] onDetected tiró un error:", onDetectedErr);
               if (!cancelled) setError(t("barcode.scanError"));
             }
             return;
           }
           if (err && !isRetryableScanError(err) && !detectedRef.current && !cancelled) {
+            // eslint-disable-next-line no-console
+            console.error("[BarcodeScanner] error fatal del loop de escaneo:", err);
             setError(t("barcode.scanError"));
           }
         }
       )
       .then((controls) => {
-        if (cancelled) { controls.stop(); return; }
+        if (cancelled) { safeStop(controls); return; }
         controlsRef.current = controls;
       })
       .catch(() => {
@@ -74,7 +101,7 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
 
     return () => {
       cancelled = true;
-      controlsRef.current?.stop();
+      safeStop(controlsRef.current);
     };
   }, [t]);
 

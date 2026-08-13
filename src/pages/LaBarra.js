@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
 import Dashboard from "./Dashboard";
-import NativeTabSlide from "../components/NativeTabSlide";
+import NativeSwipeTabs from "../components/NativeSwipeTabs";
 
 const TAB_ORDER = ["catalogo", "comunidad"];
 
@@ -39,11 +39,16 @@ const LaBarra = () => {
   if (isNative) {
     return (
       <div>
-        <NativeTabSlide tabKey={tab} tabOrder={TAB_ORDER} onSwipe={setTab}>
-          {tab === "catalogo"
-            ? <Dashboard tabsSlot={tabBar} />
-            : <>{tabBar}<ComunidadPlaceholder /></>}
-        </NativeTabSlide>
+        <NativeSwipeTabs
+          tabKey={tab}
+          tabOrder={TAB_ORDER}
+          onSwipe={setTab}
+          renderTab={(key) =>
+            key === "catalogo"
+              ? <Dashboard tabsSlot={tabBar} />
+              : <>{tabBar}<ComunidadPlaceholder /></>
+          }
+        />
       </div>
     );
   }

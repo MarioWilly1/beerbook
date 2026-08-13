@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Capacitor } from "@capacitor/core";
+import { shouldIgnoreSwipeTarget } from "../utils/touchGestureGuards";
 
 // Fase B de "sensación de app nativa" — desliza el contenido como una
 // tarjeta al cambiar de pestaña interna (Catálogo/Comunidad en LaBarra.js,
@@ -28,21 +29,6 @@ import { Capacitor } from "@capacitor/core";
 // la barra, así reutiliza 100% la animación de arriba sin duplicarla.
 const SWIPE_MIN_DISTANCE = 60;
 const SWIPE_DIRECTION_RATIO = 1.5; // cuánto más horizontal que vertical tiene que ser
-
-// Mismo criterio que findScrollParent en NativePullToRefresh.jsx, pero para
-// scroll HORIZONTAL — evita robarle el gesto a una fila de historias u otro
-// carrusel horizontal que el usuario está desplazando.
-function hasHorizontalScrollAncestor(el) {
-  let node = el;
-  while (node && node !== document.body) {
-    if (node.scrollWidth > node.clientWidth + 1) {
-      const overflowX = getComputedStyle(node).overflowX;
-      if (overflowX === "auto" || overflowX === "scroll") return true;
-    }
-    node = node.parentElement;
-  }
-  return false;
-}
 
 const NativeTabSlide = ({ tabKey, tabOrder, onSwipe, children }) => {
   const ref = useRef(null);
@@ -79,7 +65,7 @@ const NativeTabSlide = ({ tabKey, tabOrder, onSwipe, children }) => {
     // No interceptar gestos que empiezan sobre un control con su propio
     // arrastre horizontal (el slider de alcohol de BeerFilters, un <select>,
     // etc.) ni sobre algo con scroll horizontal propio (fila de historias).
-    if (["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName) || hasHorizontalScrollAncestor(target)) {
+    if (shouldIgnoreSwipeTarget(target)) {
       touchStartRef.current = null;
       return;
     }

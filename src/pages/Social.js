@@ -8,7 +8,7 @@ import Amigos from "./Amigos";
 import Chats from "./Chats";
 import Noticias from "./Noticias";
 import { useTotalUnread } from "../hooks/useTotalUnread";
-import NativeTabSlide from "../components/NativeTabSlide";
+import NativeSwipeTabs from "../components/NativeSwipeTabs";
 
 // En nativo, Noticias no tiene botón propio (ver comentario más abajo) —
 // se excluye del orden usado para el swipe, si no un deslizamiento desde
@@ -73,12 +73,17 @@ const Social = ({ defaultTab }) => {
       </div>
 
       {Capacitor.isNativePlatform() ? (
-        <NativeTabSlide tabKey={tab} tabOrder={NATIVE_TAB_ORDER} onSwipe={setTab}>
-          {tab === "feed" ? <Feed />
-            : tab === "amigos" ? <Amigos />
-            : tab === "chat" ? <Chats />
-            : <Noticias />}
-        </NativeTabSlide>
+        <NativeSwipeTabs
+          tabKey={tab}
+          tabOrder={NATIVE_TAB_ORDER}
+          onSwipe={setTab}
+          renderTab={(key) =>
+            key === "feed" ? <Feed />
+              : key === "amigos" ? <Amigos />
+              : key === "chat" ? <Chats />
+              : <Noticias />
+          }
+        />
       ) : (
         tab === "feed" ? <Feed />
           : tab === "amigos" ? <Amigos />

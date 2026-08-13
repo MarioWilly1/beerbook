@@ -100,7 +100,16 @@ const Dashboard = ({ tabsSlot }) => {
     // eslint-disable-next-line no-alert
     alert("[DEBUG] Navegando a ficha de " + match.nombre);
     setScanMatchId(match.id);
-    toastInfo(`✓ ${match.nombre}`);
+    // eslint-disable-next-line no-alert
+    alert("[DEBUG] scanMatchId seteado, llamando a toastInfo...");
+    try {
+      toastInfo(`✓ ${match.nombre}`);
+      // eslint-disable-next-line no-alert
+      alert("[DEBUG] toastInfo completado sin errores");
+    } catch (toastErr) {
+      // eslint-disable-next-line no-alert
+      alert("[DEBUG] toastInfo tiró un error: " + toastErr.message);
+    }
   }, [beers]);
 
   const countries = useMemo(() => {

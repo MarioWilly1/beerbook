@@ -95,7 +95,7 @@ const DualPhotoVerification = ({ beerNombre, beerId, onComplete, onCancel }) => 
     : step === "selfie" ? t("dualVerify.step2Subtitle") : "";
 
   // Portal a document.body — este overlay se abre desde adentro del
-  // contenido de una pestaña nativa (NativeTabSlide.jsx), que puede quedar
+  // contenido de una pestaña nativa (NativeSwipeTabs.jsx), que puede quedar
   // con un transform de GSAP activo; cualquier ancestro con transform rompe
   // position:fixed. El portal lo evita sin importar el árbol de arriba.
   return ReactDOM.createPortal(

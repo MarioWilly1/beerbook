@@ -50,6 +50,21 @@ const BarcodeNotFoundModal = ({ onClose, onSuggest, t }) => {
   );
 };
 
+// Mismo formato que ChallengesBellButton.jsx (ícono chico y redondo) — se
+// reutiliza acá para mapa/escaneo en nativo, así los tres quedan
+// consistentes en la fila de "cervezas probadas".
+const RoundIconButton = ({ onClick, active, title, Icon }) => (
+  <button onClick={onClick} title={title} style={{
+    position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
+    width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+    border: `1px solid ${active ? "#d4af37" : "rgba(212,175,55,0.25)"}`,
+    background: active ? "rgba(212,175,55,0.15)" : "rgba(212,175,55,0.06)",
+    color: active ? "#d4af37" : "#9a7d62", cursor: "pointer",
+  }}>
+    <Icon size={14} />
+  </button>
+);
+
 const Dashboard = ({ tabsSlot }) => {
   const isNative = Capacitor.isNativePlatform();
   const { t } = useTranslation();
@@ -161,49 +176,55 @@ const Dashboard = ({ tabsSlot }) => {
     <div>
       {/* En la app nativa el header de NativeShell ya muestra la marca
           "RiBeer's" en todas las pantallas — repetir el título acá es
-          redundante y ocupa espacio, así que se omite solo ahí. */}
+          redundante y ocupa espacio, así que se omite solo ahí (el título
+          de contenido nativo, distinto, vive en LaBarra.js). */}
       {!isNative && <h1 style={{ color: "#f0e4cc" }}>🍺 {t("dashboard.title")}</h1>}
 
-      {/* Map toggle + suggest row */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
-        <button
-          onClick={() => setShowMap((o) => !o)}
-          style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 14px", borderRadius: 8,
-            border: `1px solid ${showMap ? "#d4af37" : "#2e2215"}`,
-            background: showMap ? "rgba(212,175,55,0.1)" : "#1c1409",
-            color: showMap ? "#d4af37" : "#9a7d62",
-            fontSize: 13, fontWeight: 600, cursor: "pointer",
-            transition: "all 0.15s",
-          }}
-        >
-          <GlobeIcon size={14} /> {t("dashboard.mapBtn")} {showMap ? <ChevronUpIcon size={14} /> : <ChevronDownIcon size={14} />}
-        </button>
-        <button
-          onClick={() => setShowScanner(true)}
-          style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 14px", borderRadius: 8,
-            border: "1px solid #2e2215", background: "#1c1409",
-            color: "#9a7d62", fontSize: 13, fontWeight: 600, cursor: "pointer",
-          }}
-        >
-          <DeviceCameraIcon size={14} /> {t("barcode.scanBtn")}
-        </button>
-        <button
-          onClick={() => setShowSuggest(true)}
-          style={{
-            background: "none", border: "none", color: "#8b6b2e",
-            fontSize: 13, cursor: "pointer", padding: 0,
-            textDecoration: "underline", textDecorationColor: "#5a4535",
-          }}
-        >
-          {t("dashboard.suggestBeer")}
-        </button>
-      </div>
+      {/* Map toggle + suggest row — solo web. En nativo el orden pedido es
+          otro: filtros primero, el link de sugerir suelto después de los
+          filtros, y el mapa/escaneo pasan a ser iconos chicos junto al
+          contador de cervezas probadas (ver más abajo). */}
+      {!isNative && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
+          <button
+            onClick={() => setShowMap((o) => !o)}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "7px 14px", borderRadius: 8,
+              border: `1px solid ${showMap ? "#d4af37" : "#2e2215"}`,
+              background: showMap ? "rgba(212,175,55,0.1)" : "#1c1409",
+              color: showMap ? "#d4af37" : "#9a7d62",
+              fontSize: 13, fontWeight: 600, cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+          >
+            <GlobeIcon size={14} /> {t("dashboard.mapBtn")} {showMap ? <ChevronUpIcon size={14} /> : <ChevronDownIcon size={14} />}
+          </button>
+          <button
+            onClick={() => setShowScanner(true)}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "7px 14px", borderRadius: 8,
+              border: "1px solid #2e2215", background: "#1c1409",
+              color: "#9a7d62", fontSize: 13, fontWeight: 600, cursor: "pointer",
+            }}
+          >
+            <DeviceCameraIcon size={14} /> {t("barcode.scanBtn")}
+          </button>
+          <button
+            onClick={() => setShowSuggest(true)}
+            style={{
+              background: "none", border: "none", color: "#8b6b2e",
+              fontSize: 13, cursor: "pointer", padding: 0,
+              textDecoration: "underline", textDecorationColor: "#5a4535",
+            }}
+          >
+            {t("dashboard.suggestBeer")}
+          </button>
+        </div>
+      )}
 
-      {showMap && (
+      {!isNative && showMap && (
         <OriginMapPanel
           beers={beers}
           focusBeer={focusBeer}
@@ -240,16 +261,55 @@ const Dashboard = ({ tabsSlot }) => {
         familias={familias}
       />
 
+      {isNative && (
+        <button
+          onClick={() => setShowSuggest(true)}
+          style={{
+            display: "block", background: "none", border: "none", color: "#8b6b2e",
+            fontSize: 13, cursor: "pointer", padding: 0, marginBottom: 16,
+            textDecoration: "underline", textDecorationColor: "#5a4535",
+          }}
+        >
+          {t("dashboard.suggestBeer")}
+        </button>
+      )}
+
       {/* Solo se recibe en la app nativa (LaBarra.js) — en web tabsSlot es
           undefined y este bloque no renderiza nada, cero cambio visual. */}
       {tabsSlot}
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-        <p style={{ color: "#5a4535", fontSize: 13, margin: 0 }}>
+        <p style={{ color: "#5a4535", fontSize: 13, margin: 0, flex: 1 }}>
           {t("dashboard.collectionProgressShort", { count: stats.beers, total: beers.length })}
         </p>
+        {/* En nativo, mapa y escaneo pasan de botones con texto a íconos
+            chicos y redondos, mismo formato que el de Retos — quedan los
+            tres juntos acá en vez de una fila propia arriba. */}
+        {isNative && (
+          <>
+            <RoundIconButton
+              onClick={() => setShowMap((o) => !o)}
+              active={showMap}
+              title={t("dashboard.mapBtn")}
+              Icon={GlobeIcon}
+            />
+            <RoundIconButton
+              onClick={() => setShowScanner(true)}
+              title={t("barcode.scanBtn")}
+              Icon={DeviceCameraIcon}
+            />
+          </>
+        )}
         <ChallengesBellButton />
       </div>
+
+      {isNative && showMap && (
+        <OriginMapPanel
+          beers={beers}
+          focusBeer={focusBeer}
+          onFocusConsumed={() => setFocusBeer(null)}
+        />
+      )}
 
       {/* Grilla uniforme — el detalle de BeerCard se abre como overlay
           flotante (ver overlayStyle en BeerCard.js), no empuja el layout,

@@ -9,6 +9,7 @@ import Chats from "./Chats";
 import Noticias from "./Noticias";
 import { useTotalUnread } from "../hooks/useTotalUnread";
 import NativeSwipeTabs from "../components/NativeSwipeTabs";
+import NativeSectionTitle from "../components/NativeSectionTitle";
 
 // En nativo, Noticias no tiene botón propio (ver comentario más abajo) —
 // se excluye del orden usado para el swipe, si no un deslizamiento desde
@@ -36,6 +37,15 @@ const Social = ({ defaultTab }) => {
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
+      {/* Título de contenido, distinto de "Taberna" (nombre de la pestaña
+          en NativeShell.js) — solo nativo, mismo criterio que LaBarra.js /
+          MiCuaderno.js. Tocarlo vuelve a la sub-pestaña Feed. */}
+      {Capacitor.isNativePlatform() && (
+        <NativeSectionTitle onClick={() => setTab("feed")}>
+          {t("feed.nativeTitle")}
+        </NativeSectionTitle>
+      )}
+
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         <button
           onClick={() => setTab("feed")}

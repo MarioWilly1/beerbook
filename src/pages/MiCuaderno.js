@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ReactDOM from "react-dom";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Capacitor } from "@capacitor/core";
 import { useIsMobile } from "../hooks/useIsMobile";
+import NativeSectionTitle from "../components/NativeSectionTitle";
 import { getCountryName } from "../utils/countryDisplay";
 import BeerInfoModal from "../components/BeerInfoModal";
 import CollectionCard from "../components/CollectionCard";
@@ -25,7 +27,6 @@ import { soundClink, soundLevelUp, soundAchievement } from "../utils/sounds";
 import { hashToString } from "../utils/perceptualHash";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { insertTasting, updateLatestTasting } from "../utils/tastings";
-import HideEntryModal from "../components/HideEntryModal";
 import TastingGalleryModal from "../components/TastingGalleryModal";
 import QuickTastingWidget from "../components/QuickTastingWidget";
 import QuickTastingModal from "../components/QuickTastingModal";
@@ -33,7 +34,7 @@ import GlassesTab from "./GlassesTab";
 import DualPhotoVerification from "../components/DualPhotoVerification";
 import { RAREZA_EMOJI } from "../utils/rareza";
 import {
-  BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon, EyeClosedIcon,
+  BookIcon, DiamondIcon, DeviceCameraIcon, TrashIcon,
   CheckIcon, SearchIcon, XIcon, ShieldCheckIcon,
 } from "@primer/octicons-react";
 
@@ -367,12 +368,11 @@ const ColeccionTab = () => {
 };
 
 // ── NotebookCard — accordion card for Mi Cuaderno ─────────────────────────────
-const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, tastingPending, onDelete, onShowImage, onInfoModal, userId, hiddenCount, onHiddenChange }) => {
+const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, tastingPending, onDelete, onShowImage, onInfoModal, userId }) => {
   const { t, i18n } = useTranslation();
   const [expanded,  setExpanded]  = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState("");
-  const [showHideModal, setShowHideModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showDualVerify, setShowDualVerify] = useState(false);
   const fileInputRef = useRef(null);
@@ -432,16 +432,22 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
               borderRadius: "8px", cursor: "zoom-in", display: "block",
             }}
           />
-          {hasUserPhoto && (
-            <span style={{
-              position: "absolute", bottom: 6, right: 6,
-              background: "rgba(0,0,0,0.7)", color: hasSelfie ? "#a366e8" : "#d4af37",
-              fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
-              pointerEvents: "none", display: "flex", alignItems: "center", gap: 3,
-            }}>
-              {hasSelfie ? <><ShieldCheckIcon size={11} /> {t("beerform.reinforcedVerified")}</> : <>📸 {t("beerform.verified")}</>}
-            </span>
-          )}
+          {/* Badge de verificación + veces probada, agrupados sobre la
+              foto — antes "veces probada" era un recuadro propio que
+              ocupaba toda una fila debajo del nombre; acá va compacto,
+              junto a "Verificada" cuando existe. */}
+          <div style={{ position: "absolute", bottom: 6, right: 6, display: "flex", alignItems: "center", gap: 4 }}>
+            {hasUserPhoto && (
+              <span style={{
+                background: "rgba(0,0,0,0.7)", color: hasSelfie ? "#a366e8" : "#d4af37",
+                fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 5,
+                pointerEvents: "none", display: "flex", alignItems: "center", gap: 3,
+              }}>
+                {hasSelfie ? <><ShieldCheckIcon size={11} /> {t("beerform.reinforcedVerified")}</> : <>📸 {t("beerform.verified")}</>}
+              </span>
+            )}
+            <QuickTastingWidget compact count={tastingCount} pending={tastingPending} onTap={() => onQuickTasting(beer)} />
+          </div>
         </div>
 
         {/* Name + meta + bottom row */}
@@ -455,9 +461,6 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
           <p style={{ margin: "0 0 4px", fontSize: "11px", color: "#9a7d62" }}>
             {beer.estilo} · {getCountryName(beer.pais, i18n.language)} · {beer.alcohol}%
           </p>
-          <div style={{ margin: "0 0 4px" }}>
-            <QuickTastingWidget count={tastingCount} pending={tastingPending} onTap={() => onQuickTasting(beer)} />
-          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 3, minWidth: 0 }}>
             {rb && (
               <span style={{
@@ -634,29 +637,6 @@ const NotebookCard = ({ beer, onChange, onSave, onQuickTasting, tastingCount, ta
 
           <LocationPicker value={beer.location} onChange={(loc) => onChange(beer.id, "location", loc)} />
 
-          {userId && (
-            <button
-              type="button"
-              onClick={() => setShowHideModal(true)}
-              style={{ ...nbHideFromBtn, display: "flex", alignItems: "center", gap: 6 }}
-            >
-              <EyeClosedIcon size={14} /> {t("hideEntry.btn")}
-              {hiddenCount > 0 && (
-                <span style={nbHideFromBadge}>{t("hideEntry.hiddenCount", { count: hiddenCount })}</span>
-              )}
-            </button>
-          )}
-
-          {showHideModal && (
-            <HideEntryModal
-              userId={userId}
-              beerId={beer.id}
-              beerNombre={beer.nombre}
-              onClose={() => setShowHideModal(false)}
-              onSaved={onHiddenChange}
-            />
-          )}
-
           {isComplete && (
             <div style={nbBonusBannerStyle}>
               🎯 {t("notebook.bonusComplete", { xp: XP_VALUES.COMPLETE_BONUS })}
@@ -721,17 +701,9 @@ const MiCuaderno = () => {
   const [familiaFilter, setFamiliaFilter] = useState(null);
   const [alcoholFilter, setAlcoholFilter] = useState([0, 15]);
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [hiddenCounts, setHiddenCounts]   = useState({}); // { beer_id: cantidad de amigos a los que se les oculta }
   const [tastingCounts, setTastingCounts] = useState({}); // { beer_id: cantidad real de catas registradas }
   const [tastingPending, setTastingPending] = useState({}); // { beer_id: true mientras hay un guardado en curso }
   const [quickTastingTarget, setQuickTastingTarget] = useState(null); // cerveza para la que está abierto QuickTastingModal
-
-  const loadHiddenCounts = useCallback(async (uid) => {
-    const { data } = await supabase.from("entry_hidden_from").select("beer_id").eq("owner_id", uid);
-    const counts = {};
-    (data || []).forEach((r) => { counts[r.beer_id] = (counts[r.beer_id] || 0) + 1; });
-    setHiddenCounts(counts);
-  }, []);
 
   const loadTastingCounts = useCallback(async (uid) => {
     const { data } = await supabase.from("beer_tastings").select("beer_id").eq("user_id", uid);
@@ -744,10 +716,9 @@ const MiCuaderno = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) return;
       setCurrentUserId(session.user.id);
-      loadHiddenCounts(session.user.id);
       loadTastingCounts(session.user.id);
     });
-  }, [loadHiddenCounts, loadTastingCounts]);
+  }, [loadTastingCounts]);
 
   useEffect(() => {
     setEditableBeers(
@@ -954,6 +925,15 @@ const MiCuaderno = () => {
 
   return (
     <div>
+      {/* Título de contenido, distinto de "Bitácora" (nombre de la pestaña
+          en NativeShell.js) — solo nativo, mismo criterio que LaBarra.js.
+          Tocarlo vuelve a la sub-pestaña Cuaderno. */}
+      {Capacitor.isNativePlatform() && (
+        <NativeSectionTitle onClick={() => setActiveTab("cuaderno")}>
+          {t("notebook.tabCuaderno")}
+        </NativeSectionTitle>
+      )}
+
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 4, marginBottom: 20, borderBottom: "1px solid #2e2215" }}>
         {[
@@ -1030,8 +1010,6 @@ const MiCuaderno = () => {
                 onShowImage={setShowImage}
                 onInfoModal={setInfoModal}
                 userId={currentUserId}
-                hiddenCount={hiddenCounts[beer.id] || 0}
-                onHiddenChange={() => currentUserId && loadHiddenCounts(currentUserId)}
               />
             ))}
           </div>
@@ -1071,8 +1049,6 @@ const nbPhotoBtn        = { padding: "8px 12px", background: "#1c1409", border: 
 const nbClearPhotoBtn   = { padding: "6px 10px", background: "#2a0a0a", border: "1px solid #8b2020", borderRadius: 6, color: "#c07a3f", cursor: "pointer", fontSize: 12 };
 const nbReinforcedBtnStyle   = { width: "100%", padding: "9px 12px", background: "rgba(163,102,232,0.08)", border: "1.5px dashed rgba(163,102,232,0.4)", borderRadius: 8, fontSize: 12, color: "#a366e8", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 };
 const nbReinforcedBadgeStyle = { padding: "9px 12px", background: "rgba(163,102,232,0.1)", border: "1px solid rgba(163,102,232,0.3)", borderRadius: 8, fontSize: 12, color: "#a366e8", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 };
-const nbHideFromBtn     = { display: "flex", alignItems: "center", gap: 6, width: "100%", padding: "7px 10px", marginTop: 8, background: "#1c1409", border: "1px solid #2e2215", borderRadius: 8, color: "#9a7d62", cursor: "pointer", fontSize: 12, fontWeight: 600, textAlign: "left" };
-const nbHideFromBadge   = { marginLeft: "auto", fontSize: 10, fontWeight: 700, color: "#d4af37", background: "rgba(212,175,55,0.12)", padding: "2px 7px", borderRadius: 20 };
 
 // Detalle como overlay flotante (portal a document.body) en vez de acordeón
 // inline — mismo motivo y patrón que BeerCard.js.

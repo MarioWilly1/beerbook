@@ -101,7 +101,7 @@ const BarcodeScanner = ({ onDetected, onClose }) => {
   }, [t]);
 
   // Portal a document.body: este overlay se abre desde adentro del
-  // contenido de una pestaña nativa (NativeTabSlide.jsx), que puede quedar
+  // contenido de una pestaña nativa (NativeSwipeTabs.jsx), que puede quedar
   // con un transform de GSAP activo — cualquier ancestro con transform
   // rompe position:fixed (deja de fijarse a la pantalla y pasa a
   // depender del tamaño de ese ancestro). El portal evita el problema de

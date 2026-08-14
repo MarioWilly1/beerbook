@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
 import Dashboard from "./Dashboard";
 import NativeSwipeTabs from "../components/NativeSwipeTabs";
+import NativeSectionTitle from "../components/NativeSectionTitle";
 
 const TAB_ORDER = ["catalogo", "comunidad"];
 
@@ -39,6 +40,12 @@ const LaBarra = () => {
   if (isNative) {
     return (
       <div>
+        {/* Título de contenido, distinto de "Barra" (nombre de la pestaña
+            en NativeShell.js) — tocarlo vuelve al Catálogo sin importar en
+            qué pestaña interna estés (ver NativeSectionTitle.jsx). */}
+        <NativeSectionTitle onClick={() => setTab("catalogo")}>
+          {t("dashboard.nativeTitle")}
+        </NativeSectionTitle>
         <NativeSwipeTabs
           tabKey={tab}
           tabOrder={TAB_ORDER}

@@ -93,7 +93,8 @@
       },
       "hiddenEntries": {
         "title":       "Hide beers",
-        "description": "Review which notebook entries are hidden and from whom. To choose who to hide a new entry from, do it from that entry in My Notebook.",
+        "description": "Choose which notebook entries are hidden and from whom.",
+        "addBtn":      "+ Hide a beer",
         "loading":     "Loading...",
         "empty":       "You don't have any entries hidden from anyone.",
         "unhide":      "Stop hiding"
@@ -125,6 +126,7 @@
   "feed": {
     "loading":      "Loading feed...",
     "title":        "Feed",
+    "nativeTitle":  "Activity",
     "subtitle":     "Recent activity from your friends",
     "userPhotoAlt": "User photo",
     "empty": {
@@ -242,6 +244,7 @@
   },
   "dashboard": {
     "title":        "Explore every beer available",
+    "nativeTitle":  "Log it",
     "loading":      "Loading beers...",
     "collectionProgressShort": "{{count}}/{{total}} beers tried",
     "suggestBeer":  "Can't find your beer? Suggest it →",
@@ -414,9 +417,9 @@
     "error":              "Couldn't save the tasting. Please try again."
   },
   "hideEntry": {
-    "btn":               "Hide from...",
-    "hiddenCount_one":   "hidden from {{count}}",
-    "hiddenCount_other": "hidden from {{count}}",
+    "pickBeerTitle":     "Which beer do you want to hide?",
+    "searchBeerPlaceholder": "Search beer...",
+    "noBeers":           "You don't have any beers in your notebook yet.",
     "title":             "Hide this beer from...",
     "subtitle":          "Choose which friends should NOT see this entry ({{beer}}) in the feed or your profile. Everyone else still sees it normally.",
     "noFriends":         "You have no friends yet to hide anything from.",

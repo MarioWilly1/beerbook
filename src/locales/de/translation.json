@@ -93,7 +93,8 @@
       },
       "hiddenEntries": {
         "title":       "Biere verbergen",
-        "description": "Überprüfe, welche Einträge in deinem Notizbuch verborgen sind und vor wem. Um eine neue Eintrag für jemanden zu verbergen, mach das direkt bei diesem Eintrag in Mein Notizbuch.",
+        "description": "Wähle, welche Einträge in deinem Notizbuch verborgen sind und vor wem.",
+        "addBtn":      "+ Bier verbergen",
         "loading":     "Wird geladen...",
         "empty":       "Du hast keine vor irgendjemandem verborgenen Einträge.",
         "unhide":      "Nicht mehr verbergen"
@@ -125,6 +126,7 @@
   "feed": {
     "loading":      "Feed wird geladen...",
     "title":        "Feed",
+    "nativeTitle":  "Aktivität",
     "subtitle":     "Letzte Aktivitäten deiner Freunde",
     "userPhotoAlt": "Foto des Benutzers",
     "empty": {
@@ -242,6 +244,7 @@
   },
   "dashboard": {
     "title":        "Entdecke alle verfügbaren Biere",
+    "nativeTitle":  "Erfassen",
     "loading":      "Biere werden geladen...",
     "collectionProgressShort": "{{count}}/{{total}} Biere probiert",
     "suggestBeer":  "Dein Bier nicht gefunden? Vorschlagen →",
@@ -414,9 +417,9 @@
     "error":              "Verkostung konnte nicht gespeichert werden. Bitte versuch es erneut."
   },
   "hideEntry": {
-    "btn":               "Verbergen für...",
-    "hiddenCount_one":   "verborgen für {{count}}",
-    "hiddenCount_other": "verborgen für {{count}}",
+    "pickBeerTitle":     "Welches Bier möchtest du verbergen?",
+    "searchBeerPlaceholder": "Bier suchen...",
+    "noBeers":           "Du hast noch keine Biere in deinem Notizbuch.",
     "title":             "Dieses Bier verbergen für...",
     "subtitle":          "Wähle, welche Freunde diesen Eintrag ({{beer}}) NICHT im Feed oder deinem Profil sehen sollen. Alle anderen sehen ihn wie gewohnt.",
     "noFriends":         "Du hast noch keine Freunde, vor denen du etwas verbergen könntest.",

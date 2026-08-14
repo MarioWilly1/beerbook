@@ -63,6 +63,7 @@ export const useMyBeers = () => {
           Rating: row.Rating,
           XP: row.XP,
           user_photo_url: row.user_photo_url,
+          selfie_photo_url: row.selfie_photo_url,
           commercialized: row.commercialized,
           location_lat: row.location_lat,
           location_lng: row.location_lng,

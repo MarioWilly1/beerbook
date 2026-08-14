@@ -93,7 +93,8 @@
       },
       "hiddenEntries": {
         "title":       "Ocultar cervezas",
-        "description": "Repasa qué entradas de tu cuaderno están ocultas y de quién. Para elegir a quién ocultarle una entrada nueva, hazlo desde esa entrada en Mi Cuaderno.",
+        "description": "Elige qué entradas de tu cuaderno están ocultas y de quién.",
+        "addBtn":      "+ Ocultar una cerveza",
         "loading":     "Cargando...",
         "empty":       "No tienes ninguna entrada oculta de nadie.",
         "unhide":      "Dejar de ocultar"
@@ -125,6 +126,7 @@
   "feed": {
     "loading":      "Cargando feed...",
     "title":        "Feed",
+    "nativeTitle":  "Actividad",
     "subtitle":     "Actividad reciente de tus amigos",
     "userPhotoAlt": "Foto del usuario",
     "empty": {
@@ -242,6 +244,7 @@
   },
   "dashboard": {
     "title":        "Explora todas las cervezas disponibles",
+    "nativeTitle":  "Registra",
     "loading":      "Cargando cervezas...",
     "collectionProgressShort": "{{count}}/{{total}} cervezas probadas",
     "suggestBeer":  "¿No encuentras tu cerveza? Sugerirla →",
@@ -414,9 +417,9 @@
     "error":              "No se pudo guardar la cata. Inténtalo de nuevo."
   },
   "hideEntry": {
-    "btn":               "Ocultar de...",
-    "hiddenCount_one":   "oculta de {{count}}",
-    "hiddenCount_other": "oculta de {{count}}",
+    "pickBeerTitle":     "¿Qué cerveza querés ocultar?",
+    "searchBeerPlaceholder": "Buscar cerveza...",
+    "noBeers":           "Todavía no tienes ninguna cerveza en el cuaderno.",
     "title":             "Ocultar esta cerveza de...",
     "subtitle":          "Elige qué amigos NO van a ver esta entrada ({{beer}}) en el feed ni en tu perfil. El resto la sigue viendo normal.",
     "noFriends":         "Todavía no tienes amigos para ocultarles nada.",

@@ -3,26 +3,28 @@ import { gsap } from "gsap";
 import { Capacitor } from "@capacitor/core";
 import { shouldIgnoreSwipeTarget } from "../utils/touchGestureGuards";
 
-// Swipe REALMENTE interactivo entre pestañas internas (Catálogo/Comunidad
-// en LaBarra.js, Feed/Amigos/Chat/Noticias en Social.js) — a diferencia de
-// NativeTabSlide.jsx (que detecta el swipe recién al soltar el dedo y
-// reproduce una animación enlatada), acá la pantalla vecina se monta al
-// lado de la actual y sigue el dedo en tiempo real durante el arrastre,
-// como un pager nativo (Instagram, un ViewPager de Android). Al soltar: si
-// se cruzó el umbral (distancia O velocidad), termina de deslizar sola
-// hacia el lado correspondiente; si no, vuelve a su lugar con un rebote
-// elástico.
+// Swipe REALMENTE interactivo — sigue el dedo en tiempo real durante el
+// arrastre (la pantalla vecina se monta al lado de la actual), como un
+// pager nativo (Instagram, un ViewPager de Android). Al soltar: si se
+// cruzó el umbral (distancia O velocidad), termina de deslizar sola hacia
+// el lado correspondiente; si no, vuelve a su lugar con un rebote
+// elástico. Usado tanto entre las 4 secciones principales (NativeShell.js)
+// como en las pestañas internas de cada una (Catálogo/Comunidad en
+// LaBarra.js, Feed/Amigos/Chat/Noticias en Social.js).
 //
 // Exclusivo de nativo: en web `renderTab(tabKey)` se muestra directo, sin
 // wrapper ni comportamiento nuevo — igual criterio que el resto de la
 // "sensación nativa".
 //
 // Solo se monta la pantalla VECINA hacia donde se está arrastrando (nunca
-// las cuatro a la vez) — importante porque ninguno de los hooks de datos de
-// esta app tiene cache: cada mount dispara sus propios fetches. Por eso
-// esto arranca en las pestañas internas (livianas, estado local) y no en
-// las 4 secciones principales (Dashboard/Mi Cuaderno/Social/Perfil, cada
-// una con fetches propios pesados) — decisión explícita, no un descuido.
+// todas a la vez) — importante porque ninguno de los hooks de datos de esta
+// app tiene cache: cada mount dispara sus propios fetches. En las 4
+// secciones principales eso significa que arrastrar hacia una vecina
+// dispara sus fetches pesados durante el gesto mismo (igual que el
+// "preload" de la siguiente pantalla en TikTok/Instagram) — un arrastre
+// abandonado a mitad de camino no cancela esos fetches, pero tampoco deja
+// nada inconsistente: la pantalla vuelve a su lugar con el rebote elástico
+// y el fetch en curso simplemente se descarta sin usarse.
 const COMMIT_DISTANCE_RATIO = 0.35; // % del ancho para confirmar el cambio
 const COMMIT_VELOCITY = 0.5; // px/ms — un flick rápido confirma aunque sea corto
 const EDGE_DEADZONE = 10; // px antes de decidir si el gesto es horizontal
@@ -145,7 +147,13 @@ const NativeSwipeTabs = ({ tabKey, tabOrder, onSwipe, renderTab }) => {
     : [tabKey];
 
   return (
-    <div ref={wrapRef} style={{ overflow: "hidden" }} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+    // minHeight:100% — sin esto, en una pantalla con poco contenido (ej. Mi
+    // Cuaderno vacío) este div solo ocupa la altura de su contenido, y el
+    // espacio vacío debajo (dentro de <main>, pero fuera de este wrapper)
+    // no dispara ningún touch handler de acá: el gesto se pierde en
+    // silencio. Con esto el área de arrastre cubre toda la pantalla, como
+    // en un pager nativo real.
+    <div ref={wrapRef} style={{ overflow: "hidden", minHeight: "100%" }} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
       <div ref={trackRef} style={{ display: "flex", alignItems: "flex-start" }}>
         {panelKeys.map((key, i) => (
           <div key={key ?? `edge-${i}`} style={{ flex: "0 0 100%", minWidth: 0 }}>

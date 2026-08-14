@@ -8,6 +8,8 @@ import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
 import HiddenStoriesManager from "../components/HiddenStoriesManager";
 import HiddenEntriesManager from "../components/HiddenEntriesManager";
+import HideEntryPicker from "../components/HideEntryPicker";
+import HideEntryModal from "../components/HideEntryModal";
 import Onboarding from "../components/Onboarding";
 import { getWorldCountries, findCountryByName } from "../utils/worldCountries";
 import { useIsMobile } from "../hooks/useIsMobile";
@@ -79,6 +81,13 @@ const Configuracion = ({ onProfileChange }) => {
   const [saved, setSaved]   = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  // Flujo "Ocultar cerveza de amigos específicos" — antes se abría por
+  // cada tarjeta de Mi Cuaderno (HideEntryModal.jsx); acá primero se elige
+  // LA cerveza (HideEntryPicker.jsx) y recién después se delega en el mismo
+  // modal de siempre para elegir los amigos.
+  const [showHidePicker, setShowHidePicker] = useState(false);
+  const [hideEntryTarget, setHideEntryTarget] = useState(null); // { id, nombre } de la cerveza elegida
+  const [hiddenEntriesReloadKey, setHiddenEntriesReloadKey] = useState(0);
 
   const { badges } = useBadges();
   const unlockedBadges = badges.filter((b) => b.currentTier);
@@ -386,15 +395,43 @@ const Configuracion = ({ onProfileChange }) => {
 
           {/* Ocultar cervezas de amigos específicos */}
           <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid #2e2215" }}>
-            <div style={{ fontWeight: 700, color: "#f0e4cc", marginBottom: 4, fontSize: 15 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><EyeClosedIcon size={16} /> {t("settings.privacy.hiddenEntries.title")}</span>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 700, color: "#f0e4cc", fontSize: 15 }}>
+                <EyeClosedIcon size={16} /> {t("settings.privacy.hiddenEntries.title")}
+              </span>
+              <button
+                onClick={() => setShowHidePicker(true)}
+                style={{
+                  padding: "5px 12px", borderRadius: 20, border: "1px solid rgba(212,175,55,0.4)",
+                  background: "rgba(212,175,55,0.1)", color: "#d4af37", fontSize: 12, fontWeight: 700,
+                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                }}
+              >
+                {t("settings.privacy.hiddenEntries.addBtn")}
+              </button>
             </div>
             <p style={{ fontSize: 13, color: "#9a7d62", margin: "0 0 14px", lineHeight: 1.5 }}>
               {t("settings.privacy.hiddenEntries.description")}
             </p>
-            {session && <HiddenEntriesManager currentUserId={session.user.id} />}
+            {session && <HiddenEntriesManager key={hiddenEntriesReloadKey} currentUserId={session.user.id} />}
           </div>
         </div>
+      )}
+
+      {showHidePicker && (
+        <HideEntryPicker
+          onPick={(beer) => { setHideEntryTarget(beer); setShowHidePicker(false); }}
+          onClose={() => setShowHidePicker(false)}
+        />
+      )}
+      {hideEntryTarget && session && (
+        <HideEntryModal
+          userId={session.user.id}
+          beerId={hideEntryTarget.id}
+          beerNombre={hideEntryTarget.nombre}
+          onClose={() => setHideEntryTarget(null)}
+          onSaved={() => { setHideEntryTarget(null); setHiddenEntriesReloadKey((k) => k + 1); }}
+        />
       )}
 
       {/* Tab: Preferencias */}

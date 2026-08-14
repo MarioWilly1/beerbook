@@ -4,8 +4,12 @@ import {
   PlusCircleIcon, BookIcon, RssIcon, PersonIcon, PlusIcon,
 } from "@primer/octicons-react";
 import { useTotalUnread } from "../hooks/useTotalUnread";
-import NativeTabSlide from "./NativeTabSlide";
+import NativeSwipeTabs from "./NativeSwipeTabs";
 import QuickRegisterModal from "./QuickRegisterModal";
+import LaBarra from "../pages/LaBarra";
+import MiCuaderno from "../pages/MiCuaderno";
+import Social from "../pages/Social";
+import PerfilHub from "../pages/PerfilHub";
 
 const FAB_CSS = `
   .native-fab { transition: transform 0.15s ease; }
@@ -19,18 +23,34 @@ const FAB_CSS = `
 // Reutiliza las mismas rutas/páginas que ya existen — cero lógica de negocio
 // duplicada, solo cambia el "envoltorio" de navegación.
 const TABS = [
-  { to: "/",         label: "Registrar", Icon: PlusCircleIcon, end: true },
-  { to: "/cuaderno", label: "Colección", Icon: BookIcon },
-  { to: "/feed",      label: "Social",   Icon: RssIcon, badge: "social" },
-  { to: "/perfil-app", label: "Perfil",  Icon: PersonIcon },
+  { to: "/",         label: "Barra",    Icon: PlusCircleIcon, end: true },
+  { to: "/cuaderno", label: "Bitácora", Icon: BookIcon },
+  { to: "/feed",      label: "Taberna", Icon: RssIcon, badge: "social" },
+  { to: "/perfil-app", label: "Perfil", Icon: PersonIcon },
 ];
 const TAB_PATHS = TABS.map((tb) => tb.to);
 
-const NativeShell = ({ children }) => {
+const NativeShell = ({ children, session, profile }) => {
   const totalUnread = useTotalUnread();
   const location = useLocation();
   const navigate = useNavigate();
   const [showQuickRegister, setShowQuickRegister] = useState(false);
+
+  const isMainTab = TAB_PATHS.includes(location.pathname);
+
+  // Renderiza directo (sin pasar por <Routes>) las 4 secciones principales,
+  // para que NativeSwipeTabs pueda montar la vecina hacia donde se arrastra
+  // el dedo sin depender del router — mismo patrón que ya usan LaBarra.js y
+  // Social.js para sus pestañas internas, ahora un nivel más arriba.
+  const renderMainTab = (path) => {
+    switch (path) {
+      case "/": return <LaBarra />;
+      case "/cuaderno": return <MiCuaderno />;
+      case "/feed": return <Social defaultTab="feed" />;
+      case "/perfil-app": return <PerfilHub session={session} profile={profile} />;
+      default: return null;
+    }
+  };
 
   return (
     <div style={wrapStyle}>
@@ -41,15 +61,23 @@ const NativeShell = ({ children }) => {
       </header>
 
       <main style={mainStyle}>
-        {/* Fase E — reutiliza el mismo deslizamiento liviano de la Fase B
-            (NativeTabSlide), ahora con tabKey=pathname para animar entre las
-            4 secciones principales. Si el pathname (actual o el anterior) no
-            está en TAB_PATHS — pantallas secundarias abiertas desde el menú
-            de Perfil, ej. /logros, /configuracion — no anima, ver el guard
-            agregado en NativeTabSlide.jsx. */}
-        <NativeTabSlide tabKey={location.pathname} tabOrder={TAB_PATHS} onSwipe={navigate}>
-          {children}
-        </NativeTabSlide>
+        {/* Swipe real (sigue el dedo en vivo, resuelve con rebote elástico o
+            completa el cambio) entre las 4 secciones principales — mismo
+            componente que ya probamos a fondo en las pestañas internas de
+            LaBarra.js/Social.js. Las pantallas secundarias (abiertas desde
+            el menú de Perfil: /logros, /configuracion, etc.) no participan
+            del swipe, se siguen sirviendo tal cual desde `children`
+            (el árbol de <Routes> de App.js). */}
+        {isMainTab ? (
+          <NativeSwipeTabs
+            tabKey={location.pathname}
+            tabOrder={TAB_PATHS}
+            onSwipe={navigate}
+            renderTab={renderMainTab}
+          />
+        ) : (
+          children
+        )}
       </main>
 
       {/* FAB v2 — reemplaza el atajo simple a Registrar (v1) por el flujo de

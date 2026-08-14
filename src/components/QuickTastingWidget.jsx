@@ -4,11 +4,17 @@ import { PlusIcon } from "@primer/octicons-react";
 
 let floatIdSeq = 0;
 
-// Botón compacto "🍺 Veces probada: N [+]" — un toque registra una cata en
-// blanco (sin foto/nota, eso queda opcional para después desde la galería)
-// y suma +3 XP fijo. El conteo se actualiza optimista en el toque; el padre
-// es quien confirma/revierte según la respuesta real del server.
-const QuickTastingWidget = ({ count, onTap, pending }) => {
+// Botón "🍺 Veces probada: N [+]" — un toque registra una cata en blanco
+// (sin foto/nota, eso queda opcional para después desde la galería) y suma
+// +3 XP fijo. El conteo se actualiza optimista en el toque; el padre es
+// quien confirma/revierte según la respuesta real del server.
+//
+// `compact` — variante chica sin el texto de la etiqueta (solo "🍺 N" +
+// el botón "+"), pensada para superponerse como badge sobre la foto en la
+// tarjeta colapsada de Mi Cuaderno, donde el recuadro completo ocupaba una
+// fila entera. La vista expandida (detalle) sigue usando la variante
+// completa, ahí sí hay espacio de sobra.
+const QuickTastingWidget = ({ count, onTap, pending, compact }) => {
   const { t } = useTranslation();
   const [bump, setBump]   = useState(false);
   const [floats, setFloats] = useState([]);
@@ -25,18 +31,21 @@ const QuickTastingWidget = ({ count, onTap, pending }) => {
   }, [pending, onTap]);
 
   return (
-    <div style={wrapStyle} onClick={(e) => e.stopPropagation()}>
-      <span style={{ fontSize: 12, color: "#9a7d62" }}>
-        🍺 {t("notebook.timesTriedLabel")}:{" "}
+    <div style={compact ? wrapCompactStyle : wrapStyle} onClick={(e) => e.stopPropagation()}>
+      <span style={{ fontSize: compact ? 11 : 12, color: compact ? "#f0e4cc" : "#9a7d62" }}>
+        🍺{compact ? " " : ` ${t("notebook.timesTriedLabel")}: `}
         <strong style={{ ...countStyle, transform: bump ? "scale(1.35)" : "scale(1)" }}>{count}</strong>
       </span>
       <button
         onClick={handleClick}
         disabled={pending}
         title={t("notebook.quickTastingBtn")}
-        style={{ ...plusBtnStyle, opacity: pending ? 0.5 : 1, cursor: pending ? "not-allowed" : "pointer" }}
+        style={{
+          ...(compact ? plusBtnCompactStyle : plusBtnStyle),
+          opacity: pending ? 0.5 : 1, cursor: pending ? "not-allowed" : "pointer",
+        }}
       >
-        <PlusIcon size={12} />
+        <PlusIcon size={compact ? 10 : 12} />
       </button>
       {floats.map((id) => (
         <span key={id} className="quick-tasting-float">+3 XP</span>
@@ -50,11 +59,22 @@ const wrapStyle = {
   padding: "4px 8px", borderRadius: 8, minWidth: 0, maxWidth: "100%",
   background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)",
 };
+const wrapCompactStyle = {
+  position: "relative", display: "inline-flex", alignItems: "center", gap: 5,
+  padding: "2px 6px", borderRadius: 20, minWidth: 0,
+  background: "rgba(0,0,0,0.65)", border: "1px solid rgba(212,175,55,0.35)",
+};
 const countStyle = { display: "inline-block", color: "#d4af37", transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1)" };
 const plusBtnStyle = {
   display: "flex", alignItems: "center", justifyContent: "center",
   width: 20, height: 20, borderRadius: "50%", flexShrink: 0,
   border: "1px solid rgba(212,175,55,0.5)", background: "rgba(212,175,55,0.15)",
+  color: "#d4af37", padding: 0,
+};
+const plusBtnCompactStyle = {
+  display: "flex", alignItems: "center", justifyContent: "center",
+  width: 15, height: 15, borderRadius: "50%", flexShrink: 0,
+  border: "1px solid rgba(212,175,55,0.5)", background: "rgba(212,175,55,0.2)",
   color: "#d4af37", padding: 0,
 };
 

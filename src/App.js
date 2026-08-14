@@ -213,7 +213,7 @@ function App() {
       // páginas/hooks de siempre, solo cambia el "envoltorio". Suma dos
       // rutas propias de esta variante: /noticias (antes solo alcanzable
       // como tab interno de La Taberna) y /perfil-app (menú de Perfil).
-      <NativeShell>
+      <NativeShell session={session} profile={profile}>
         <Routes>
           <Route path="/" element={<LaBarra />} />
           <Route path="/cuaderno" element={<MiCuaderno />} />

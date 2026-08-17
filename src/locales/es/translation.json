@@ -211,6 +211,7 @@
     "notFound":             "Perfil no encontrado.",
     "statBeers":            "Cervezas",
     "statVerified":         "{{count}} verificadas",
+    "statLiters":           "{{count}} litros consumidos",
     "statStreak":           "Racha máxima",
     "statStreakSub":        "récord de días seguidos",
     "statStreakActive":     "activa: {{count}} días",
@@ -408,6 +409,18 @@
     "saveBtn":            "Guardar · +{{xp}} XP",
     "inNotebook":         "En tu cuaderno"
   },
+  "volume": {
+    "label":           "Cantidad",
+    "cana":             "Caña",
+    "quinto":           "Quinto",
+    "botellin":         "Botellín",
+    "tercio":           "Tercio",
+    "lata":             "Lata",
+    "pinta":            "Pinta",
+    "litro":            "Litro",
+    "otro":             "Otro",
+    "otroPlaceholder":  "ml"
+  },
   "quickTasting": {
     "title":              "Nueva cata",
     "photoPlaceholder":   "Tocá para sacar/elegir foto",
@@ -504,6 +517,7 @@
     "disabledWeekly":      "No disponible en modo Cervezas Verificadas",
     "notInRankingBeers":   "Aún no apareces — sube fotos de tus cervezas para entrar.",
     "notInRankingXP":      "Aún no apareces en el ranking — registra tu primera cerveza para entrar.",
+    "notInRankingLitros":  "Aún no apareces — cargá el volumen de alguna cata para entrar.",
     "onlyYou":             "Solo apareces tú. Invita amigos para tener más competencia.",
     "leagueBase":          "Liga Base",
     "leagueN":             "Liga {{n}}",
@@ -515,22 +529,29 @@
       "friends": "Entre amigos"
     },
     "dim": {
-      "xp":    "XP Total",
-      "beers": "Cervezas Verificadas"
+      "xp":     "XP Total",
+      "beers":  "Cervezas Verificadas",
+      "litros": "Litros"
     },
     "subtitles": {
-      "xpTotal":     "XP histórico acumulado · solo entradas con foto",
-      "xpWeekly":    "Cervezas verificadas nuevas en los últimos 7 días",
-      "xpFriends":   "Tú y tus amigos, ordenados por XP total",
-      "beersTotal":  "Quién registró más cervezas verificadas (con foto)",
-      "beersFriends":"Quién registró más cervezas verificadas entre tus amigos"
+      "xpTotal":       "XP histórico acumulado · solo entradas con foto",
+      "xpWeekly":      "Cervezas verificadas nuevas en los últimos 7 días",
+      "xpFriends":     "Tú y tus amigos, ordenados por XP total",
+      "beersTotal":    "Quién registró más cervezas verificadas (con foto)",
+      "beersFriends":  "Quién registró más cervezas verificadas entre tus amigos",
+      "litrosTotal":   "Litros acumulados en todas las catas con volumen cargado",
+      "litrosWeekly":  "Litros cargados en los últimos 7 días",
+      "litrosFriends": "Tú y tus amigos, ordenados por litros totales"
     },
     "empty": {
-      "xpTotal":     "El ranking está vacío.",
-      "xpWeekly":    "Nadie añadió cervezas verificadas esta semana todavía.",
-      "xpFriends":   "Añade amigos para ver el ranking entre amigos.",
-      "beersTotal":  "Nadie tiene cervezas verificadas todavía.",
-      "beersFriends":"Ninguno de tus amigos tiene cervezas verificadas todavía."
+      "xpTotal":       "El ranking está vacío.",
+      "xpWeekly":      "Nadie añadió cervezas verificadas esta semana todavía.",
+      "xpFriends":     "Añade amigos para ver el ranking entre amigos.",
+      "beersTotal":    "Nadie tiene cervezas verificadas todavía.",
+      "beersFriends":  "Ninguno de tus amigos tiene cervezas verificadas todavía.",
+      "litrosTotal":   "Nadie cargó el volumen de una cata todavía.",
+      "litrosWeekly":  "Nadie cargó litros esta semana todavía.",
+      "litrosFriends": "Ninguno de tus amigos cargó litros todavía."
     },
     "consent": {
       "title":       "¿Quieres aparecer en el ranking?",

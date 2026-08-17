@@ -25,7 +25,7 @@ export async function updateLatestTasting(supabase, userId, beerId, fields) {
 export async function fetchTastingHistory(supabase, userId, beerId) {
   return supabase
     .from("beer_tastings")
-    .select("id, rating, comment, user_photo_url, location_name, price_paid, xp_earned, created_at")
+    .select("id, rating, comment, user_photo_url, location_name, price_paid, cantidad_ml, xp_earned, created_at")
     .eq("user_id", userId)
     .eq("beer_id", beerId)
     .order("id", { ascending: false });

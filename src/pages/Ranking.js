@@ -20,9 +20,14 @@ const SCOPE_TABS = [
   { key: "amigos",  Icon: PeopleIcon,   tKey: "ranking.scope.friends" },
 ];
 
+// No hay ícono de gota/litro en @primer/octicons-react — se arma uno chico
+// con el mismo calling-convention `<Icon size={n}/>` que ya usan XP/Cervezas.
+const DropletIcon = ({ size }) => <span style={{ fontSize: size, lineHeight: 1 }}>💧</span>;
+
 const DIM_OPTIONS = [
-  { key: "xp",    Icon: StarIcon,   tKey: "ranking.dim.xp"    },
-  { key: "beers", Icon: BeakerIcon, tKey: "ranking.dim.beers" },
+  { key: "xp",     Icon: StarIcon,     tKey: "ranking.dim.xp"     },
+  { key: "beers",  Icon: BeakerIcon,   tKey: "ranking.dim.beers"  },
+  { key: "litros", Icon: DropletIcon,  tKey: "ranking.dim.litros" },
 ];
 
 const leagueLabel = (t, prestige) => (prestige === 0 ? t("ranking.leagueBase") : t("ranking.leagueN", { n: prestige }));
@@ -184,6 +189,35 @@ const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onR
   );
 };
 
+const RankingRowLitros = ({ entry, isSelf, onClick, selfLabel, onReport }) => {
+  const pos = Number(entry.rank_pos);
+  const liters = (Number(entry.total_beers) / 1000).toFixed(1);
+  return (
+    <div onClick={onClick} style={rowStyle(isSelf, pos, true)}>
+      <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
+        {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
+      </span>
+      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
+          <PrestigeBadge prestige={entry.prestige} size="icon" cupSize={24} />
+          {entry.nombre || "Usuario"}
+          {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
+        </div>
+        {entry.equipped_tag_slug && (
+          <div style={{ marginTop: 2 }}>
+            <EquippedTag slug={entry.equipped_tag_slug} />
+          </div>
+        )}
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: isSelf ? "#1a4a6b" : "#4a90d9" }}>💧 {liters} L</div>
+      </div>
+      {!isSelf && onReport && <ReportIcon onReport={onReport} />}
+    </div>
+  );
+};
+
 const Ranking = () => {
   const { t } = useTranslation();
   const { stats: myStats } = useUserStats();
@@ -202,6 +236,7 @@ const Ranking = () => {
   const {
     rankingTotal, rankingSemanal, rankingAmigos,
     rankingTotalBeers, rankingAmigosBeers,
+    rankingTotalLitros, rankingAmigosLitros, rankingSemanalLitros,
     loading, currentUserId,
   } = useRanking(league);
 
@@ -246,20 +281,27 @@ const Ranking = () => {
   const list =
     dim === "beers"
       ? (scope === "amigos" ? rankingAmigosBeers : rankingTotalBeers)
+      : dim === "litros"
+      ? (scope === "amigos" ? rankingAmigosLitros : scope === "semanal" ? rankingSemanalLitros : rankingTotalLitros)
       : scope === "total"   ? rankingTotal
       : scope === "semanal" ? rankingSemanal
       : rankingAmigos;
 
-  const isOwnLeague    = league === myStats.prestige;
-  const selfEntryXP    = rankingTotal.find((e) => e.id === currentUserId);
-  const selfEntryBeers = rankingTotalBeers.find((e) => e.id === currentUserId);
-  const selfEntry      = dim === "beers" ? selfEntryBeers : selfEntryXP;
-  const selfInList     = list.some((e) => e.id === currentUserId);
+  const isOwnLeague     = league === myStats.prestige;
+  const selfEntryXP     = rankingTotal.find((e) => e.id === currentUserId);
+  const selfEntryBeers  = rankingTotalBeers.find((e) => e.id === currentUserId);
+  const selfEntryLitros = rankingTotalLitros.find((e) => e.id === currentUserId);
+  const selfEntry       = dim === "beers" ? selfEntryBeers : dim === "litros" ? selfEntryLitros : selfEntryXP;
+  const selfInList      = list.some((e) => e.id === currentUserId);
 
   const subtitleKey = dim === "xp"
     ? scope === "semanal" ? "ranking.subtitles.xpWeekly"
       : scope === "amigos"  ? "ranking.subtitles.xpFriends"
       : "ranking.subtitles.xpTotal"
+    : dim === "litros"
+    ? scope === "semanal" ? "ranking.subtitles.litrosWeekly"
+      : scope === "amigos"  ? "ranking.subtitles.litrosFriends"
+      : "ranking.subtitles.litrosTotal"
     : scope === "amigos" ? "ranking.subtitles.beersFriends"
     : "ranking.subtitles.beersTotal";
 
@@ -267,12 +309,16 @@ const Ranking = () => {
     ? scope === "semanal" ? "ranking.empty.xpWeekly"
       : scope === "amigos"  ? "ranking.empty.xpFriends"
       : "ranking.empty.xpTotal"
+    : dim === "litros"
+    ? scope === "semanal" ? "ranking.empty.litrosWeekly"
+      : scope === "amigos"  ? "ranking.empty.litrosFriends"
+      : "ranking.empty.litrosTotal"
     : scope === "amigos" ? "ranking.empty.beersFriends"
     : "ranking.empty.beersTotal";
 
   const selfLabel     = t("ranking.self");
   const verifiedLabel = t("ranking.verifiedLabel");
-  const RowComp       = dim === "beers" ? RankingRowBeers : RankingRowXP;
+  const RowComp       = dim === "beers" ? RankingRowBeers : dim === "litros" ? RankingRowLitros : RankingRowXP;
 
   if (league === null || loading) return <p style={{ padding: 24, color: "#9a7d62" }}>{t("ranking.loading")}</p>;
 
@@ -399,6 +445,8 @@ const Ranking = () => {
               <p style={{ textAlign: "center", color: "#5a4535", fontSize: 13, marginTop: 16 }}>
                 {dim === "beers"
                   ? t("ranking.notInRankingBeers")
+                  : dim === "litros"
+                  ? t("ranking.notInRankingLitros")
                   : t("ranking.notInRankingXP")}
               </p>
             )}

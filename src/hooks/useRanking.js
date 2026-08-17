@@ -4,11 +4,14 @@ import { supabase } from "../services/supabase";
 // Ranking dentro de una liga de Prestigio (league = valor de profiles.prestige
 // a mirar). Se refetchea cada vez que cambia la liga seleccionada.
 export const useRanking = (league) => {
-  const [rankingTotal,       setRankingTotal]       = useState([]);
-  const [rankingSemanal,     setRankingSemanal]     = useState([]);
-  const [rankingAmigos,      setRankingAmigos]      = useState([]);
-  const [rankingTotalBeers,  setRankingTotalBeers]  = useState([]);
-  const [rankingAmigosBeers, setRankingAmigosBeers] = useState([]);
+  const [rankingTotal,        setRankingTotal]        = useState([]);
+  const [rankingSemanal,      setRankingSemanal]      = useState([]);
+  const [rankingAmigos,       setRankingAmigos]       = useState([]);
+  const [rankingTotalBeers,   setRankingTotalBeers]   = useState([]);
+  const [rankingAmigosBeers,  setRankingAmigosBeers]  = useState([]);
+  const [rankingTotalLitros,   setRankingTotalLitros]   = useState([]);
+  const [rankingAmigosLitros,  setRankingAmigosLitros]  = useState([]);
+  const [rankingSemanalLitros, setRankingSemanalLitros] = useState([]);
   const [loading,            setLoading]            = useState(true);
   const [currentUserId,      setCurrentUserId]      = useState(null);
 
@@ -20,12 +23,18 @@ export const useRanking = (league) => {
       const { data: { session } } = await supabase.auth.getSession();
       setCurrentUserId(session?.user?.id || null);
 
-      const [totalRes, semanalRes, amigosRes, totalBeersRes, amigosBeersRes] = await Promise.all([
-        supabase.rpc("get_ranking_global",       { p_prestige: league }),
-        supabase.rpc("get_ranking_semanal",      { p_prestige: league }),
-        supabase.rpc("get_ranking_amigos",       { p_prestige: league }),
-        supabase.rpc("get_ranking_global_beers", { p_prestige: league }),
-        supabase.rpc("get_ranking_amigos_beers", { p_prestige: league }),
+      const [
+        totalRes, semanalRes, amigosRes, totalBeersRes, amigosBeersRes,
+        totalLitrosRes, amigosLitrosRes, semanalLitrosRes,
+      ] = await Promise.all([
+        supabase.rpc("get_ranking_global",         { p_prestige: league }),
+        supabase.rpc("get_ranking_semanal",        { p_prestige: league }),
+        supabase.rpc("get_ranking_amigos",         { p_prestige: league }),
+        supabase.rpc("get_ranking_global_beers",   { p_prestige: league }),
+        supabase.rpc("get_ranking_amigos_beers",   { p_prestige: league }),
+        supabase.rpc("get_ranking_global_litros",  { p_prestige: league }),
+        supabase.rpc("get_ranking_amigos_litros",  { p_prestige: league }),
+        supabase.rpc("get_ranking_semanal_litros", { p_prestige: league }),
       ]);
 
       setRankingTotal(totalRes.data             || []);
@@ -33,6 +42,9 @@ export const useRanking = (league) => {
       setRankingAmigos(amigosRes.data           || []);
       setRankingTotalBeers(totalBeersRes.data   || []);
       setRankingAmigosBeers(amigosBeersRes.data || []);
+      setRankingTotalLitros(totalLitrosRes.data     || []);
+      setRankingAmigosLitros(amigosLitrosRes.data   || []);
+      setRankingSemanalLitros(semanalLitrosRes.data || []);
       setLoading(false);
     };
 
@@ -42,6 +54,7 @@ export const useRanking = (league) => {
   return {
     rankingTotal, rankingSemanal, rankingAmigos,
     rankingTotalBeers, rankingAmigosBeers,
+    rankingTotalLitros, rankingAmigosLitros, rankingSemanalLitros,
     loading, currentUserId,
   };
 };

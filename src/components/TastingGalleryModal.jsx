@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../services/supabase";
 import { fetchTastingHistory } from "../utils/tastings";
+import { formatMl } from "./VolumeSelector";
 import Lightbox from "./Lightbox";
 import { XIcon } from "@primer/octicons-react";
 
@@ -64,6 +65,9 @@ const TastingGalleryModal = ({ userId, beerId, beerNombre, onClose }) => {
                   </div>
                   {tasting.rating != null && (
                     <p style={{ margin: "2px 0 0", fontSize: 12, color: "#f0e4cc" }}>⭐ {tasting.rating} / 5</p>
+                  )}
+                  {tasting.cantidad_ml != null && (
+                    <p style={{ margin: "2px 0 0", fontSize: 12, color: "#f0e4cc" }}>🍺 {formatMl(tasting.cantidad_ml)}</p>
                   )}
                   {tasting.comment && (
                     <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9a7d62", overflowWrap: "break-word" }}>{tasting.comment}</p>

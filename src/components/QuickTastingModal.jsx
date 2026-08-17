@@ -4,6 +4,7 @@ import { DeviceCameraIcon, XIcon } from "@primer/octicons-react";
 import { supabase } from "../services/supabase";
 import { compressImage, uploadUserBeerPhoto } from "../utils/photoUpload";
 import { hashToString } from "../utils/perceptualHash";
+import VolumeSelector from "./VolumeSelector";
 
 const COMMENT_MAX = 140;
 
@@ -21,6 +22,7 @@ const QuickTastingModal = ({ beer, onClose, onSaved }) => {
   const [photoFile, setPhotoFile]       = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [comment, setComment]           = useState("");
+  const [cantidadMl, setCantidadMl]     = useState(null);
   const [saving, setSaving]             = useState(false);
   const [error, setError]               = useState("");
   const fileInputRef = useRef(null);
@@ -50,6 +52,7 @@ const QuickTastingModal = ({ beer, onClose, onSaved }) => {
         user_photo_url: photoUrl,
         photo_hash: hashToString(hash),
         comment: comment.trim(),
+        cantidad_ml: cantidadMl || null,
       });
     } catch {
       setError(t("quickTasting.error"));
@@ -93,6 +96,10 @@ const QuickTastingModal = ({ beer, onClose, onSaved }) => {
             </>
           )}
         </button>
+
+        <div style={{ marginBottom: 12 }}>
+          <VolumeSelector value={cantidadMl} onChange={setCantidadMl} />
+        </div>
 
         <textarea
           value={comment}

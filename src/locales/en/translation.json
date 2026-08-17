@@ -211,6 +211,7 @@
     "notFound":            "Profile not found.",
     "statBeers":           "Beers",
     "statVerified":        "{{count}} verified",
+    "statLiters":          "{{count}} liters consumed",
     "statStreak":          "Longest streak",
     "statStreakSub":       "days in a row record",
     "statStreakActive":    "active: {{count}} days",
@@ -408,6 +409,18 @@
     "saveBtn":            "Save · +{{xp}} XP",
     "inNotebook":         "In your notebook"
   },
+  "volume": {
+    "label":           "Amount",
+    "cana":             "Draft",
+    "quinto":           "Small bottle",
+    "botellin":         "Bottle",
+    "tercio":           "Bottle",
+    "lata":             "Can",
+    "pinta":            "Pint",
+    "litro":            "Liter",
+    "otro":             "Other",
+    "otroPlaceholder":  "ml"
+  },
   "quickTasting": {
     "title":              "New tasting",
     "photoPlaceholder":   "Tap to take/choose a photo",
@@ -504,6 +517,7 @@
     "disabledWeekly":      "Not available in Verified Beers mode",
     "notInRankingBeers":   "Not in yet — upload photos of your beers to enter.",
     "notInRankingXP":      "Not in the ranking yet — log your first beer to enter.",
+    "notInRankingLitros":  "Not in yet — log the volume of a tasting to enter.",
     "onlyYou":             "Only you appear. Invite friends for more competition.",
     "leagueBase":          "Base League",
     "leagueN":             "League {{n}}",
@@ -515,22 +529,29 @@
       "friends": "Friends"
     },
     "dim": {
-      "xp":    "Total XP",
-      "beers": "Verified Beers"
+      "xp":     "Total XP",
+      "beers":  "Verified Beers",
+      "litros": "Liters"
     },
     "subtitles": {
-      "xpTotal":     "Accumulated historical XP · photo entries only",
-      "xpWeekly":    "New verified beers in the last 7 days",
-      "xpFriends":   "You and your friends, sorted by total XP",
-      "beersTotal":  "Who logged the most verified beers (with photo)",
-      "beersFriends":"Who logged the most verified beers among your friends"
+      "xpTotal":       "Accumulated historical XP · photo entries only",
+      "xpWeekly":      "New verified beers in the last 7 days",
+      "xpFriends":     "You and your friends, sorted by total XP",
+      "beersTotal":    "Who logged the most verified beers (with photo)",
+      "beersFriends":  "Who logged the most verified beers among your friends",
+      "litrosTotal":   "Liters accumulated across all tastings with volume logged",
+      "litrosWeekly":  "Liters logged in the last 7 days",
+      "litrosFriends": "You and your friends, sorted by total liters"
     },
     "empty": {
-      "xpTotal":     "The ranking is empty.",
-      "xpWeekly":    "Nobody added verified beers this week yet.",
-      "xpFriends":   "Add friends to see the friends ranking.",
-      "beersTotal":  "Nobody has verified beers yet.",
-      "beersFriends":"None of your friends have verified beers yet."
+      "xpTotal":       "The ranking is empty.",
+      "xpWeekly":      "Nobody added verified beers this week yet.",
+      "xpFriends":     "Add friends to see the friends ranking.",
+      "beersTotal":    "Nobody has verified beers yet.",
+      "beersFriends":  "None of your friends have verified beers yet.",
+      "litrosTotal":   "Nobody has logged a tasting's volume yet.",
+      "litrosWeekly":  "Nobody logged liters this week yet.",
+      "litrosFriends": "None of your friends have logged liters yet."
     },
     "consent": {
       "title":       "Want to appear in the ranking?",

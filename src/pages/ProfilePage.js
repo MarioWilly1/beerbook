@@ -97,7 +97,7 @@ const ProfilePage = () => {
       }
 
       if (canSeeStats) {
-        const [beersRes, achRes, badgesRes, challengesRes, entriesRes] = await Promise.all([
+        const [beersRes, achRes, badgesRes, challengesRes, entriesRes, litersRes] = await Promise.all([
           supabase.from("user_beers").select('"XP", user_photo_url').eq("user_id", userId),
           supabase.from("user_achievements")
             .select("slug, nombre, unlocked_at, xp_awarded")
@@ -110,6 +110,10 @@ const ProfilePage = () => {
           // DEFINER, que replica server-side la misma regla de canSeeStats
           // (dueño / perfil público / amigos). Ver 20260722010000_visible_user_beers.sql.
           supabase.rpc("get_visible_user_beers", { p_user_id: userId }),
+          // Mismo criterio para el total de litros — beer_tastings tiene la
+          // misma restricción de RLS (select_own_tastings). Ver
+          // 20260816000000_tasting_volume_and_ranking_litros.sql.
+          supabase.rpc("get_visible_tastings_liters", { p_user_id: userId }),
         ]);
 
         setVerifiedEntries(
@@ -130,8 +134,9 @@ const ProfilePage = () => {
         const cycleXP      = Math.max(0, lifetimeXP - (prof.prestige_xp_baseline || 0));
         const totalBeers   = beerData.length;
         const verifiedBeers = beerData.filter((b) => b.user_photo_url?.trim()).length;
+        const totalLiters  = litersRes.data ? Number(litersRes.data) / 1000 : 0;
 
-        setStats({ totalXP: lifetimeXP, totalBeers, verifiedBeers, ...getLevelInfo(cycleXP) });
+        setStats({ totalXP: lifetimeXP, totalBeers, verifiedBeers, totalLiters, ...getLevelInfo(cycleXP) });
 
         setAchievements({
           total: achData.length,
@@ -285,7 +290,12 @@ const ProfilePage = () => {
       {canSeeStats && stats && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 12, marginBottom: 20 }}>
-            <StatCard label={t("profile.statBeers")} value={`🍺 ${stats.totalBeers}`} sub={t("profile.statVerified", { count: stats.verifiedBeers })} />
+            <StatCard
+              label={t("profile.statBeers")}
+              value={`🍺 ${stats.totalBeers}`}
+              sub={t("profile.statVerified", { count: stats.verifiedBeers })}
+              sub2={stats.totalLiters > 0 ? t("profile.statLiters", { count: stats.totalLiters.toFixed(1) }) : null}
+            />
             <StatCard
               label={t("profile.statStreak")}
               value={`🔥 ${profileData.longest_streak ?? 0}`}
@@ -472,13 +482,14 @@ const replayBtnStyle = {
   cursor: "pointer",
 };
 
-const StatCard = ({ label, value, sub }) => (
+const StatCard = ({ label, value, sub, sub2 }) => (
   <div style={{ background: "#1c1409", border: "1px solid #2e2215", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
     <div style={{ fontSize: 11, fontWeight: 700, color: "#5a4535", textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 6 }}>
       {label}
     </div>
     <div style={{ fontSize: 17, fontWeight: 700, color: "#f0e4cc" }}>{value}</div>
     {sub && <div style={{ fontSize: 11, color: "#9a7d62", marginTop: 3 }}>{sub}</div>}
+    {sub2 && <div style={{ fontSize: 10, color: "#5a4535", marginTop: 2 }}>{sub2}</div>}
   </div>
 );
 

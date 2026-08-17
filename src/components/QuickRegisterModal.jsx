@@ -15,6 +15,7 @@ import { toastSave } from "../utils/toast";
 import { soundClink } from "../utils/sounds";
 import BeerAutocomplete from "./BeerAutocomplete";
 import SuggestBeerModal from "./SuggestBeerModal";
+import VolumeSelector from "./VolumeSelector";
 import { XIcon, DeviceCameraIcon, SearchIcon } from "@primer/octicons-react";
 
 // Registro rápido de una cerveza nueva (Fase G): abre la cámara directo,
@@ -37,6 +38,7 @@ const QuickRegisterModal = ({ onClose }) => {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [selectedBeer, setSelectedBeer] = useState(null);
   const [comment, setComment] = useState("");
+  const [cantidadMl, setCantidadMl] = useState(null);
   const [showSuggest, setShowSuggest] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
@@ -134,6 +136,7 @@ const QuickRegisterModal = ({ onClose }) => {
       const { error: tastingError } = await insertTasting(supabase, session.user.id, selectedBeer.id, {
         comment: trimmedComment || null,
         user_photo_url: photoUrl || null,
+        cantidad_ml: cantidadMl || null,
         ...(hashStr !== undefined ? { photo_hash: hashStr } : {}),
       });
       if (tastingError) { setError(t("quickRegister.saveError")); setPhase("confirm"); return; }
@@ -144,7 +147,7 @@ const QuickRegisterModal = ({ onClose }) => {
       return;
     }
 
-    const result = await registerFirstTasting(supabase, selectedBeer, { photoUrl, photoHash: hashStr, comment: trimmedComment });
+    const result = await registerFirstTasting(supabase, selectedBeer, { photoUrl, photoHash: hashStr, comment: trimmedComment, cantidadMl });
     if (result.error) { setError(t("quickRegister.saveError")); setPhase("confirm"); return; }
     onClose();
   };
@@ -234,6 +237,12 @@ const QuickRegisterModal = ({ onClose }) => {
               <p style={{ margin: "0 0 14px", fontSize: 12, color: "#c07a3f", lineHeight: 1.5 }}>
                 {t("quickRegister.alreadyOwnedHint")}
               </p>
+            )}
+
+            {phase !== "saving" && (
+              <div style={{ marginBottom: 14 }}>
+                <VolumeSelector value={cantidadMl} onChange={setCantidadMl} />
+              </div>
             )}
 
             {phase !== "saving" && (

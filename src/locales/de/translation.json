@@ -211,6 +211,7 @@
     "notFound":            "Profil nicht gefunden.",
     "statBeers":           "Biere",
     "statVerified":        "{{count}} verifiziert",
+    "statLiters":          "{{count}} Liter getrunken",
     "statStreak":          "Längste Serie",
     "statStreakSub":       "Rekord in Folge",
     "statStreakActive":    "aktiv: {{count}} Tage",
@@ -408,6 +409,18 @@
     "saveBtn":            "Speichern · +{{xp}} XP",
     "inNotebook":         "In deinem Notizbuch"
   },
+  "volume": {
+    "label":           "Menge",
+    "cana":             "Fassbier",
+    "quinto":           "Kleine Flasche",
+    "botellin":         "Flasche",
+    "tercio":           "Flasche",
+    "lata":             "Dose",
+    "pinta":            "Pint",
+    "litro":            "Liter",
+    "otro":             "Andere",
+    "otroPlaceholder":  "ml"
+  },
   "quickTasting": {
     "title":              "Neue Verkostung",
     "photoPlaceholder":   "Tippen, um ein Foto zu machen/wählen",
@@ -504,6 +517,7 @@
     "disabledWeekly":      "Im Modus 'Verifizierte Biere' nicht verfügbar",
     "notInRankingBeers":   "Noch nicht dabei — lade Fotos deiner Biere hoch, um einzusteigen.",
     "notInRankingXP":      "Noch nicht in der Rangliste — registriere dein erstes Bier.",
+    "notInRankingLitros":  "Noch nicht dabei — erfasse die Menge einer Verkostung.",
     "onlyYou":             "Nur du erscheinst. Lade Freunde ein für mehr Wettbewerb.",
     "leagueBase":          "Basisliga",
     "leagueN":             "Liga {{n}}",
@@ -515,22 +529,29 @@
       "friends": "Freunde"
     },
     "dim": {
-      "xp":    "Gesamt-XP",
-      "beers": "Verifizierte Biere"
+      "xp":     "Gesamt-XP",
+      "beers":  "Verifizierte Biere",
+      "litros": "Liter"
     },
     "subtitles": {
-      "xpTotal":     "Angesammelter XP · nur Einträge mit Foto",
-      "xpWeekly":    "Neue verifizierte Biere in den letzten 7 Tagen",
-      "xpFriends":   "Du und deine Freunde, nach gesamt XP sortiert",
-      "beersTotal":  "Wer die meisten verifizierten Biere protokolliert hat",
-      "beersFriends":"Wer die meisten verifizierten Biere unter deinen Freunden hat"
+      "xpTotal":       "Angesammelter XP · nur Einträge mit Foto",
+      "xpWeekly":      "Neue verifizierte Biere in den letzten 7 Tagen",
+      "xpFriends":     "Du und deine Freunde, nach gesamt XP sortiert",
+      "beersTotal":    "Wer die meisten verifizierten Biere protokolliert hat",
+      "beersFriends":  "Wer die meisten verifizierten Biere unter deinen Freunden hat",
+      "litrosTotal":   "Angesammelte Liter aus allen Verkostungen mit erfasster Menge",
+      "litrosWeekly":  "Liter erfasst in den letzten 7 Tagen",
+      "litrosFriends": "Du und deine Freunde, nach Gesamtlitern sortiert"
     },
     "empty": {
-      "xpTotal":     "Die Rangliste ist leer.",
-      "xpWeekly":    "Diese Woche hat noch niemand verifizierte Biere hinzugefügt.",
-      "xpFriends":   "Füge Freunde hinzu, um die Freundes-Rangliste zu sehen.",
-      "beersTotal":  "Noch niemand hat verifizierte Biere.",
-      "beersFriends":"Keiner deiner Freunde hat verifizierte Biere."
+      "xpTotal":       "Die Rangliste ist leer.",
+      "xpWeekly":      "Diese Woche hat noch niemand verifizierte Biere hinzugefügt.",
+      "xpFriends":     "Füge Freunde hinzu, um die Freundes-Rangliste zu sehen.",
+      "beersTotal":    "Noch niemand hat verifizierte Biere.",
+      "beersFriends":  "Keiner deiner Freunde hat verifizierte Biere.",
+      "litrosTotal":   "Noch niemand hat die Menge einer Verkostung erfasst.",
+      "litrosWeekly":  "Diese Woche hat noch niemand Liter erfasst.",
+      "litrosFriends": "Keiner deiner Freunde hat Liter erfasst."
     },
     "consent": {
       "title":       "Möchtest du in der Rangliste erscheinen?",

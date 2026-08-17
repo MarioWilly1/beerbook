@@ -19,7 +19,7 @@ import { RAREZA_COLECCIONABLE } from "./rareza";
 // no dupliquen esta lógica.
 export async function registerFirstTasting(supabase, beer, {
   photoUrl = "", photoHash, selfiePhotoUrl = "", selfiePhotoHash,
-  comment = "", rating = "", location = null, times = 0,
+  comment = "", rating = "", location = null, times = 0, cantidadMl = null,
 } = {}) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return { error: "no-session" };
@@ -49,6 +49,7 @@ export async function registerFirstTasting(supabase, beer, {
     location_name:    location?.name   ?? null,
     location_public:  location?.isPublic ?? true,
     price_paid:       location?.price  ?? null,
+    cantidad_ml:      cantidadMl || null,
   };
   if (photoHash !== undefined) tastingFields.photo_hash = photoHash;
   if (selfiePhotoHash !== undefined) tastingFields.selfie_photo_hash = selfiePhotoHash;

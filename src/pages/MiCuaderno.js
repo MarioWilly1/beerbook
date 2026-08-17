@@ -830,7 +830,7 @@ const MiCuaderno = () => {
     setQuickTastingTarget(beer);
   };
 
-  const handleQuickTastingSaved = async ({ user_photo_url, photo_hash, comment }) => {
+  const handleQuickTastingSaved = async ({ user_photo_url, photo_hash, comment, cantidad_ml }) => {
     const beer = quickTastingTarget;
     if (!beer) return;
     const { data: { session } } = await supabase.auth.getSession();
@@ -839,7 +839,7 @@ const MiCuaderno = () => {
     setTastingPending((prev) => ({ ...prev, [beer.id]: true }));
 
     const { error } = await insertTasting(supabase, session.user.id, beer.id, {
-      user_photo_url, photo_hash, comment,
+      user_photo_url, photo_hash, comment, cantidad_ml,
     });
 
     setTastingPending((prev) => ({ ...prev, [beer.id]: false }));

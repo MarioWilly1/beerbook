@@ -14,6 +14,7 @@ import { registerFirstTasting } from "../utils/registerBeer";
 import Lightbox from "./Lightbox";
 import BeerInfoModal from "./BeerInfoModal";
 import LocationPicker from "./LocationPicker";
+import VolumeSelector from "./VolumeSelector";
 import { RAREZA_EMOJI, RAREZA_COLECCIONABLE } from "../utils/rareza";
 import DualPhotoVerification from "./DualPhotoVerification";
 import { GlobeIcon, CheckIcon, XIcon, ShieldCheckIcon } from "@primer/octicons-react";
@@ -44,6 +45,12 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
   const [selfiePhotoUrl,  setSelfiePhotoUrl]  = useState(myBeerData?.selfie_photo_url || "");
   const [selfiePhotoHash, setSelfiePhotoHash] = useState(undefined); // undefined = sin cambios esta sesión
   const [showDualVerify, setShowDualVerify]   = useState(false);
+  // cantidad_ml vive por cata en beer_tastings, no hay columna resumen en
+  // user_beers para prellenar acá. undefined = "no tocado esta sesión"
+  // (mismo criterio que photoHash más abajo) — así, al EDITAR una entrada
+  // ya existente, no tocar el selector no borra el volumen que ya tenía
+  // guardado esa cata.
+  const [cantidadMl, setCantidadMl] = useState(undefined);
   const [location,  setLocation]  = useState(
     myBeerData?.location_lat
       ? { lat: myBeerData.location_lat, lng: myBeerData.location_lng, name: myBeerData.location_name, isPublic: myBeerData.location_public ?? true, price: myBeerData.price_paid ?? null }
@@ -121,7 +128,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
       // QuickRegisterModal.jsx para no duplicarla.
       const result = await registerFirstTasting(supabase, beer, {
         photoUrl, photoHash, selfiePhotoUrl, selfiePhotoHash,
-        comment, rating, location, times,
+        comment, rating, location, times, cantidadMl,
       });
       setSaving(false);
       if (result.error) return;
@@ -151,6 +158,7 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
     };
     if (photoHash !== undefined) tastingFields.photo_hash = photoHash;
     if (selfiePhotoHash !== undefined) tastingFields.selfie_photo_hash = selfiePhotoHash;
+    if (cantidadMl !== undefined) tastingFields.cantidad_ml = cantidadMl;
 
     const { error } = await supabase.from("user_beers").update({
       times, comment: comment || "", Rating: tastingFields.rating,
@@ -308,6 +316,10 @@ const BeerCard = ({ beer, myBeerData, onSaved, isInMyBeers, onVerMapa, isTrendin
               onChange={(e) => setTimes(Math.max(0, parseInt(e.target.value) || 0))}
               style={inputStyle}
             />
+          </div>
+
+          <div style={fieldStyle}>
+            <VolumeSelector value={cantidadMl} onChange={setCantidadMl} />
           </div>
 
           <div style={fieldStyle}>

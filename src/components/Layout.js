@@ -59,7 +59,7 @@ const Layout = ({ children, session, profile, onAvatarChange }) => {
   const { stats, refetch: refetchStats } = useUserStats();
 
   const username =
-    profile?.nombre ||
+    profile?.username ||
     session?.user?.user_metadata?.full_name ||
     session?.user?.email ||
     "Usuario";

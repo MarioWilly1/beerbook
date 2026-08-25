@@ -23,7 +23,7 @@ const ReportUserEntriesModal = ({ user, onClose }) => {
   if (picked) {
     return (
       <ReportEntryModal
-        target={{ user_id: user.id, beer_id: picked.beer_id, nombre: user.nombre, beer_nombre: picked.beer_nombre }}
+        target={{ user_id: user.id, beer_id: picked.beer_id, username: user.username, beer_nombre: picked.beer_nombre }}
         onClose={onClose}
       />
     );
@@ -48,7 +48,7 @@ const ReportUserEntriesModal = ({ user, onClose }) => {
         }}
       >
         <p style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 700, color: "#f0e4cc" }}>
-          🚩 {t("feed.report.pickEntryTitle", { nombre: user.nombre })}
+          🚩 {t("feed.report.pickEntryTitle", { nombre: user.username })}
         </p>
 
         {entries === null ? (

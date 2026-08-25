@@ -1,4 +1,26 @@
 {
+  "username": {
+    "label":            "Username",
+    "placeholder":      "your_handle",
+    "hint":              "3-15 characters · letters, numbers and underscore · no spaces",
+    "checking":          "Checking availability...",
+    "available":         "Available!",
+    "taken":              "That username is already taken.",
+    "suggestionsIntro":  "Try one of these:",
+    "errors": {
+      "required":  "Choose a username.",
+      "tooShort":  "3 characters minimum.",
+      "tooLong":   "15 characters maximum.",
+      "badChars":  "Only letters, numbers and underscore — no spaces or symbols."
+    },
+    "saveError":  "Couldn't save your username. Please try again.",
+    "gate": {
+      "title":     "Choose your username",
+      "subtitle":  "This is the public handle other users will see — in the ranking, feed, chat and your profile. Your real name stays private.",
+      "saveBtn":   "Continue",
+      "saving":    "Saving..."
+    }
+  },
   "nav": {
     "catalog":      "The Bar",
     "notebook":     "My Keg",
@@ -57,8 +79,10 @@
     },
     "profile": {
       "changeAvatar":         "Change avatar →",
-      "usernameLabel":        "Username",
-      "usernamePlaceholder":  "Your visible name in the app",
+      "realNameLabel":        "Real name",
+      "realNameHint":         "Private — not shown to other users",
+      "realNamePlaceholder":  "Your name",
+      "usernameFieldHint":    "Public — this is what others see",
       "errorEmpty":           "Name cannot be empty.",
       "errorMinLength":       "Minimum 2 characters.",
       "bioLabel":             "Bio",

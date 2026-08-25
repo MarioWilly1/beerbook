@@ -10,7 +10,7 @@ import Avatar from "./Avatar";
 // audita/deshace, mismo rol que HiddenStoriesManager pero para stories.
 const HiddenEntriesManager = ({ currentUserId }) => {
   const { t } = useTranslation();
-  const [rows, setRows]       = useState([]); // [{ beer_id, beer_nombre, hidden: [{id,nombre,avatar_url}] }]
+  const [rows, setRows]       = useState([]); // [{ beer_id, beer_nombre, hidden: [{id,username,avatar_url}] }]
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState(null); // `${beer_id}:${hidden_user_id}` en transición
 
@@ -20,7 +20,7 @@ const HiddenEntriesManager = ({ currentUserId }) => {
 
     const { data: hiddenRows } = await supabase
       .from("entry_hidden_from")
-      .select("beer_id, hidden_user_id, profiles!entry_hidden_from_hidden_user_id_fkey(id, nombre, avatar_url)")
+      .select("beer_id, hidden_user_id, profiles!entry_hidden_from_hidden_user_id_fkey(id, username, avatar_url)")
       .eq("owner_id", currentUserId);
 
     if (!hiddenRows || hiddenRows.length === 0) {
@@ -85,8 +85,8 @@ const HiddenEntriesManager = ({ currentUserId }) => {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {row.hidden.map((f) => (
               <span key={f.id} style={chipStyle}>
-                <Avatar avatarUrl={f.avatar_url} nombre={f.nombre} size={18} />
-                {f.nombre}
+                <Avatar avatarUrl={f.avatar_url} nombre={f.username} size={18} />
+                {f.username}
                 <button
                   onClick={() => handleRemove(row.beer_id, f.id)}
                   disabled={removing === `${row.beer_id}:${f.id}`}

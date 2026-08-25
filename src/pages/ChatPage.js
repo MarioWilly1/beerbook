@@ -113,7 +113,11 @@ const StoryReplyBubble = ({ content, isMe, time, t }) => {
           padding: "3px 8px",
           fontSize: 10, color: "rgba(240,228,204,0.85)",
         }}>
-          📖 {t("chat.storyReplyLabel", { nombre: data.owner_nombre || "?" })}
+          {/* owner_username es lo que graban las respuestas nuevas
+              (StoryViewer.jsx); owner_nombre es el campo viejo — mensajes
+              ya enviados antes de este cambio lo siguen teniendo, se
+              queda como fallback para no romper el historial. */}
+          📖 {t("chat.storyReplyLabel", { nombre: data.owner_username || data.owner_nombre || "?" })}
         </div>
       </div>
       {/* Texto de respuesta */}
@@ -214,9 +218,9 @@ const ChatPage = () => {
       {/* Header */}
       <div style={headerStyle}>
         <button onClick={() => navigate("/chats")} style={backBtnStyle}><ArrowLeftIcon size={18} /></button>
-        {otherUser && <Avatar avatarUrl={otherUser.avatar_url} nombre={otherUser.nombre} size={36} />}
+        {otherUser && <Avatar avatarUrl={otherUser.avatar_url} nombre={otherUser.username} size={36} />}
         <span style={{ fontWeight: 700, fontSize: 15, color: "#f0e4cc", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {otherUser?.nombre || "…"}
+          {otherUser?.username || "…"}
         </span>
       </div>
 
@@ -237,8 +241,8 @@ const ChatPage = () => {
               <div key={msg.id} style={{ display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start", marginBottom: 4 }}>
                 {showAvatar && (
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, marginLeft: 4 }}>
-                    <Avatar avatarUrl={msg.sender?.avatar_url} nombre={msg.sender?.nombre || "?"} size={20} />
-                    <span style={{ fontSize: 11, color: "#9a7d62" }}>{msg.sender?.nombre}</span>
+                    <Avatar avatarUrl={msg.sender?.avatar_url} nombre={msg.sender?.username || "?"} size={20} />
+                    <span style={{ fontSize: 11, color: "#9a7d62" }}>{msg.sender?.username}</span>
                   </div>
                 )}
                 {renderMessage(msg)}

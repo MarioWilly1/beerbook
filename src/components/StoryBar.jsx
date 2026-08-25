@@ -49,7 +49,7 @@ const StoryBar = () => {
           <div style={{ position: "relative", flexShrink: 0 }}>
             <StoryRing
               avatarUrl={myGroup.avatarUrl}
-              nombre={myGroup.nombre}
+              nombre={myGroup.username}
               label={t("stories.myStory")}
               variant={myGroup.stories.length === 0 ? "add" : "own"}
               onClick={handleMyRingClick}
@@ -72,7 +72,7 @@ const StoryBar = () => {
           <StoryRing
             key={group.userId}
             avatarUrl={group.avatarUrl}
-            nombre={group.nombre}
+            nombre={group.username}
             variant={group.hasUnseen ? "unseen" : "seen"}
             onClick={() => setViewer({ groupIndex: i + 1, storyIndex: 0 })}
           />

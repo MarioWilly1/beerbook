@@ -20,10 +20,13 @@ const SuggestBeerModal = ({ onClose, t, prefillNombre = "" }) => {
     setSending(true);
     setError("");
     const { data: { user } } = await supabase.auth.getUser();
-    const { data: profile } = await supabase.from("profiles").select("nombre").eq("id", user.id).single();
+    const { data: profile } = await supabase.from("profiles").select("username").eq("id", user.id).single();
     await supabase.from("beer_suggestions").insert({
       user_id:            user.id,
-      sugerida_por_nombre: profile?.nombre || null,
+      // La columna sigue llamándose sugerida_por_nombre (no se migró el
+      // esquema de beer_suggestions) pero graba el apodo público, no el
+      // nombre real — mismo criterio que el resto de la app.
+      sugerida_por_nombre: profile?.username || null,
       nombre:             nombre.trim(),
       estilo:             estilo.trim() || null,
       pais:               pais.trim()   || null,

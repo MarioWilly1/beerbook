@@ -105,9 +105,9 @@ const LugarPage = () => {
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
                   {visitors.map((v) => (
                     <Link key={v.user_id} to={`/perfil/${v.user_id}`} style={visitorLinkStyle}>
-                      <Avatar avatarUrl={v.avatar_url} nombre={v.nombre} size={44} />
+                      <Avatar avatarUrl={v.avatar_url} nombre={v.username} size={44} />
                       <span style={{ fontSize: 11, color: "#9a7d62", marginTop: 5, textAlign: "center", maxWidth: 60, wordBreak: "break-word" }}>
-                        {v.nombre}
+                        {v.username}
                       </span>
                     </Link>
                   ))}

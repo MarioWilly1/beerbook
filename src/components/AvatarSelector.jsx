@@ -128,7 +128,7 @@ const AvatarSelector = ({ profile, session, onSave, onClose }) => {
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
           <Avatar
             avatarUrl={previewUrl || profile?.avatar_url}
-            nombre={profile?.nombre}
+            nombre={profile?.username}
             size={80}
           />
         </div>

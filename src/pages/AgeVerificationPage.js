@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../services/supabase";
 import DateInput from "../components/DateInput";
+import UsernameField from "../components/UsernameField";
 
 const isOver18 = (dateStr) => {
   if (!dateStr) return true;
@@ -84,6 +85,8 @@ const AgeVerificationPage = ({ session, onComplete }) => {
     "";
 
   const [nombre, setNombre] = useState(suggestedName);
+  const [username, setUsername] = useState("");
+  const [usernameValid, setUsernameValid] = useState(false);
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [error, setError] = useState("");
@@ -92,6 +95,11 @@ const AgeVerificationPage = ({ session, onComplete }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!usernameValid) {
+      setError("Elegí un nombre de usuario disponible para continuar.");
+      return;
+    }
 
     if (!ageConfirmed) {
       setError("Debés confirmar que eres mayor de 18 años para continuar.");
@@ -107,12 +115,18 @@ const AgeVerificationPage = ({ session, onComplete }) => {
 
     const { data, error } = await supabase
       .from("profiles")
-      .upsert({ id: session.user.id, nombre: nombre.trim() || "Usuario" })
-      .select("id, nombre")
+      .upsert({ id: session.user.id, nombre: nombre.trim() || "Usuario", username })
+      // Sin "nombre" — columna restringida a nivel de Postgres (ver
+      // 20260826000000_restrict_profiles_nombre_column.sql).
+      .select("id, username")
       .single();
 
     if (error) {
-      setError("No pudimos guardar tu perfil. Inténtalo de nuevo.");
+      setError(
+        error.code === "23505"
+          ? "Ese nombre de usuario se acaba de tomar. Elegí otro."
+          : "No pudimos guardar tu perfil. Inténtalo de nuevo."
+      );
       setLoading(false);
       return;
     }
@@ -139,7 +153,7 @@ const AgeVerificationPage = ({ session, onComplete }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <Field label="¿Cómo quieres que te llamemos?">
+          <Field label="¿Cómo quieres que te llamemos?" hint="Privado — no se muestra a otros usuarios">
             <input
               type="text"
               value={nombre}
@@ -148,6 +162,10 @@ const AgeVerificationPage = ({ session, onComplete }) => {
               className="auth-input"
               style={inputStyle}
             />
+          </Field>
+
+          <Field label="Nombre de usuario *" hint="Público — así te ven los demás">
+            <UsernameField value={username} onChange={setUsername} onValidityChange={setUsernameValid} />
           </Field>
 
           <Field
@@ -165,11 +183,11 @@ const AgeVerificationPage = ({ session, onComplete }) => {
 
           <button
             type="submit"
-            disabled={!ageConfirmed || loading}
+            disabled={!ageConfirmed || !usernameValid || loading}
             style={{
               ...primaryBtnStyle,
-              opacity: !ageConfirmed || loading ? 0.45 : 1,
-              cursor: !ageConfirmed || loading ? "not-allowed" : "pointer",
+              opacity: !ageConfirmed || !usernameValid || loading ? 0.45 : 1,
+              cursor: !ageConfirmed || !usernameValid || loading ? "not-allowed" : "pointer",
             }}
           >
             {loading ? "Entrando..." : "Entrar a RiBeer's"}

@@ -1,4 +1,26 @@
 {
+  "username": {
+    "label":            "Nombre de usuario",
+    "placeholder":      "tu_apodo",
+    "hint":              "3-15 caracteres · letras, números y guion bajo · sin espacios",
+    "checking":          "Verificando disponibilidad...",
+    "available":         "¡Disponible!",
+    "taken":              "Ese apodo ya está en uso.",
+    "suggestionsIntro":  "Probá con:",
+    "errors": {
+      "required":  "Elegí un nombre de usuario.",
+      "tooShort":  "Mínimo 3 caracteres.",
+      "tooLong":   "Máximo 15 caracteres.",
+      "badChars":  "Solo letras, números y guion bajo — sin espacios ni símbolos."
+    },
+    "saveError":  "No pudimos guardar el nombre de usuario. Inténtalo de nuevo.",
+    "gate": {
+      "title":     "Elegí tu nombre de usuario",
+      "subtitle":  "Es el apodo público que van a ver el resto de los usuarios — en el ranking, el feed, el chat y tu perfil. Tu nombre real queda privado.",
+      "saveBtn":   "Continuar",
+      "saving":    "Guardando..."
+    }
+  },
   "nav": {
     "catalog":      "La Barra",
     "notebook":     "Mi Barril",
@@ -57,8 +79,10 @@
     },
     "profile": {
       "changeAvatar":         "Cambiar avatar →",
-      "usernameLabel":        "Nombre de usuario",
-      "usernamePlaceholder":  "Tu nombre visible en la app",
+      "realNameLabel":        "Nombre real",
+      "realNameHint":         "Privado — no se muestra a otros usuarios",
+      "realNamePlaceholder":  "Tu nombre",
+      "usernameFieldHint":    "Público — así te ven los demás",
       "errorEmpty":           "El nombre no puede estar vacío.",
       "errorMinLength":       "Mínimo 2 caracteres.",
       "bioLabel":             "Biografía",

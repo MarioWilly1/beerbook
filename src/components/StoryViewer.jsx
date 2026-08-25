@@ -74,7 +74,10 @@ const StoryViewer = ({
       story_type: story.type,
       story_text: story.text_content || null,
       story_bg:   story.text_bg   || null,
-      owner_nombre: group.nombre,
+      // owner_username, no owner_nombre — respuestas nuevas ya no graban
+      // el nombre real en el JSON del mensaje (ver ChatPage.js, que sigue
+      // leyendo owner_nombre como fallback para mensajes viejos).
+      owner_username: group.username,
     });
     const { data: convId, error } = await supabase.rpc("get_or_create_direct_conversation", {
       other_user_id: group.userId,
@@ -119,7 +122,7 @@ const StoryViewer = ({
   const loadViewers = async (storyId) => {
     const { data } = await supabase
       .from("story_views")
-      .select("viewer_id, viewed_at, profiles(nombre, avatar_url)")
+      .select("viewer_id, viewed_at, profiles(username, avatar_url)")
       .eq("story_id", storyId)
       .order("viewed_at", { ascending: false });
     setViewers(data || []);
@@ -311,10 +314,10 @@ const StoryViewer = ({
 
       {/* Header: avatar + nombre + tiempo */}
       <div style={headerStyle}>
-        <Avatar avatarUrl={group.avatarUrl} nombre={group.nombre} size={36} />
+        <Avatar avatarUrl={group.avatarUrl} nombre={group.username} size={36} />
         <div style={{ flex: 1, overflow: "hidden" }}>
           <div style={{ fontWeight: 700, fontSize: 13, color: "#f0e4cc", lineHeight: 1.2 }}>
-            {group.nombre}
+            {group.username}
             {isMine && (
               <span style={{ fontWeight: 400, color: "#9a7d62", marginLeft: 6, fontSize: 11 }}>
                 {t("stories.ownLabel")}
@@ -393,8 +396,8 @@ const StoryViewer = ({
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {viewers.map((v) => (
                 <div key={v.viewer_id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Avatar avatarUrl={v.profiles?.avatar_url} nombre={v.profiles?.nombre} size={32} />
-                  <span style={{ fontSize: 13, color: "#f0e4cc" }}>{v.profiles?.nombre || "?"}</span>
+                  <Avatar avatarUrl={v.profiles?.avatar_url} nombre={v.profiles?.username} size={32} />
+                  <span style={{ fontSize: 13, color: "#f0e4cc" }}>{v.profiles?.username || "?"}</span>
                   <span style={{ fontSize: 11, color: "#5a4535", marginLeft: "auto" }}>
                     {timeAgo(v.viewed_at)}
                   </span>
@@ -445,7 +448,7 @@ const StoryViewer = ({
                 onFocus={() => { stopProgress(); setPaused(true); }}
                 onBlur={() => { if (!replySending) setPaused(false); }}
                 onKeyDown={(e) => { if (e.key === "Enter") handleReply(); }}
-                placeholder={t("chat.replyTo", { nombre: group.nombre })}
+                placeholder={t("chat.replyTo", { nombre: group.username })}
                 style={replyInputStyle}
               />
               <button

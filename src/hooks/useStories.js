@@ -42,7 +42,7 @@ export const useStories = () => {
         .order("created_at", { ascending: true }),
       supabase
         .from("profiles")
-        .select("nombre, avatar_url")
+        .select("username, avatar_url")
         .eq("id", uid)
         .single(),
     ]);
@@ -57,7 +57,7 @@ export const useStories = () => {
     if (uniqueUserIds.length > 0) {
       const { data: profiles, error: profilesErr } = await supabase
         .from("profiles")
-        .select("id, nombre, avatar_url")
+        .select("id, username, avatar_url")
         .in("id", uniqueUserIds);
       if (profilesErr) {
         console.error("[useStories] profiles query error:", profilesErr.message);
@@ -85,7 +85,7 @@ export const useStories = () => {
       if (!groups[row.user_id]) {
         groups[row.user_id] = {
           userId:    row.user_id,
-          nombre:    profile?.nombre     || "?",
+          username:  profile?.username   || "?",
           avatarUrl: profile?.avatar_url || null,
           stories:   [],
         };
@@ -101,7 +101,7 @@ export const useStories = () => {
     // 6. Grupo propio
     const mine = groups[uid] ?? {
       userId:    uid,
-      nombre:    myProfile?.nombre     || "Yo",
+      username:  myProfile?.username   || "Yo",
       avatarUrl: myProfile?.avatar_url || null,
       stories:   [],
       hasUnseen: false,

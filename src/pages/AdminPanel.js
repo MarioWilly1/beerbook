@@ -10,6 +10,20 @@ import {
   MegaphoneIcon,
 } from "@primer/octicons-react";
 
+// nombre (el nombre real) está restringido a nivel de Postgres — ni con
+// join embebido se puede leer directo, solo vía esta RPC (ver
+// 20260826000000_restrict_profiles_nombre_column.sql), que además
+// chequea is_admin() server-side (devuelve vacío para cualquiera que no
+// sea admin real, en vez de que la query completa falle con 403).
+async function fetchNombresMap(userIds) {
+  const uniqueIds = [...new Set(userIds.filter(Boolean))];
+  if (uniqueIds.length === 0) return {};
+  const { data } = await supabase.rpc("admin_get_nombres", { p_user_ids: uniqueIds });
+  const map = {};
+  (data || []).forEach((r) => { map[r.id] = r.nombre; });
+  return map;
+}
+
 function fmtDate(ts) {
   if (!ts) return "—";
   return new Date(ts).toLocaleDateString([], { day: "2-digit", month: "short", year: "numeric" });
@@ -318,9 +332,10 @@ const SupportPanel = ({ t }) => {
     setLoading(true);
     const { data } = await supabase
       .from("support_tickets")
-      .select("*, profiles(nombre, avatar_url)")
+      .select("*, profiles(avatar_url)")
       .order("created_at", { ascending: false });
-    setTickets(data || []);
+    const nombres = await fetchNombresMap((data || []).map((tk) => tk.user_id));
+    setTickets((data || []).map((tk) => ({ ...tk, profiles: { ...tk.profiles, nombre: nombres[tk.user_id] } })));
     setLoading(false);
   }, []);
 
@@ -426,12 +441,10 @@ const SuggestionsPanel = ({ t }) => {
     setLoading(true);
     const { data } = await supabase
       .from("beer_suggestions")
-      // profiles!beer_suggestions_user_id_fkey: beer_suggestions tiene dos FKs
-      // a profiles (user_id y reviewed_by) — sin especificar cuál, PostgREST
-      // devuelve PGRST201 (ambigüedad) y la query falla en silencio.
-      .select("*, profiles!beer_suggestions_user_id_fkey(nombre)")
+      .select("*")
       .order("created_at", { ascending: false });
-    setItems(data || []);
+    const nombres = await fetchNombresMap((data || []).map((s) => s.user_id));
+    setItems((data || []).map((s) => ({ ...s, profiles: { nombre: nombres[s.user_id] } })));
     setLoading(false);
   }, []);
 
@@ -542,11 +555,10 @@ const GlassSuggestionsPanel = ({ t }) => {
     setLoading(true);
     const { data } = await supabase
       .from("glass_suggestions")
-      // profiles!glass_suggestions_user_id_fkey: mismo motivo que en
-      // beer_suggestions — hay dos FKs a profiles (user_id y reviewed_by).
-      .select("*, profiles!glass_suggestions_user_id_fkey(nombre), beers_new(nombre)")
+      .select("*, beers_new(nombre)")
       .order("created_at", { ascending: false });
-    setItems(data || []);
+    const nombres = await fetchNombresMap((data || []).map((s) => s.user_id));
+    setItems((data || []).map((s) => ({ ...s, profiles: { nombre: nombres[s.user_id] } })));
     setLoading(false);
   }, []);
 
@@ -673,12 +685,16 @@ const ReportsPanel = ({ t }) => {
       .from("entry_flags")
       .select(`
         *,
-        reported_profile:profiles!entry_flags_user_id_fkey(nombre, avatar_url),
-        reporter_profile:profiles!entry_flags_reporter_id_fkey(nombre),
+        reported_profile:profiles!entry_flags_user_id_fkey(avatar_url),
         beers_new(nombre, foto_url)
       `)
       .order("created_at", { ascending: false });
-    setFlags(data || []);
+    const nombres = await fetchNombresMap((data || []).flatMap((f) => [f.user_id, f.reporter_id]));
+    setFlags((data || []).map((f) => ({
+      ...f,
+      reported_profile: { ...f.reported_profile, nombre: nombres[f.user_id] },
+      reporter_profile: { nombre: nombres[f.reporter_id] },
+    })));
     setLoading(false);
   }, []);
 

@@ -69,7 +69,7 @@ const ReportEntryModal = ({ target, onClose }) => {
               🚩 {t("feed.report.title")}
             </p>
             <p style={{ margin: "0 0 14px", fontSize: 13, color: "#9a7d62" }}>
-              {t("feed.report.subtitle", { nombre: target.nombre, beer: target.beer_nombre })}
+              {t("feed.report.subtitle", { nombre: target.username, beer: target.beer_nombre })}
             </p>
             <textarea
               value={reason}

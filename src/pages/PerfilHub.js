@@ -22,7 +22,7 @@ const PerfilHub = ({ session, profile }) => {
   const [showChallenges, setShowChallenges] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const username = profile?.nombre || session?.user?.email || "Usuario";
+  const username = profile?.username || session?.user?.email || "Usuario";
 
   const handleLogout = async () => {
     setShowLogoutConfirm(false);

@@ -20,6 +20,7 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AgeVerificationPage from "./pages/AgeVerificationPage";
+import ChooseUsernamePage from "./pages/ChooseUsernamePage";
 import LugarPage from "./pages/LugarPage";
 import Legal from "./pages/Legal";
 import NativeShell from "./components/NativeShell";
@@ -174,6 +175,20 @@ function App() {
   // Logged in but no profile → age verification
   if (!profile) {
     return <AgeVerificationPage session={session} onComplete={setProfile} />;
+  }
+
+  // Cuenta existente de antes de que profiles.username existiera (no
+  // pasa por acá ningún registro nuevo — RegisterPage/AgeVerificationPage
+  // ya piden el apodo al crear el perfil) → gate obligatorio, mismo
+  // criterio que el onboarding: bloquea el resto de la app hasta elegir
+  // un apodo público único.
+  if (!profile.username) {
+    return (
+      <ChooseUsernamePage
+        session={session}
+        onComplete={(data) => setProfile((p) => ({ ...p, username: data.username }))}
+      />
+    );
   }
 
   // Perfil recién creado (o migrado) que todavía no vio el onboarding →

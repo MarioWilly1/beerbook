@@ -6,6 +6,7 @@ import { useBadges } from "../hooks/useBadges";
 import { TIER_META } from "../utils/badges";
 import Avatar from "../components/Avatar";
 import AvatarSelector from "../components/AvatarSelector";
+import UsernameField from "../components/UsernameField";
 import HiddenStoriesManager from "../components/HiddenStoriesManager";
 import HiddenEntriesManager from "../components/HiddenEntriesManager";
 import HideEntryPicker from "../components/HideEntryPicker";
@@ -68,6 +69,13 @@ const Configuracion = ({ onProfileChange }) => {
 
   const [nombre, setNombre]     = useState("");
   const [nombreError, setNombreError] = useState("");
+  const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  // Arranca en true: el propio apodo ya guardado es válido por definición
+  // hasta que el usuario lo toque — evita que el botón Guardar quede
+  // deshabilitado por una fracción de segundo mientras UsernameField hace
+  // su primer chequeo contra la base al montar.
+  const [usernameValid, setUsernameValid] = useState(true);
   const [bio, setBio]           = useState("");
   const [pais, setPais]         = useState("");
   const [featuredBadges, setFeaturedBadges] = useState([]);
@@ -103,14 +111,24 @@ const Configuracion = ({ onProfileChange }) => {
       const { data: { session: s } } = await supabase.auth.getSession();
       if (!s) return;
       setSession(s);
-      const { data } = await supabase
-        .from("profiles")
-        .select("nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking")
-        .eq("id", s.user.id)
-        .single();
+      // nombre (el nombre real) está restringido a nivel de Postgres —
+      // ni siquiera el propio dueño puede pedirlo en un SELECT directo,
+      // solo vía esta función (ver
+      // 20260826000000_restrict_profiles_nombre_column.sql). Se pide
+      // aparte, en paralelo, y se mergea en el mismo objeto de siempre
+      // para no tocar el resto de este componente.
+      const [{ data }, { data: nombreReal }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("username, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking")
+          .eq("id", s.user.id)
+          .single(),
+        supabase.rpc("get_my_nombre"),
+      ]);
       if (data) {
-        setLocalProfile(data);
-        setNombre(data.nombre || "");
+        setLocalProfile({ ...data, nombre: nombreReal });
+        setNombre(nombreReal || "");
+        setUsername(data.username || "");
         setBio(data.bio || "");
         setPais(data.pais_origen || "");
         setFeaturedBadges(data.featured_badges || []);
@@ -132,17 +150,30 @@ const Configuracion = ({ onProfileChange }) => {
       setNombreError(t("settings.profile.errorMinLength"));
       return;
     }
+    if (!usernameValid) {
+      setUsernameError(t("username.errors.required"));
+      return;
+    }
     setNombreError("");
+    setUsernameError("");
     setSaving(true);
-    await supabase.from("profiles").update({
+    const { error } = await supabase.from("profiles").update({
       nombre: trimmedNombre,
+      username,
       bio: bio.trim() || null,
       pais_origen: pais.trim() || null,
       featured_badges: featuredBadges,
     }).eq("id", session.user.id);
+
+    if (error) {
+      setSaving(false);
+      setUsernameError(error.code === "23505" ? t("username.taken") : t("username.saveError"));
+      return;
+    }
+
     setNombre(trimmedNombre);
-    setLocalProfile((p) => ({ ...p, nombre: trimmedNombre }));
-    if (onProfileChange) onProfileChange({ nombre: trimmedNombre });
+    setLocalProfile((p) => ({ ...p, nombre: trimmedNombre, username }));
+    if (onProfileChange) onProfileChange({ nombre: trimmedNombre, username });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -220,13 +251,13 @@ const Configuracion = ({ onProfileChange }) => {
           {/* Avatar row */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28, padding: 16, background: "#1c1409", borderRadius: 12, border: "1px solid #2e2215" }}>
             <div style={{ position: "relative", cursor: "pointer" }} onClick={() => setShowAvatarSelector(true)}>
-              <Avatar avatarUrl={localProfile?.avatar_url} nombre={localProfile?.nombre} size={64} />
+              <Avatar avatarUrl={localProfile?.avatar_url} nombre={localProfile?.username || localProfile?.nombre} size={64} />
               <span style={{ position: "absolute", bottom: 0, right: 0, background: "#d4af37", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
                 ✏️
               </span>
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: "#f0e4cc" }}>{localProfile?.nombre || "—"}</div>
+              <div style={{ fontWeight: 700, fontSize: 16, color: "#f0e4cc" }}>{localProfile?.username ? `@${localProfile.username}` : "—"}</div>
               <button
                 onClick={() => setShowAvatarSelector(true)}
                 style={{ fontSize: 12, color: "#d4af37", background: "none", border: "none", cursor: "pointer", padding: 0, marginTop: 4 }}
@@ -236,9 +267,12 @@ const Configuracion = ({ onProfileChange }) => {
             </div>
           </div>
 
-          {/* Nombre */}
+          {/* Nombre real — privado */}
           <div style={{ marginBottom: 20 }}>
-            <label style={labelStyle}>{t("settings.profile.usernameLabel")}</label>
+            <label style={labelStyle}>
+              {t("settings.profile.realNameLabel")}
+              <span style={hintInlineStyle}>{t("settings.profile.realNameHint")}</span>
+            </label>
             <input
               type="text"
               value={nombre}
@@ -246,7 +280,7 @@ const Configuracion = ({ onProfileChange }) => {
                 if (e.target.value.length <= 30) setNombre(e.target.value);
                 if (nombreError) setNombreError("");
               }}
-              placeholder={t("settings.profile.usernamePlaceholder")}
+              placeholder={t("settings.profile.realNamePlaceholder")}
               style={{ ...inputStyle, borderColor: nombreError ? "#8b2020" : "#2e2215" }}
               autoCapitalize="words"
               spellCheck="false"
@@ -258,6 +292,22 @@ const Configuracion = ({ onProfileChange }) => {
                 {nombre.length}/30
               </span>
             </div>
+          </div>
+
+          {/* Apodo público */}
+          <div style={{ marginBottom: 20 }}>
+            <label style={labelStyle}>
+              {t("username.label")}
+              <span style={hintInlineStyle}>{t("settings.profile.usernameFieldHint")}</span>
+            </label>
+            <UsernameField
+              value={username}
+              onChange={(v) => { setUsername(v); if (usernameError) setUsernameError(""); }}
+              currentUserId={session?.user?.id}
+              onValidityChange={setUsernameValid}
+              dark
+            />
+            {usernameError && <p style={{ fontSize: 11, color: "#8b2020", margin: "3px 0 0" }}>{usernameError}</p>}
           </div>
 
           {/* Bio */}
@@ -539,6 +589,10 @@ const Configuracion = ({ onProfileChange }) => {
 const labelStyle = {
   display: "block", fontSize: 12, fontWeight: 700, color: "#9a7d62",
   textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 6,
+};
+const hintInlineStyle = {
+  fontWeight: 400, textTransform: "none", letterSpacing: 0,
+  color: "#5a4535", marginLeft: 8, fontSize: 11,
 };
 const inputStyle = {
   width: "100%", padding: "10px 12px", border: "1px solid #2e2215",

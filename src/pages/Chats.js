@@ -71,11 +71,11 @@ const ConvRow = ({ conv, onClick, t }) => {
 
   return (
     <div onClick={onClick} style={rowStyle}>
-      <Avatar avatarUrl={conv.other_avatar_url} nombre={conv.other_nombre || "?"} size={44} />
+      <Avatar avatarUrl={conv.other_avatar_url} nombre={conv.other_username || "?"} size={44} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 }}>
           <span style={{ fontWeight: hasUnread ? 700 : 600, color: "#f0e4cc", fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {conv.other_nombre || t("chat.unknownUser")}
+            {conv.other_username || t("chat.unknownUser")}
           </span>
           <span style={{ fontSize: 11, color: "#5a4535", flexShrink: 0, marginLeft: 8 }}>
             {formatTime(conv.last_message_at)}

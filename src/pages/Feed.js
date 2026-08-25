@@ -44,10 +44,10 @@ const FeedEntry = ({ entry, reactionData, currentUserId, onToggle, onReport }) =
       <div style={cardStyle}>
         {/* Header: avatar + action + timestamp */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-          <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={40} />
+          <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.username} size={40} />
           <div style={{ flex: 1 }}>
             <div>
-              <span style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc" }}>{entry.nombre}</span>
+              <span style={{ fontWeight: 700, fontSize: 14, color: "#f0e4cc" }}>{entry.username}</span>
               {" "}
               <PrestigeBadge prestige={entry.prestige} size="sm" />
               {" "}

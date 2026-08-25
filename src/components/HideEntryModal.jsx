@@ -31,7 +31,7 @@ const HideEntryModal = ({ userId, beerId, beerNombre, onClose, onSaved }) => {
   const filteredFriends = useMemo(() => {
     const norm = search.trim().toLowerCase();
     if (!norm) return friends;
-    return friends.filter((f) => (f.nombre || "").toLowerCase().includes(norm));
+    return friends.filter((f) => (f.username || "").toLowerCase().includes(norm));
   }, [friends, search]);
 
   const toggle = (friendId) => {
@@ -140,8 +140,8 @@ const HideEntryModal = ({ userId, beerId, beerNombre, onClose, onSaved }) => {
                       onChange={() => toggle(f.id)}
                       style={{ width: 16, height: 16, cursor: "pointer", flexShrink: 0 }}
                     />
-                    <Avatar avatarUrl={f.avatar_url} nombre={f.nombre} size={28} />
-                    <span style={{ fontSize: 13, color: "#f0e4cc", flex: 1 }}>{f.nombre}</span>
+                    <Avatar avatarUrl={f.avatar_url} nombre={f.username} size={28} />
+                    <span style={{ fontSize: 13, color: "#f0e4cc", flex: 1 }}>{f.username}</span>
                   </label>
                 ))
               )}

@@ -91,8 +91,8 @@ const Amigos = () => {
           </h3>
           {receivedRequests.map((req) => (
             <div key={req.id} style={rowStyle}>
-              <Avatar avatarUrl={req.avatar_url} nombre={req.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{req.nombre}</span>
+              <Avatar avatarUrl={req.avatar_url} nombre={req.username} size={36} />
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{req.username}</span>
               <button onClick={() => handleAccept(req.id)} style={btnGreen}>{t("friends.accept")}</button>
               <button onClick={() => handleReject(req.id)} style={btnGray}>{t("friends.reject")}</button>
             </div>
@@ -124,8 +124,8 @@ const Amigos = () => {
           const status = getUserStatus(user.id);
           return (
             <div key={user.id} style={rowStyle}>
-              <Avatar avatarUrl={user.avatar_url} nombre={user.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{user.nombre}</span>
+              <Avatar avatarUrl={user.avatar_url} nombre={user.username} size={36} />
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{user.username}</span>
               {status === "friend"   && <span style={chipGreen}>✓ {t("friends.statusFriends")}</span>}
               {status === "sent"     && <span style={chipGray}>{t("friends.statusSent")}</span>}
               {status === "received" && <button onClick={() => handleAccept(user.id)} style={btnGreen}>{t("friends.accept")}</button>}
@@ -143,8 +143,8 @@ const Amigos = () => {
         ) : (
           friends.map((f) => (
             <div key={f.id} style={rowStyle}>
-              <Avatar avatarUrl={f.avatar_url} nombre={f.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{f.nombre}</span>
+              <Avatar avatarUrl={f.avatar_url} nombre={f.username} size={36} />
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{f.username}</span>
               <button onClick={() => openDM(f.id)} style={{ ...btnMsg, display: "flex" }} title={t("friends.sendMessage")}><CommentIcon size={14} /></button>
               <button onClick={() => handleRemove(f.id)} style={btnDanger}>{t("friends.removeBtn")}</button>
             </div>
@@ -158,8 +158,8 @@ const Amigos = () => {
           <h3 style={sectionTitle}>{t("friends.sentRequests", { count: sentRequests.length })}</h3>
           {sentRequests.map((r) => (
             <div key={r.id} style={rowStyle}>
-              <Avatar avatarUrl={r.avatar_url} nombre={r.nombre} size={36} />
-              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{r.nombre}</span>
+              <Avatar avatarUrl={r.avatar_url} nombre={r.username} size={36} />
+              <span style={{ flex: 1, fontWeight: 600, color: "#f0e4cc" }}>{r.username}</span>
               <span style={chipGray}>{t("friends.pending")}</span>
             </div>
           ))}

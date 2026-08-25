@@ -31,7 +31,7 @@ const TiendaPage = () => {
     const [itemsRes, ownedRes, profileRes, achRes] = await Promise.all([
       supabase.from("cosmetic_items").select("*").eq("active", true),
       supabase.from("user_cosmetics").select("item_slug").eq("user_id", uid),
-      supabase.from("profiles").select("chapas, prestige, equipped_tag_slug, equipped_frame_slug, avatar_url, nombre").eq("id", uid).single(),
+      supabase.from("profiles").select("chapas, prestige, equipped_tag_slug, equipped_frame_slug, avatar_url, username").eq("id", uid).single(),
       supabase.from("user_achievements").select("slug").eq("user_id", uid),
     ]);
 
@@ -148,9 +148,9 @@ const ItemCard = ({
       boxShadow: equipped ? "0 0 0 1px rgba(212,175,55,0.3)" : "none",
     }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "6px 0" }}>
-        <AvatarFrame frameSlug={previewFrameSlug} avatarUrl={profile?.avatar_url} nombre={profile?.nombre} size={56} />
+        <AvatarFrame frameSlug={previewFrameSlug} avatarUrl={profile?.avatar_url} nombre={profile?.username} size={56} />
         <p style={{ margin: 0, fontWeight: 700, fontSize: 13, color: "#f0e4cc", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {profile?.nombre}
+          {profile?.username}
         </p>
         {previewTagSlug && <EquippedTag slug={previewTagSlug} size="sm" />}
       </div>

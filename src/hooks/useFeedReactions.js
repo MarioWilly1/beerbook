@@ -18,7 +18,7 @@ export const useFeedReactions = (entries) => {
 
     supabase
       .from("feed_reactions")
-      .select("activity_user_id, activity_beer_id, reaction, user_id, profiles(nombre)")
+      .select("activity_user_id, activity_beer_id, reaction, user_id, profiles(username)")
       .in("activity_user_id", uniqueUserIds)
       .then(({ data }) => {
         const map = {};
@@ -28,7 +28,7 @@ export const useFeedReactions = (entries) => {
           map[key].counts[row.reaction] = (map[key].counts[row.reaction] || 0) + 1;
           if (row.user_id === currentUserId) map[key].mine = row.reaction;
           if (!map[key].names[row.reaction]) map[key].names[row.reaction] = [];
-          map[key].names[row.reaction].push(row.profiles?.nombre || "?");
+          map[key].names[row.reaction].push(row.profiles?.username || "?");
         }
         setReactionsMap(map);
       });

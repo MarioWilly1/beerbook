@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import DateInput from "../components/DateInput";
+import UsernameField from "../components/UsernameField";
 import { EyeIcon, EyeClosedIcon } from "@primer/octicons-react";
 
 const isOver18 = (dateStr) => {
@@ -58,6 +59,8 @@ const AgeCheckboxLabel = ({ ageConfirmed, onChange }) => {
 
 const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) => {
   const [nombre, setNombre] = useState("");
+  const [username, setUsername] = useState("");
+  const [usernameValid, setUsernameValid] = useState(false);
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -70,6 +73,11 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!usernameValid) {
+      setError("Elegí un nombre de usuario disponible para continuar.");
+      return;
+    }
 
     if (!ageConfirmed) {
       setError("Debés confirmar que eres mayor de 18 años para crear una cuenta.");
@@ -97,11 +105,28 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
 
     if (data.session) {
       // Email confirmation disabled — user is logged in immediately
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .upsert({ id: data.session.user.id, nombre: nombre.trim() || "Usuario" })
-        .select("id, nombre")
+        .upsert({ id: data.session.user.id, nombre: nombre.trim() || "Usuario", username })
+        // Sin "nombre" en el .select() — la columna está restringida a
+        // nivel de Postgres (ver 20260826000000_restrict_profiles_nombre_column.sql),
+        // pedirla acá haría fallar el upsert entero con 403.
+        .select("id, username")
         .single();
+
+      // 23505 = choque de unicidad — alguien tomó el mismo apodo justo
+      // ahora, en la ventana entre el chequeo en vivo y este guardado.
+      // La sesión ya existe (auth.signUp ya corrió), así que se puede
+      // reintentar el upsert con otro apodo sin perder nada.
+      if (profileError) {
+        setError(
+          profileError.code === "23505"
+            ? "Ese nombre de usuario se acaba de tomar. Elegí otro."
+            : "No pudimos crear tu perfil. Inténtalo de nuevo."
+        );
+        setLoading(false);
+        return;
+      }
 
       if (profileData) onProfileCreated(profileData);
     } else {
@@ -153,7 +178,7 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
         </div>
 
         <form onSubmit={handleSubmit}>
-          <Field label="Nombre *">
+          <Field label="Nombre *" hint="Privado — no se muestra a otros usuarios">
             <input
               type="text"
               value={nombre}
@@ -163,6 +188,10 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
               className="auth-input"
               style={inputStyle}
             />
+          </Field>
+
+          <Field label="Nombre de usuario *" hint="Público — así te ven los demás">
+            <UsernameField value={username} onChange={setUsername} onValidityChange={setUsernameValid} />
           </Field>
 
           <Field label="Email *">
@@ -210,11 +239,11 @@ const RegisterPage = ({ initialEmail = "", onSwitchToLogin, onProfileCreated }) 
 
           <button
             type="submit"
-            disabled={!ageConfirmed || loading}
+            disabled={!ageConfirmed || !usernameValid || loading}
             style={{
               ...primaryBtnStyle,
-              opacity: !ageConfirmed || loading ? 0.45 : 1,
-              cursor: !ageConfirmed || loading ? "not-allowed" : "pointer",
+              opacity: !ageConfirmed || !usernameValid || loading ? 0.45 : 1,
+              cursor: !ageConfirmed || !usernameValid || loading ? "not-allowed" : "pointer",
             }}
           >
             {loading ? "Creando cuenta..." : "Crear cuenta"}

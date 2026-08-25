@@ -1,4 +1,26 @@
 {
+  "username": {
+    "label":            "Benutzername",
+    "placeholder":      "dein_name",
+    "hint":              "3-15 Zeichen · Buchstaben, Zahlen und Unterstrich · keine Leerzeichen",
+    "checking":          "Verfügbarkeit wird geprüft...",
+    "available":         "Verfügbar!",
+    "taken":              "Dieser Benutzername ist bereits vergeben.",
+    "suggestionsIntro":  "Versuch es mit:",
+    "errors": {
+      "required":  "Wähle einen Benutzernamen.",
+      "tooShort":  "Mindestens 3 Zeichen.",
+      "tooLong":   "Höchstens 15 Zeichen.",
+      "badChars":  "Nur Buchstaben, Zahlen und Unterstrich — keine Leerzeichen oder Symbole."
+    },
+    "saveError":  "Der Benutzername konnte nicht gespeichert werden. Bitte versuch es erneut.",
+    "gate": {
+      "title":     "Wähle deinen Benutzernamen",
+      "subtitle":  "Das ist der öffentliche Name, den andere Nutzer sehen — in der Rangliste, im Feed, im Chat und in deinem Profil. Dein echter Name bleibt privat.",
+      "saveBtn":   "Weiter",
+      "saving":    "Wird gespeichert..."
+    }
+  },
   "nav": {
     "catalog":      "Die Theke",
     "notebook":     "Mein Fass",
@@ -57,8 +79,10 @@
     },
     "profile": {
       "changeAvatar":         "Avatar ändern →",
-      "usernameLabel":        "Benutzername",
-      "usernamePlaceholder":  "Dein sichtbarer Name in der App",
+      "realNameLabel":        "Echter Name",
+      "realNameHint":         "Privat — wird anderen Nutzern nicht angezeigt",
+      "realNamePlaceholder":  "Dein Name",
+      "usernameFieldHint":    "Öffentlich — so sehen dich andere",
       "errorEmpty":           "Der Name darf nicht leer sein.",
       "errorMinLength":       "Mindestens 2 Zeichen.",
       "bioLabel":             "Biografie",

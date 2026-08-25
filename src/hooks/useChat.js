@@ -41,7 +41,7 @@ export const useChat = (conversationId) => {
     if (participantIds.length > 0) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, nombre, avatar_url")
+        .select("id, username, avatar_url")
         .in("id", participantIds);
       (profiles || []).forEach((p) => { profilesRef.current[p.id] = p; });
       const other = (profiles || []).find((p) => p.id !== me);
@@ -72,7 +72,7 @@ export const useChat = (conversationId) => {
         if (!sender) {
           const { data } = await supabase
             .from("profiles")
-            .select("id, nombre, avatar_url")
+            .select("id, username, avatar_url")
             .eq("id", msg.sender_id)
             .single();
           if (data) { profilesRef.current[data.id] = data; sender = data; }

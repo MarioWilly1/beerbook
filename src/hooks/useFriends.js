@@ -28,13 +28,13 @@ export const useFriends = () => {
     let profileMap = {};
     if (allIds.length > 0) {
       const { data: profiles } = await supabase
-        .from("profiles").select("id, nombre, avatar_url").in("id", allIds);
+        .from("profiles").select("id, username, avatar_url").in("id", allIds);
       (profiles || []).forEach((p) => { profileMap[p.id] = p; });
     }
 
     const resolve = (id) => ({
       id,
-      nombre:     profileMap[id]?.nombre     || "Usuario",
+      username:   profileMap[id]?.username   || "usuario",
       avatar_url: profileMap[id]?.avatar_url || null,
     });
 

@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
 
-const PROFILE_SELECT = "id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking, ranking_consent_shown, current_streak, longest_streak, preferred_language, prestige, prestige_xp_baseline, onboarding_visto, equipped_tag_slug, equipped_frame_slug";
+// Sin "nombre" — desde que existe el apodo público (username), nombre
+// (el nombre real) ya no se lee en ningún flujo que use este hook, y la
+// columna está restringida a nivel de Postgres (solo el propio dueño
+// puede leerla, vía la función get_my_nombre(), no con un SELECT
+// directo — ver 20260826000000_restrict_profiles_nombre_column.sql).
+// Pedirla acá directo haría fallar la query entera con 403.
+const PROFILE_SELECT = "id, username, avatar_url, bio, pais_origen, featured_badges, perfil_publico, aparecer_en_ranking, ranking_consent_shown, current_streak, longest_streak, preferred_language, prestige, prestige_xp_baseline, onboarding_visto, equipped_tag_slug, equipped_frame_slug";
 
 export const useProfile = (session) => {
   const [profile, setProfile] = useState(null);

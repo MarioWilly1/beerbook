@@ -55,7 +55,7 @@ const UserChip = ({ ub }) => (
       <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#2a1e0f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👤</div>
     )}
     <div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e4cc" }}>{ub.nombre || "—"}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "#f0e4cc" }}>{ub.username || "—"}</div>
       {ub.rating > 0 && (
         <div style={{ fontSize: 11, color: "#d4af37" }}>{"★".repeat(Math.round(ub.rating))}{"☆".repeat(5 - Math.round(ub.rating))}</div>
       )}

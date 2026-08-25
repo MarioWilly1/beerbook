@@ -33,7 +33,7 @@ const HiddenStoriesManager = ({ currentUserId }) => {
     const [{ data: profiles }, { data: hidden }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("id, nombre, avatar_url")
+        .select("id, username, avatar_url")
         .in("id", friendIds),
       supabase
         .from("story_hidden_from")
@@ -99,9 +99,9 @@ const HiddenStoriesManager = ({ currentUserId }) => {
         const isHidden = hiddenSet.has(friend.id);
         return (
           <div key={friend.id} style={rowStyle}>
-            <Avatar avatarUrl={friend.avatar_url} nombre={friend.nombre} size={36} />
+            <Avatar avatarUrl={friend.avatar_url} nombre={friend.username} size={36} />
             <span style={{ flex: 1, fontSize: 14, color: "#f0e4cc", marginLeft: 10 }}>
-              {friend.nombre}
+              {friend.username}
             </span>
             <button
               onClick={() => toggleHidden(friend.id)}

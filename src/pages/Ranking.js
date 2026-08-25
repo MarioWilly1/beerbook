@@ -135,11 +135,11 @@ const RankingRowXP = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onRepo
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
-      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
+      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.username} size={36} />
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           <PrestigeBadge prestige={entry.prestige} size="icon" cupSize={24} />
-          {entry.nombre || "Usuario"}
+          {entry.username || "Usuario"}
           {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
         <div style={{ fontSize: 12, color: isSelf ? "#3a2a10" : "#9a7d62" }}>Nivel {level}</div>
@@ -167,11 +167,11 @@ const RankingRowBeers = ({ entry, isSelf, onClick, selfLabel, verifiedLabel, onR
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
-      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
+      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.username} size={36} />
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           <PrestigeBadge prestige={entry.prestige} size="icon" cupSize={24} />
-          {entry.nombre || "Usuario"}
+          {entry.username || "Usuario"}
           {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
         {entry.equipped_tag_slug && (
@@ -197,11 +197,11 @@ const RankingRowLitros = ({ entry, isSelf, onClick, selfLabel, onReport }) => {
       <span style={{ fontSize: pos <= 3 ? 22 : 14, minWidth: 30, textAlign: "center", color: "#9a7d62" }}>
         {pos <= 3 ? MEDAL[pos - 1] : `#${pos}`}
       </span>
-      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.nombre} size={36} />
+      <AvatarFrame frameSlug={entry.equipped_frame_slug} avatarUrl={entry.avatar_url} nombre={entry.username} size={36} />
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 15, color: isSelf ? "#0d0a06" : "#f0e4cc", display: "flex", alignItems: "center", gap: 6 }}>
           <PrestigeBadge prestige={entry.prestige} size="icon" cupSize={24} />
-          {entry.nombre || "Usuario"}
+          {entry.username || "Usuario"}
           {isSelf && <span style={{ fontSize: 11, color: "#8b6b2e" }}>{selfLabel}</span>}
         </div>
         {entry.equipped_tag_slug && (
@@ -424,7 +424,7 @@ const Ranking = () => {
                 onClick={() => navigate(`/perfil/${entry.id}`)}
                 selfLabel={selfLabel}
                 verifiedLabel={verifiedLabel}
-                onReport={currentUserId ? () => setReportUser({ id: entry.id, nombre: entry.nombre }) : undefined}
+                onReport={currentUserId ? () => setReportUser({ id: entry.id, username: entry.username }) : undefined}
               />
             ))}
 

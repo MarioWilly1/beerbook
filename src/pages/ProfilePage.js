@@ -53,7 +53,11 @@ const ProfilePage = () => {
 
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, nombre, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline, equipped_tag_slug, equipped_frame_slug")
+        // Sin "nombre" — columna restringida a nivel de Postgres, nadie
+        // puede leer el nombre real de OTRO usuario (ver
+        // 20260826000000_restrict_profiles_nombre_column.sql). Esta
+        // pantalla ya solo usa username, que sí es público.
+        .select("id, username, avatar_url, bio, pais_origen, featured_badges, perfil_publico, current_streak, longest_streak, last_activity_date, prestige, prestige_xp_baseline, equipped_tag_slug, equipped_frame_slug")
         .eq("id", userId)
         .single();
 
@@ -200,10 +204,10 @@ const ProfilePage = () => {
       {/* Header */}
       <div style={{ marginBottom: 20, padding: 24, background: "#1c1409", borderRadius: 16, border: "1px solid #2e2215" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <AvatarFrame frameSlug={profileData.equipped_frame_slug} avatarUrl={profileData.avatar_url} nombre={profileData.nombre} size={72} />
+          <AvatarFrame frameSlug={profileData.equipped_frame_slug} avatarUrl={profileData.avatar_url} nombre={profileData.username} size={72} />
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-              <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{profileData.nombre}</h2>
+              <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{profileData.username}</h2>
               {canSeeStats && friendsCount != null && (
                 <span
                   onClick={isSelf ? () => navigate("/amigos") : undefined}
@@ -360,7 +364,7 @@ const ProfilePage = () => {
                         onClick={() => setReportTarget({
                           user_id: userId,
                           beer_id: entry.beer_id,
-                          nombre: profileData.nombre,
+                          username: profileData.username,
                           beer_nombre: entry.beers_new?.nombre || "",
                         })}
                         title={t("feed.reportBtn")}
@@ -408,7 +412,7 @@ const ProfilePage = () => {
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
           <p style={{ fontWeight: 700, color: "#f0e4cc", margin: "0 0 8px" }}>{t("profile.privateTitle")}</p>
           <p style={{ color: "#9a7d62", fontSize: 13, margin: "0 0 20px", lineHeight: 1.5 }}>
-            {t("profile.privateBody", { nombre: profileData.nombre })}
+            {t("profile.privateBody", { nombre: profileData.username })}
           </p>
           {currentUserId && !isSelf && (
             hasSentReq ? (
